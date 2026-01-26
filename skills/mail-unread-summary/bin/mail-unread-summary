@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/bin:/bin"
+export HOME="${HOME:-$PWD}"
+export USER="${USER:-$(id -un)}"
+export LOGNAME="${LOGNAME:-$USER}"
+
+# Hard fallback for stripped envs
+export GOG_ACCOUNT="${GOG_ACCOUNT:-petarceklic@gmail.com}"
+
+GOG="$(command -v gog || true)"
+PY="$(command -v python3 || true)"
+
+if [[ -z "$GOG" ]]; then
+  echo "ERROR: gog not found on PATH ($PATH)" >&2
+  exit 1
+fi
+if [[ -z "$PY" ]]; then
+  echo "ERROR: python3 not found on PATH ($PATH)" >&2
+  exit 1
+fi
+
+N="${1:-3}"
+if ! [[ "$N" =~ ^[0-9]+$ ]]; then
+  echo "Usage: mail-unread-summary [N]" >&2
+  exit 2
+fi
+
+TMP="$(mktemp)"
+trap 'rm -f "$TMP"' EXIT
+
+# Write gog output to a file so python never sees an empty pipe by accident
+"$GOG" --account "$GOG_ACCOUNT" gmail search "is:unread" --max "$N" --json >"$TMP" 2>/dev/null || true
+
+# Validate we actually got JSON
+if [[ ! -s "$TMP" ]]; then
+  echo "ERROR: gog returned empty output." >&2
+  echo "Try: gog --account \"$GOG_ACCOUNT\" gmail search \"is:unread\" --max 3 --json" >&2
+  exit 3
+fi
+
+FIRST="$(head -c 1 "$TMP" || true)"
+if [[ "$FIRST" != "{" ]]; then
+  echo "ERROR: gog did not return JSON. Output was:" >&2
+  sed -n '1,50p' "$TMP" >&2
+  exit 4
+fi
+
+"$PY" - "$TMP" <<'PY'
+import sys, json
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+threads = data.get("threads") or []
+print(f"Unread summary (showing {len(threads)} thread(s))\n")
+
+urgent = 0
+urgent_words = ["urgent","asap","action required","payment","invoice","failed","paused"]
+
+for t in threads:
+    date = t.get("date","")
+    frm  = t.get("from","")
+    subj = t.get("subject","")
+    labels = t.get("labels") or []
+    is_urgent = ("IMPORTANT" in labels) or any(w in subj.lower() for w in urgent_words)
+    tag = "[URGENT]" if is_urgent else "[FYI]"
+    if is_urgent:
+        urgent += 1
+    label_str = ",".join(labels) if labels else ""
+    print(f"- {tag} {date} | {frm} | {subj}" + (f" ({label_str})" if label_str else ""))
+
+print(f"\nLikely urgent: {urgent} item(s)." if urgent else "\nNothing looks obviously urgent.")
+PY

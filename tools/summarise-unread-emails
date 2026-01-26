@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+# default to 10 if no number provided
+N="${1:-10}"
+
+exec gmail-unread-summary "$N"

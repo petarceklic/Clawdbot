@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Minimal env safety for gog + macOS keychain
+export USER="${USER:-$(id -un)}"
+export LOGNAME="${LOGNAME:-$USER}"
+
+# Locate gog
+GOG=""
+for p in /opt/homebrew/bin/gog /usr/local/bin/gog; do
+  if [[ -x "$p" ]]; then GOG="$p"; break; fi
+done
+if [[ -z "$GOG" ]] && command -v gog >/dev/null 2>&1; then
+  GOG="$(command -v gog)"
+fi
+if [[ -z "$GOG" ]]; then
+  echo "ERROR: gog not found. Add /opt/homebrew/bin to PATH." >&2
+  exit 10
+fi
+
+PY="/usr/bin/python3"
+N="${1:-10}"
+
+# Resolve account
+ACCOUNT="${GOG_ACCOUNT:-}"
+if [[ -z "$ACCOUNT" ]]; then
+  ACCOUNT="$("$GOG" auth list --plain 2>/dev/null | head -n 1 | awk '{print $1}')"
+fi
+if [[ -z "$ACCOUNT" ]]; then
+  echo "ERROR: No authorised account. Set GOG_ACCOUNT or run: gog auth list" >&2
+  exit 11
+fi
+
+TMP="$(mktemp)"
+cleanup() { rm -f "$TMP"; }
+trap cleanup EXIT
+
+# Write JSON to file (avoid stdin parsing issues)
+"$GOG" --account "$ACCOUNT" gmail search "is:unread" --max "$N" --json >"$TMP"
+
+# Parse from file path, not stdin
+"$PY" -c '
+import json, sys
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+threads = data.get("threads", []) or []
+print(f"Unread summary (showing {len(threads)} threads)\n")
+urgent_words = ["urgent","asap","action required","invoice","payment","failed","paused","out for delivery","delivery"]
+urgent = 0
+
+for t in threads:
+    labels = t.get("labels", []) or []
+    subject = t.get("subject","")
+    sender = t.get("from","")
+    date = t.get("date","")
+    subj_l = subject.lower()
+
+    is_urgent = ("IMPORTANT" in labels) or any(w in subj_l for w in urgent_words)
+    tag = "[URGENT]" if is_urgent else "[FYI]"
+    urgent += int(is_urgent)
+
+    print(f"- {tag} {date} | {sender} | {subject}")
+
+print(f"\\nLikely urgent: {urgent} item(s)." if urgent else "\\nNothing looks obviously urgent.")
+' "$TMP"

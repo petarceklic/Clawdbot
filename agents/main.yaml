@@ -1,0 +1,8 @@
+env:
+  PATH: "/opt/homebrew/bin:/usr/bin:/bin"
+  GOG_ACCOUNT: "petarceklic@gmail.com"
+
+tools:
+  allow:
+    - gmail-unread-summary
+    - summarise-unread-emails

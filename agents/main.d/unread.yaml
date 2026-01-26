@@ -1,0 +1,13 @@
+intent: unread_email_summary
+
+match:
+  - summarise unread emails
+  - summarize unread emails
+  - unread emails
+  - gmail unread
+  - check unread emails
+
+execute:
+  command: gmail-unread-summary
+  args:
+    - "{{ number | default(10) }}"

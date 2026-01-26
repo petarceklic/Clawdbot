@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "skills": {
+    "youtube-watcher": {
+      "version": "1.0.0",
+      "installedAt": 1769347092664
+    },
+    "gog": {
+      "version": "1.0.0",
+      "installedAt": 1769379298486
+    }
+  }
+}
