@@ -1,6 +1,7 @@
 """
 Possum Crypto -- Trade Executor
 Dry-run simulates fills from ticker bid/ask; live places market orders via Kraken.
+Manages positions table for ongoing P&L tracking.
 """
 
 import logging
@@ -75,6 +76,7 @@ class Trader:
 
         # Log to database
         self._log_trade(result, signal)
+        self._open_position(result, signal)
 
         return result
 
@@ -122,11 +124,183 @@ class Trader:
             )
 
             self._log_trade(result, signal)
+            self._open_position(result, signal)
             return result
 
         except Exception as e:
             logger.error("Live order failed for %s %s: %s", signal.side, signal.symbol, e)
             return {"action": "error", "reason": str(e)}
+
+    def update_positions(self, prices: dict[str, float]):
+        """
+        Update current prices and unrealised P&L on all open positions.
+        Called at the start of each cycle.
+
+        prices: dict mapping symbol -> current price (e.g. {"BTC/AUD": 94000.0})
+        """
+        from database.db import get_db
+        db = get_db()
+
+        open_positions = db.fetch_all(
+            "SELECT id, symbol, side, entry_price, quantity FROM positions WHERE status = 'open'"
+        )
+
+        for pos in open_positions:
+            symbol = pos["symbol"]
+            if symbol not in prices:
+                continue
+
+            current_price = prices[symbol]
+            entry_price = pos["entry_price"]
+            quantity = pos["quantity"]
+            side = pos["side"]
+
+            if side == "buy":
+                pnl = (current_price - entry_price) * quantity
+            else:
+                pnl = (entry_price - current_price) * quantity
+
+            db.execute(
+                """UPDATE positions
+                   SET current_price = ?, unrealised_pnl_aud = ?
+                   WHERE id = ?""",
+                (round(current_price, 2), round(pnl, 4), pos["id"]),
+            )
+
+        if open_positions:
+            logger.info("Updated prices on %d open positions", len(open_positions))
+
+    def check_stops_and_targets(self, prices: dict[str, float]) -> list[dict]:
+        """
+        Check open positions for stop-loss or take-profit hits.
+        Returns list of closed position dicts.
+        """
+        from database.db import get_db
+        db = get_db()
+
+        open_positions = db.fetch_all(
+            "SELECT * FROM positions WHERE status = 'open'"
+        )
+
+        closed = []
+        now = datetime.now(timezone.utc).isoformat()
+
+        for pos in open_positions:
+            symbol = pos["symbol"]
+            if symbol not in prices:
+                continue
+
+            current_price = prices[symbol]
+            entry_price = pos["entry_price"]
+            stop_loss = pos["stop_loss"]
+            take_profit = pos["take_profit"]
+            quantity = pos["quantity"]
+            side = pos["side"]
+
+            close_reason = None
+
+            if side == "buy":
+                if current_price <= stop_loss:
+                    close_reason = "stop_loss"
+                elif current_price >= take_profit:
+                    close_reason = "take_profit"
+            else:  # sell/short
+                if current_price >= stop_loss:
+                    close_reason = "stop_loss"
+                elif current_price <= take_profit:
+                    close_reason = "take_profit"
+
+            if close_reason:
+                if side == "buy":
+                    pnl = (current_price - entry_price) * quantity
+                else:
+                    pnl = (entry_price - current_price) * quantity
+
+                db.execute(
+                    """UPDATE positions
+                       SET status = 'closed', close_timestamp_utc = ?,
+                           close_price = ?, realised_pnl_aud = ?,
+                           close_reason = ?, current_price = ?,
+                           unrealised_pnl_aud = 0
+                       WHERE id = ?""",
+                    (now, round(current_price, 2), round(pnl, 4),
+                     close_reason, round(current_price, 2), pos["id"]),
+                )
+
+                closed_info = {
+                    "symbol": symbol,
+                    "variant": pos["variant"],
+                    "side": side,
+                    "entry_price": entry_price,
+                    "close_price": current_price,
+                    "pnl_aud": round(pnl, 4),
+                    "close_reason": close_reason,
+                }
+                closed.append(closed_info)
+
+                logger.info(
+                    "POSITION CLOSED: %s %s [%s] -- %s @ $%.2f -> $%.2f, P&L $%.2f",
+                    side.upper(), symbol, pos["variant"],
+                    close_reason, entry_price, current_price, pnl,
+                )
+
+        return closed
+
+    def has_open_position(self, symbol: str) -> bool:
+        """Check if there's already an open position for this symbol."""
+        from database.db import get_db
+        db = get_db()
+        row = db.fetch_one(
+            "SELECT COUNT(*) as cnt FROM positions WHERE symbol = ? AND status = 'open'",
+            (symbol,),
+        )
+        return row["cnt"] > 0 if row else False
+
+    def _open_position(self, result: dict, signal: TradeSignal):
+        """Create a position record when a trade is executed."""
+        try:
+            from database.db import get_db
+            db = get_db()
+            db.execute_insert(
+                """INSERT INTO positions
+                   (symbol, variant, side, entry_timestamp_utc, entry_price,
+                    quantity, stop_loss, take_profit, current_price,
+                    unrealised_pnl_aud, status, dry_run)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'open', ?)""",
+                (
+                    signal.symbol,
+                    signal.variant,
+                    signal.side,
+                    result.get("timestamp_utc"),
+                    result.get("fill_price_aud"),
+                    result.get("quantity"),
+                    signal.suggested_stop or self._default_stop(result.get("fill_price_aud", 0), signal.side),
+                    signal.suggested_target or self._default_target(result.get("fill_price_aud", 0), signal.side),
+                    result.get("fill_price_aud"),
+                    result.get("dry_run", True),
+                ),
+            )
+            logger.info(
+                "Position opened: %s %s [%s] @ $%.2f, stop=$%.2f, TP=$%.2f",
+                signal.side, signal.symbol, signal.variant,
+                result.get("fill_price_aud", 0),
+                signal.suggested_stop or 0,
+                signal.suggested_target or 0,
+            )
+        except Exception as e:
+            logger.warning("Failed to open position record: %s", e)
+
+    def _default_stop(self, price: float, side: str) -> float:
+        pct = self.cfg.trading.stop_loss_pct
+        if side == "buy":
+            return round(price * (1 - pct), 2)
+        return round(price * (1 + pct), 2)
+
+    def _default_target(self, price: float, side: str) -> float:
+        pct = self.cfg.trading.take_profit_pct
+        if side == "buy":
+            return round(price * (1 + pct), 2)
+        return round(price * (1 - pct), 2)
 
     def _log_trade(self, result: dict, signal: TradeSignal):
         """Log trade to database."""

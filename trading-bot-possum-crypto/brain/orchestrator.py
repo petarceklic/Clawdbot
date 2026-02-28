@@ -2,21 +2,23 @@
 Possum Crypto -- Orchestrator
 Main analysis pipeline (synchronous -- only 3 assets):
 
-  Regime filter (Fear & Greed)
+  Check open positions (update prices, check stops/TPs)
+    -> Regime filter (Fear & Greed)
     -> For each asset in universe:
+       -> Skip if open position exists
        -> Fetch OHLCV + ticker
        -> Calculate technicals
        -> Grok API call
        -> Variant engine (9 strategies filtered by regime)
        -> Execute best signal (dry-run or live)
-       -> Log signals + trades
+       -> Log signals + trades + open position
     -> Write daily results JSON
 """
 
 import logging
 
 from agent.grok_agent import get_grok_agent
-from data.market_data import fetch_ohlcv, fetch_ticker
+from data.market_data import fetch_ohlcv, fetch_ticker, fetch_all_tickers
 from data.technical_indicators import get_all_indicators
 from execution.trader import get_trader
 from filters.regime_filter import get_current_regime
@@ -42,6 +44,12 @@ class Orchestrator:
         logger.info("CRYPTO ANALYSIS CYCLE STARTING")
         logger.info("=" * 60)
 
+        trader = get_trader()
+        trade_logger = get_trade_logger()
+
+        # 0. Update open positions and check stops/TPs
+        positions_closed = self._check_open_positions(trader)
+
         # 1. Regime filter
         regime_data = get_current_regime()
         regime = regime_data["regime"]
@@ -58,14 +66,22 @@ class Orchestrator:
         # 2. Process each asset
         grok = get_grok_agent()
         engine = get_variant_engine()
-        trader = get_trader()
-        trade_logger = get_trade_logger()
 
         results = []
         trades_placed = 0
         universe = self.cfg.trading.universe
 
         for symbol in universe:
+            # Skip if already holding an open position
+            if trader.has_open_position(symbol):
+                logger.info("Skipping %s -- open position exists", symbol)
+                results.append({
+                    "symbol": symbol,
+                    "action": "skipped",
+                    "reason": "open_position_exists",
+                })
+                continue
+
             try:
                 result = self._process_asset(
                     symbol=symbol,
@@ -84,11 +100,14 @@ class Orchestrator:
                 results.append({"symbol": symbol, "action": "error", "reason": str(e)})
 
         logger.info(
-            "CYCLE COMPLETE: %d assets processed, %d trades | Regime: %s",
-            len(results), trades_placed, regime,
+            "CYCLE COMPLETE: %d assets processed, %d trades, %d positions closed | Regime: %s",
+            len(results), trades_placed, len(positions_closed), regime,
         )
 
-        # 3. Write daily results
+        # 3. Get position summary for results
+        position_summary = trade_logger.get_position_summary()
+
+        # 4. Write daily results
         cycle_summary = {
             "status": "completed",
             "regime": regime,
@@ -97,6 +116,8 @@ class Orchestrator:
             "btc_dominance": regime_data.get("btc_dominance"),
             "assets_processed": len(results),
             "trades_placed": trades_placed,
+            "positions_closed": positions_closed,
+            "open_positions": position_summary,
             "results": results,
         }
 
@@ -106,6 +127,27 @@ class Orchestrator:
             logger.error("Failed to write daily results: %s", e)
 
         return cycle_summary
+
+    def _check_open_positions(self, trader) -> list[dict]:
+        """Update prices on open positions and close any that hit stop/TP."""
+        try:
+            # Fetch current prices for all assets
+            tickers = fetch_all_tickers(self.cfg.trading.universe)
+            prices = {sym: t.get("last", 0) for sym, t in tickers.items() if t.get("last")}
+
+            if not prices:
+                return []
+
+            # Update current prices and unrealised P&L
+            trader.update_positions(prices)
+
+            # Check stop-loss and take-profit
+            closed = trader.check_stops_and_targets(prices)
+            return closed
+
+        except Exception as e:
+            logger.error("Failed to check open positions: %s", e)
+            return []
 
     def _process_asset(
         self,
