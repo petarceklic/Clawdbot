@@ -103,7 +103,7 @@ def get_exchange() -> ExchangeAdapter:
         from config import get_config
         cfg = get_config()
         _adapter = ExchangeAdapter(
-            api_key=cfg.kraken.api_key,
-            api_secret=cfg.kraken.api_secret,
+            api_key=cfg.kraken.key,
+            api_secret=cfg.kraken.secret,
         )
     return _adapter

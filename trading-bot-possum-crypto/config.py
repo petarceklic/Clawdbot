@@ -21,8 +21,8 @@ RESULTS_DIR = PROJECT_DIR / "results"
 
 class KrakenSettings(BaseSettings):
     """Kraken exchange API credentials."""
-    api_key: str = ""
-    api_secret: str = ""
+    key: str = ""
+    secret: str = ""
 
     model_config = {"env_prefix": "POSSUM_KRAKEN_"}
 
