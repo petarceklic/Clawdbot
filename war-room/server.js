@@ -2588,9 +2588,9 @@ app.get('/leaderboard', async (req, res) => {
     </section>
 
     <!-- Performance Chart -->
-    ${hasChart ? `
     <section class="section">
       <h2 class="section-title">📈 Performance Over Time</h2>
+      ${hasChart ? `
       <div class="chart-wrap">
         <canvas id="perfChart" height="220"></canvas>
         <div class="chart-legend">
@@ -2598,8 +2598,8 @@ app.get('/leaderboard', async (req, res) => {
           <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#34d399"></div> Possum AU</div>
         </div>
       </div>
+      ` : `<div style="text-align:center;padding:40px 0;color:var(--muted)">Chart will appear once trading begins</div>`}
     </section>
-    ` : ''}
 
     <!-- Positions -->
     <div class="two-col">
