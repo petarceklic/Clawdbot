@@ -447,7 +447,7 @@ app.get('/', (req, res) => {
     </div>
     <div class="header-right">
       <a href="/possum-au" class="btn-ideas" style="color:#34d399;background:#10b98110;border-color:#10b98130">🦘 Possum AU</a>
-      <a href="/possum-us" class="btn-ideas" style="color:#34d399;background:#10b98110;border-color:#10b98130">🇺🇸 Possum US</a>
+      <a href="/possum-us" class="btn-ideas" style="color:#3b82f6;background:#3b82f610;border-color:#3b82f630">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn-ideas" style="color:#f59e0b;background:#f59e0b10;border-color:#f59e0b30">₿ Crypto</a>
       <a href="/possum-pm" class="btn-ideas" style="color:#a78bfa;background:#a78bfa10;border-color:#a78bfa30">🎯 Possum PM</a>
       <a href="/leaderboard" class="btn-ideas" style="color:#fbbf24;background:#fbbf2410;border-color:#fbbf2430">🏆 Leaderboard</a>
@@ -892,11 +892,12 @@ app.get('/possum-au', (req, res) => {
     <div class="header-right">
       <div class="live"><div class="dot-pulse"></div> PAPER mode</div>
       <a href="/" class="btn">← War Room</a>
+      <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940;background:#34d39915">🦘 Possum AU</a>
       <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
       <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
       <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-      <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">↻ Refresh</a>
+      <a href="/possum-au" class="btn" style="color:#999;border-color:#99999940" title="Refresh">↻</a>
     </div>
   </header>
 
@@ -910,16 +911,16 @@ app.get('/possum-au', (req, res) => {
         <div class="stat-value blue">A$15,000</div>
         <div class="stat-sub">Competition cap</div>
       </div>
-      <div class="stat-card" data-g="${todayPnl >= 0 ? 'green' : 'red'}">
+      <div class="stat-card" data-g="${compLive && todayPnl >= 0 ? 'green' : compLive ? 'red' : 'blue'}">
         <div class="stat-icon">📈</div>
         <div class="stat-label">Today's P&amp;L</div>
-        <div class="stat-value ${todayPnl > 0 ? 'green' : todayPnl < 0 ? 'red' : 'zero'}">${fmtAud(todayPnl)}</div>
-        <div class="stat-sub">${today?.date || '—'}</div>
+        <div class="stat-value ${compLive ? (todayPnl > 0 ? 'green' : todayPnl < 0 ? 'red' : 'zero') : 'zero'}">${compLive ? fmtAud(todayPnl) : '+A$0.00'}</div>
+        <div class="stat-sub">${compLive ? (today?.date || '—') : '—'}</div>
       </div>
-      <div class="stat-card" data-g="${todayRet >= 0 ? 'green' : 'red'}">
+      <div class="stat-card" data-g="blue">
         <div class="stat-icon">📊</div>
         <div class="stat-label">Daily Return</div>
-        <div class="stat-value ${todayRet > 0 ? 'green' : todayRet < 0 ? 'red' : 'zero'}">${todayRet != null ? (todayRet > 0 ? '+' : '') + Number(todayRet).toFixed(2) + '%' : '—'}</div>
+        <div class="stat-value zero">${compLive ? (todayRet != null ? (todayRet > 0 ? '+' : '') + Number(todayRet).toFixed(2) + '%' : '—') : '0.00%'}</div>
         <div class="stat-sub">vs starting capital</div>
       </div>
       <div class="stat-card" data-g="amber">
@@ -943,7 +944,7 @@ app.get('/possum-au', (req, res) => {
       <div class="stat-card" data-g="green">
         <div class="stat-icon">🔢</div>
         <div class="stat-label">Today's Trades</div>
-        <div class="stat-value green">${today?.num_trades ?? '—'}</div>
+        <div class="stat-value green">${compLive ? (today?.num_trades ?? '—') : '0'}</div>
         <div class="stat-sub">Signals generated</div>
       </div>
     </div>
@@ -1262,10 +1263,11 @@ app.get('/possum-us', async (req, res) => {
       <div class="live"><div class="dot-pulse"></div> ${botStatus}</div>
       <a href="/" class="btn">← War Room</a>
       <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
+      <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640;background:#3b82f615">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
       <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
       <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-      <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">↻ Refresh</a>
+      <a href="/possum-us" class="btn" style="color:#999;border-color:#99999940" title="Refresh">↻</a>
     </div>
   </header>
 
@@ -1280,22 +1282,22 @@ app.get('/possum-us', async (req, res) => {
         <div class="stat-value blue">$9,500</div>
         <div class="stat-sub">Competition cap (~A$15k)</div>
       </div>
-      <div class="stat-card" data-g="${dailyPnl >= 0 ? 'green' : 'red'}">
+      <div class="stat-card" data-g="blue">
         <div class="stat-icon">📈</div>
         <div class="stat-label">Today P&amp;L</div>
-        <div class="stat-value ${dailyPnl > 0 ? 'green' : dailyPnl < 0 ? 'red' : 'muted'}">${fmtUsd(dailyPnl)}</div>
+        <div class="stat-value ${compLive ? (dailyPnl > 0 ? 'green' : dailyPnl < 0 ? 'red' : 'muted') : 'muted'}">${compLive ? fmtUsd(dailyPnl) : '$0.00'}</div>
         <div class="stat-sub">Since open</div>
       </div>
-      <div class="stat-card" data-g="${dailyPnlPct >= 0 ? 'green' : 'red'}">
+      <div class="stat-card" data-g="blue">
         <div class="stat-icon">📊</div>
         <div class="stat-label">Today P&amp;L %</div>
-        <div class="stat-value ${dailyPnlPct > 0 ? 'green' : dailyPnlPct < 0 ? 'red' : 'muted'}">${dailyPnlPct != null ? (dailyPnlPct > 0 ? '+' : '') + Number(dailyPnlPct).toFixed(2) + '%' : '—'}</div>
+        <div class="stat-value muted">${compLive ? (dailyPnlPct != null ? (dailyPnlPct > 0 ? '+' : '') + Number(dailyPnlPct).toFixed(2) + '%' : '—') : '0.00%'}</div>
         <div class="stat-sub">vs start of day</div>
       </div>
       <div class="stat-card" data-g="amber">
         <div class="stat-icon">🔢</div>
         <div class="stat-label">Total Trades</div>
-        <div class="stat-value amber">${totalTrades}</div>
+        <div class="stat-value amber">${compLive ? totalTrades : '0'}</div>
         <div class="stat-sub">Trades today</div>
       </div>
       <div class="stat-card" data-g="blue">
@@ -1707,9 +1709,10 @@ app.get('/possum-crypto', (req, res) => {
     <a href="/" class="btn">← War Room</a>
     <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
     <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
+    <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40;background:#f59e0b15">₿ Crypto</a>
     <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
     <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-    <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">↻ Refresh</a>
+    <a href="/possum-crypto" class="btn" style="color:#999;border-color:#99999940" title="Refresh">↻</a>
   </div>
 </header>
 
@@ -1736,16 +1739,16 @@ app.get('/possum-crypto', (req, res) => {
         <div class="stat-value amber">${regime.fgi_value != null ? regime.fgi_value : '—'}</div>
         <div class="stat-sub">Crypto FGI</div>
       </div>
-      <div class="stat-card" data-g="${openPositions.length ? 'green' : 'blue'}">
+      <div class="stat-card" data-g="${compLive && openPositions.length ? 'green' : 'blue'}">
         <div class="stat-icon">📊</div>
         <div class="stat-label">Open Positions</div>
-        <div class="stat-value ${openPositions.length ? 'green' : 'blue'}">${openPositions.length}</div>
+        <div class="stat-value ${compLive && openPositions.length ? 'green' : 'blue'}">${compLive ? openPositions.length : 0}</div>
         <div class="stat-sub">of 3 assets</div>
       </div>
       <div class="stat-card" data-g="amber">
         <div class="stat-icon">🔢</div>
         <div class="stat-label">Total Trades</div>
-        <div class="stat-value amber">${recentTrades.length > 0 ? recentTrades.length + '+' : '0'}</div>
+        <div class="stat-value amber">${compLive ? (recentTrades.length > 0 ? recentTrades.length + '+' : '0') : '0'}</div>
         <div class="stat-sub">last 10 shown</div>
       </div>
       <div class="stat-card" data-g="blue">
@@ -1763,7 +1766,7 @@ app.get('/possum-crypto', (req, res) => {
     </div>
 
     <!-- Asset Cards -->
-    <div class="asset-row">${assetCards}</div>
+    ${compLive ? `<div class="asset-row">${assetCards}</div>` : ''}
 
     ${compLive ? `
     <!-- Open Positions -->
@@ -2115,8 +2118,9 @@ app.get('/possum-pm', (req, res) => {
     <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
     <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
     <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+    <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40;background:#a78bfa15">🎯 Possum PM</a>
     <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-    <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">↻ Refresh</a>
+    <a href="/possum-pm" class="btn" style="color:#999;border-color:#99999940" title="Refresh">↻</a>
   </div>
 </header>
 
@@ -2134,25 +2138,25 @@ app.get('/possum-pm', (req, res) => {
       <div class="stat-card" data-g="purple">
         <div class="stat-icon">📋</div>
         <div class="stat-label">Active Contracts</div>
-        <div class="stat-value purple">${contracts.length}</div>
+        <div class="stat-value purple">${compLive ? contracts.length : 0}</div>
         <div class="stat-sub">in contracts.json</div>
       </div>
       <div class="stat-card" data-g="green">
         <div class="stat-icon">📈</div>
         <div class="stat-label">Open Trades</div>
-        <div class="stat-value green">${openTrades}</div>
+        <div class="stat-value green">${compLive ? openTrades : 0}</div>
         <div class="stat-sub">paper positions</div>
       </div>
       <div class="stat-card" data-g="amber">
         <div class="stat-icon">🔢</div>
         <div class="stat-label">Total Decisions</div>
-        <div class="stat-value amber">${totalDecisions}</div>
+        <div class="stat-value amber">${compLive ? totalDecisions : 0}</div>
         <div class="stat-sub">pipeline runs</div>
       </div>
       <div class="stat-card" data-g="amber">
         <div class="stat-icon">📊</div>
         <div class="stat-label">Trades Logged</div>
-        <div class="stat-value amber">${totalTrades}</div>
+        <div class="stat-value amber">${compLive ? totalTrades : 0}</div>
         <div class="stat-sub">all time</div>
       </div>
       <div class="stat-card" data-g="blue">
@@ -2514,7 +2518,8 @@ app.get('/leaderboard', async (req, res) => {
       <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
       <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
-      <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">↻ Refresh</a>
+      <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440;background:#fbbf2415">🏆 Leaderboard</a>
+      <a href="/leaderboard" class="btn" style="color:#999;border-color:#99999940" title="Refresh">↻</a>
     </div>
   </header>
 
