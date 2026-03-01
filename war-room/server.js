@@ -10,6 +10,15 @@ const PROJECTS_FILE = path.join(__dirname, '../projects.md');
 const SESSIONS_DIR = path.join(os.homedir(), '.clawdbot/agents/main/sessions');
 const CRON_FILE = path.join(os.homedir(), '.clawdbot/cron/jobs.json');
 const BRAVE_COUNTER = path.join(__dirname, 'brave-usage.json');
+const COMPETITION_JSON = path.join(__dirname, '../trading-bot-possum/interface/competition.json');
+
+function isCompetitionActive() {
+  try {
+    const comp = JSON.parse(fs.readFileSync(COMPETITION_JSON, 'utf8')).competition;
+    const today = new Date().toISOString().slice(0, 10);
+    return today >= comp.start_date && today <= comp.end_date;
+  } catch { return false; }
+}
 
 // ── Data: Claude usage from session files ─────────────────────────────────────
 const CONTEXT_WINDOW = 1000000; // claude-sonnet-4-6 (1M token context)
@@ -664,6 +673,7 @@ function pnlClass(n) { return n > 0 ? 'pnl-pos' : n < 0 ? 'pnl-neg' : 'pnl-zero'
 function medalFor(rank) { return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`; }
 
 app.get('/possum-au', (req, res) => {
+  const compLive = isCompetitionActive();
   const allDays = getPossumAUData();
   const leaderboard = buildVariantLeaderboard(allDays);
 
@@ -882,11 +892,11 @@ app.get('/possum-au', (req, res) => {
     <div class="header-right">
       <div class="live"><div class="dot-pulse"></div> PAPER mode</div>
       <a href="/" class="btn">← War Room</a>
-      <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
-      <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
-      <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
+      <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
+      <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+      <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
       <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-      <a href="/possum-au" class="btn btn-accent">↻ Refresh</a>
+      <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">↻ Refresh</a>
     </div>
   </header>
 
@@ -938,6 +948,7 @@ app.get('/possum-au', (req, res) => {
       </div>
     </div>
 
+    ${compLive ? `
     <!-- Variant Leaderboard -->
     <section class="section">
       <h2 class="section-title">🏆 Variant Leaderboard</h2>
@@ -996,6 +1007,7 @@ app.get('/possum-au', (req, res) => {
         </table>
       </div>
     </section>
+    ` : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:0.85rem">📅 Competition starts soon — data sections will appear once trading begins</div>'}
 
   </div>
 </div>
@@ -1028,6 +1040,7 @@ function fmtUsdPlain(n) {
 }
 
 app.get('/possum-us', async (req, res) => {
+  const compLive = isCompetitionActive();
   const data = await getPossumUSData();
   const equity = data?.equity ?? null;
   const dailyPnl = data?.daily_pnl ?? 0;
@@ -1248,11 +1261,11 @@ app.get('/possum-us', async (req, res) => {
     <div class="header-right">
       <div class="live"><div class="dot-pulse"></div> ${botStatus}</div>
       <a href="/" class="btn">← War Room</a>
-      <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
-      <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
-      <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
+      <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
+      <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+      <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
       <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-      <a href="/possum-us" class="btn btn-accent">↻ Refresh</a>
+      <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">↻ Refresh</a>
     </div>
   </header>
 
@@ -1305,6 +1318,7 @@ app.get('/possum-us', async (req, res) => {
       </div>
     </div>
 
+    ${compLive ? `
     <!-- Variant Leaderboard -->
     <section class="section">
       <h2 class="section-title">🏆 Variant Leaderboard</h2>
@@ -1368,6 +1382,7 @@ app.get('/possum-us', async (req, res) => {
         </table>
       </div>
     </section>
+    ` : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:0.85rem">📅 Competition starts soon — data sections will appear once trading begins</div>'}
 
   </div>
 </div>
@@ -1419,6 +1434,7 @@ function buildCryptoLeaderboard(signals) {
 }
 
 app.get('/possum-crypto', (req, res) => {
+  const compLive = isCompetitionActive();
   const dbExists = fs.existsSync(CRYPTO_DB);
 
   // Fetch data
@@ -1689,11 +1705,11 @@ app.get('/possum-crypto', (req, res) => {
   <div class="header-right">
     <div class="live"><div class="dot-pulse"></div> PAPER mode</div>
     <a href="/" class="btn">← War Room</a>
-    <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
-    <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
-    <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
+    <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
+    <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
+    <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
     <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-    <a href="/possum-crypto" class="btn btn-accent">↻ Refresh</a>
+    <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">↻ Refresh</a>
   </div>
 </header>
 
@@ -1749,6 +1765,7 @@ app.get('/possum-crypto', (req, res) => {
     <!-- Asset Cards -->
     <div class="asset-row">${assetCards}</div>
 
+    ${compLive ? `
     <!-- Open Positions -->
     <section class="section">
       <h2 class="section-title">🟢 Open Positions</h2>
@@ -1812,6 +1829,7 @@ app.get('/possum-crypto', (req, res) => {
         </table>
       </div>
     </section>
+    ` : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:0.85rem">📅 Competition starts soon — data sections will appear once trading begins</div>'}
 
   </div><!-- .content -->
 </div><!-- .app -->
@@ -1823,6 +1841,7 @@ app.get('/possum-crypto', (req, res) => {
 
 // ── Possum PM Route ────────────────────────────────────────────────────────────
 app.get('/possum-pm', (req, res) => {
+  const compLive = isCompetitionActive();
   const dbExists = fs.existsSync(PM_DB);
   const contractsRaw = fs.existsSync(PM_CONTRACTS_FILE) ? JSON.parse(fs.readFileSync(PM_CONTRACTS_FILE, 'utf-8')) : [];
   const contracts = contractsRaw.filter(c => c.active !== false);
@@ -2093,11 +2112,11 @@ app.get('/possum-pm', (req, res) => {
   <div class="header-right">
     <div class="live"><div class="dot-pulse"></div> PAPER mode</div>
     <a href="/" class="btn">← War Room</a>
-    <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
-    <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
-    <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+    <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
+    <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
+    <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
     <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
-    <a href="/possum-pm" class="btn btn-accent">↻ Refresh</a>
+    <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">↻ Refresh</a>
   </div>
 </header>
 
@@ -2150,6 +2169,7 @@ app.get('/possum-pm', (req, res) => {
       </div>
     </div>
 
+  ${compLive ? `
   <!-- Contracts Panel -->
   <div class="section">
     <div class="section-title">📋 Contracts Panel</div>
@@ -2213,6 +2233,7 @@ app.get('/possum-pm', (req, res) => {
         </table>
       </div>`}
   </div>
+  ` : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:0.85rem">📅 Competition starts soon — data sections will appear once trading begins</div>'}
 
   </div><!-- .content -->
 </div><!-- .app -->
@@ -2240,65 +2261,110 @@ app.get('/leaderboard', async (req, res) => {
   const compActive = competition.active || false;
   const today = data?.today || new Date().toISOString().slice(0, 10);
   const timestamp = data?.timestamp || new Date().toISOString();
+  const history = data?.history || [];
+  const score = data?.score || {};
+  const feeDrag = data?.fee_drag || {};
 
-  const botColors = { 'Possum US': '#3b82f6', 'Possum AU': '#f59e0b', 'Possum Crypto': '#a855f7', 'Possum PM': '#14b8a6' };
+  // Per-bot raw data
+  const usData = data?.us || {};
+  const auData = data?.au || {};
+  const cryptoData = data?.crypto || {};
+  const pmData = data?.pm || {};
+
+  const botColors = { 'Possum US': '#3b82f6', 'Possum AU': '#34d399', 'Possum Crypto': '#f59e0b', 'Possum PM': '#a78bfa' };
   const botEmojis = { 'Possum US': '🇺🇸', 'Possum AU': '🦘', 'Possum Crypto': '₿', 'Possum PM': '🎯' };
+  const botLinks = { 'Possum US': '/possum-us', 'Possum AU': '/possum-au', 'Possum Crypto': '/possum-crypto', 'Possum PM': '/possum-pm' };
   const medals = ['🥇', '🥈', '🥉'];
 
   function fmtPct(n) {
     if (n == null) return '—';
     return (n > 0 ? '+' : '') + Number(n).toFixed(2) + '%';
   }
+  function fmtMoney(n, sym) {
+    if (n == null) return '—';
+    const abs = Math.abs(n).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (n < 0 ? '-' : n > 0 ? '+' : '') + sym + abs;
+  }
+  function pnlColor(n) { return n > 0 ? '#10b981' : n < 0 ? '#ef4444' : 'var(--muted)'; }
 
-  const botCards = bots.map((b, i) => {
+  // Build table rows for each bot (wider, more info)
+  const botRows = bots.map((b, i) => {
     const color = botColors[b.name] || '#64647a';
     const emoji = botEmojis[b.name] || '🤖';
-    const rank = i + 1;
-    const medal = medals[i] || `#${rank}`;
-    const ret = b.competition_return;
-    const retColor = ret > 0 ? '#10b981' : ret < 0 ? '#ef4444' : '#64647a';
+    const link = botLinks[b.name] || '#';
+    const medal = medals[i] || `#${i+1}`;
+    const ret = compActive ? b.competition_return : b.cumulative_pct;
+    const retStr = fmtPct(ret);
+    const retColor = pnlColor(ret);
     const regime = b.regime || '—';
-    const online = b.online !== false;
-    const statusDot = online ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b98180"></span>' : '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444"></span>';
+    const dailyPnl = b.daily_pnl;
+    const dailyCurr = b.currency_label === 'USD' ? '$' : 'A$';
+    const trades = b.total_trades ?? 0;
+    const regimeExtra = b.regime_extra ? ` · ${b.regime_extra}` : '';
 
-    if (compActive) {
-      return `<div class="lb-card" style="border-left:3px solid ${color}">
-        <div class="lb-rank">${medal}</div>
-        <div class="lb-info">
-          <div class="lb-name" style="color:${color}">${emoji} ${b.name}</div>
-          <div class="lb-type">${b.type || '—'}</div>
-        </div>
-        <div class="lb-stats">
-          <div class="lb-return" style="color:${retColor}">${fmtPct(ret)}</div>
-          <div class="lb-regime">${regime}</div>
-        </div>
-        <div class="lb-status">${statusDot}</div>
-      </div>`;
-    } else {
-      return `<div class="lb-card" style="border-left:3px solid ${color}">
-        <div class="lb-dot" style="background:${color}"></div>
-        <div class="lb-info">
-          <div class="lb-name" style="color:${color}">${emoji} ${b.name}</div>
-          <div class="lb-type">${b.type || '—'}</div>
-        </div>
-        <div class="lb-stats">
-          <div class="lb-regime">${regime}</div>
-        </div>
-        <div class="lb-status">${statusDot} ${online ? 'ONLINE' : 'OFFLINE'}</div>
-      </div>`;
-    }
+    return `<tr>
+      <td style="font-size:1.1rem;text-align:center;width:44px">${medal}</td>
+      <td>
+        <a href="${link}" style="text-decoration:none">
+          <span style="font-weight:700;color:${color}">${emoji} ${b.name}</span>
+          <span style="display:block;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">${b.type || '—'}</span>
+        </a>
+      </td>
+      <td style="font-size:0.75rem;color:var(--muted);text-transform:capitalize">${regime}${regimeExtra}</td>
+      <td style="font-weight:800;font-size:1.1rem;color:${retColor};letter-spacing:-0.5px">${retStr}</td>
+      <td style="color:${pnlColor(dailyPnl)};font-weight:600">${dailyPnl != null ? fmtMoney(dailyPnl, dailyCurr) : '—'}</td>
+      <td style="color:var(--muted)">${trades}</td>
+    </tr>`;
   }).join('');
 
+  // Competition info
+  const daysLeft = competition.days_remaining;
   const compBanner = compActive
-    ? `<div class="comp-banner green">🏁 Competition Active — Started ${competition.start_date || '—'} · Ends ${competition.end_date || '—'}</div>`
-    : `<div class="comp-banner amber">⏳ Competition starts ${competition.start_date || 'soon'} — All bots on A$15,000 starting capital</div>`;
+    ? `<div class="comp-banner green">🏁 Competition Active — Started ${competition.start_date || '—'} · Ends ${competition.end_date || '—'}${daysLeft != null ? ' · ' + daysLeft + ' days remaining' : ''}</div>`
+    : `<div class="comp-banner amber">⏳ Competition starts ${competition.start_date || 'soon'} — All bots racing on A$15,000 starting capital</div>`;
+
+  // Chart data (history)
+  const chartLabels = history.map(h => `"${h.date?.slice(5) || ''}"`).join(',');
+  const chartUS = history.map(h => h.us_cumulative ?? 'null').join(',');
+  const chartAU = history.map(h => h.au_cumulative ?? 'null').join(',');
+  const hasChart = history.length > 1;
+
+  // Positions summary tables
+  const usPositions = usData.positions || [];
+  const auPositions = auData.positions || [];
+  const cryptoPositions = cryptoData.positions || [];
+  const pmTrades = pmData.trades || [];
+
+  const equityPosRows = [...usPositions.map(p => ({...p, bot: '🇺🇸 US', curr: '$'})), ...auPositions.map(p => ({...p, bot: '🦘 AU', curr: 'A$'}))];
+  const eqPosHtml = equityPosRows.length ? equityPosRows.map(p => {
+    const pColor = pnlColor(p.net_pnl);
+    const dir = (p.direction || '').toUpperCase();
+    const dirColor = dir === 'BUY' ? '#10b981' : '#ef4444';
+    return `<tr>
+      <td style="font-size:0.75rem;color:var(--muted)">${p.bot}</td>
+      <td style="font-weight:600">${p.ticker || p.symbol || '—'}</td>
+      <td><span style="color:${dirColor};font-size:0.65rem;font-weight:700;border:1px solid ${dirColor}40;padding:2px 7px;border-radius:99px">${dir}</span></td>
+      <td style="font-size:0.75rem;color:var(--muted)">${p.primary_variant || p.variant || '—'}</td>
+      <td style="color:${pColor};font-weight:600">${p.net_pnl != null ? fmtMoney(p.net_pnl, p.curr || '$') : '—'}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty-cell">No equity positions</td></tr>';
+
+  const cryptoPosHtml = cryptoPositions.length ? cryptoPositions.map(p => {
+    const pColor = pnlColor(p.unrealised_pnl_aud);
+    return `<tr>
+      <td style="font-weight:600">${p.symbol}</td>
+      <td><span style="color:#10b981;font-size:0.65rem;font-weight:700;border:1px solid #10b98140;padding:2px 7px;border-radius:99px">${(p.side||'').toUpperCase()}</span></td>
+      <td style="font-size:0.75rem;color:var(--muted)">${p.variant || '—'}</td>
+      <td style="color:var(--muted)">A$${Number(p.entry_price||0).toFixed(2)}</td>
+      <td style="color:${pColor};font-weight:600">${p.unrealised_pnl_aud != null ? fmtMoney(p.unrealised_pnl_aud, 'A$') : '—'}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty-cell">No crypto positions</td></tr>';
 
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="30">
   <title>Fleet Leaderboard — War Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -2366,44 +2432,68 @@ app.get('/leaderboard', async (req, res) => {
     .btn-accent { color: #34d399; background: #10b98110; border-color: #10b98130; }
     .btn-accent:hover { background: #10b98120; }
 
-    .content { padding: 28px; flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; }
+    .content { padding: 28px; flex: 1; max-width: 1400px; width: 100%; }
+
+    /* Hero stats */
+    .hero { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 16px; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; inset: 0; background: var(--glow, transparent); opacity: .07; pointer-events: none; }
+    .stat-card[data-g="green"] { --glow: var(--green); }
+    .stat-card[data-g="red"] { --glow: var(--red); }
+    .stat-card[data-g="amber"] { --glow: var(--amber); }
+    .stat-card[data-g="blue"] { --glow: var(--blue); }
+    .stat-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.zero { color: var(--muted); }
+    .stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 5px; }
+    .stat-icon { position: absolute; top: 12px; right: 14px; font-size: 1.1rem; opacity: .4; }
 
     .comp-banner {
-      border-radius: var(--r); padding: 14px 20px; margin-bottom: 24px;
+      border-radius: var(--r); padding: 14px 20px; margin-bottom: 28px;
       font-size: 0.8rem; font-weight: 600;
     }
     .comp-banner.green { background: #10b98110; border: 1px solid #10b98130; color: #34d399; }
     .comp-banner.amber { background: #f59e0b10; border: 1px solid #f59e0b30; color: #fbbf24; }
 
-    .lb-card {
-      display: grid; grid-template-columns: 44px 1fr auto auto;
-      align-items: center; gap: 16px;
-      background: var(--surface); border: 1px solid var(--border2);
-      border-radius: var(--r); padding: 16px 20px; margin-bottom: 10px;
-      transition: border-color .15s;
-    }
-    .lb-card:hover { border-color: var(--accent); }
-    .lb-rank { font-size: 1.3rem; text-align: center; }
-    .lb-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto; }
-    .lb-name { font-size: 0.9rem; font-weight: 700; }
-    .lb-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 2px; }
-    .lb-return { font-size: 1.5rem; font-weight: 800; text-align: right; letter-spacing: -0.5px; }
-    .lb-regime { font-size: 0.7rem; color: var(--muted); text-transform: capitalize; text-align: right; margin-top: 2px; }
-    .lb-status { font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-
+    /* Section headings */
     .section-title {
       font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .12em; color: var(--muted); margin-bottom: 14px; margin-top: 32px;
+      letter-spacing: .12em; color: var(--muted); margin-bottom: 14px;
       display: flex; align-items: center; gap: 8px;
     }
     .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section { margin-bottom: 36px; }
 
-    .meta-row {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 24px; font-size: 0.75rem; color: var(--muted);
+    /* Tables */
+    .table-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--border2); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    thead tr { border-bottom: 1px solid var(--border2); }
+    th { padding: 10px 14px; text-align: left; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; white-space: nowrap; }
+    td { padding: 11px 14px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #ffffff03; }
+    .empty-cell { color: var(--muted); text-align: center; padding: 24px; font-size: 0.8rem; }
+
+    /* Chart */
+    .chart-wrap {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 20px; margin-bottom: 36px;
     }
-    .meta-row a { color: var(--muted); text-decoration: none; }
-    .meta-row a:hover { color: var(--text); }
+    .chart-wrap canvas { width: 100% !important; }
+    .chart-legend { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+    .chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--muted); }
+    .chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Two column layout */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -2420,27 +2510,185 @@ app.get('/leaderboard', async (req, res) => {
     <div class="header-right">
       <div class="live"><div class="dot-pulse"></div> Auto-refresh 30s</div>
       <a href="/" class="btn">← War Room</a>
-      <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
-      <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
-      <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
-      <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
-      <a href="/leaderboard" class="btn btn-accent" style="color:#fbbf24;border-color:#fbbf2440">↻ Refresh</a>
+      <a href="/possum-au" class="btn" style="color:#34d399;border-color:#34d39940">🦘 Possum AU</a>
+      <a href="/possum-us" class="btn" style="color:#3b82f6;border-color:#3b82f640">🇺🇸 Possum US</a>
+      <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+      <a href="/possum-pm" class="btn" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
+      <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">↻ Refresh</a>
     </div>
   </header>
 
   <div class="content">
-    <div class="meta-row">
-      <span>Possum Fleet Showdown · A$15,000 per bot</span>
-      <span>${today} · ${timestamp.slice(11,19)} UTC</span>
-    </div>
 
     ${compBanner}
 
-    <h2 class="section-title">🏆 Scoreboard</h2>
-    ${botCards || '<div style="color:var(--muted);text-align:center;padding:32px">Could not load leaderboard data. Is the dashboard API running?</div>'}
+    <!-- Hero Stats -->
+    <div class="hero">
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Competition</div>
+        <div class="stat-value amber">${compActive ? 'LIVE' : 'Pending'}</div>
+        <div class="stat-sub">${competition.name || 'Possum Fleet Showdown'}</div>
+      </div>
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💵</div>
+        <div class="stat-label">Starting Capital</div>
+        <div class="stat-value blue">A$15,000</div>
+        <div class="stat-sub">per bot</div>
+      </div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-label">Active Bots</div>
+        <div class="stat-value green">${bots.filter(b => b.available).length}</div>
+        <div class="stat-sub">of 4 bots</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">${compActive ? 'Days Left' : 'Starts In'}</div>
+        <div class="stat-value amber">${daysLeft != null ? daysLeft : '—'}</div>
+        <div class="stat-sub">${competition.start_date || '—'} → ${competition.end_date || '—'}</div>
+      </div>
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">⚔️</div>
+        <div class="stat-label">US vs AU Score</div>
+        <div class="stat-value blue" style="font-size:1rem">${score.us_wins ?? 0} - ${score.draws ?? 0} - ${score.au_wins ?? 0}</div>
+        <div class="stat-sub">${score.total ?? 0} trading days</div>
+      </div>
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Fee Drag Today</div>
+        <div class="stat-value blue" style="font-size:1rem">${feeDrag.us_fees_today != null ? '$' + Number(feeDrag.us_fees_today).toFixed(2) : '—'} / ${feeDrag.au_fees_today != null ? 'A$' + Number(feeDrag.au_fees_today).toFixed(2) : '—'}</div>
+        <div class="stat-sub">US / AU fees</div>
+      </div>
+    </div>
+
+    <!-- Scoreboard Table -->
+    <section class="section">
+      <h2 class="section-title">🏆 Scoreboard</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:44px">Rank</th>
+            <th>Bot</th>
+            <th>Regime</th>
+            <th>${compActive ? 'Return' : 'All-Time'}</th>
+            <th>Today P&amp;L</th>
+            <th>Trades</th>
+          </tr></thead>
+          <tbody>
+            ${botRows || '<tr><td colspan="6" class="empty-cell">Could not load leaderboard data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Performance Chart -->
+    ${hasChart ? `
+    <section class="section">
+      <h2 class="section-title">📈 Performance Over Time</h2>
+      <div class="chart-wrap">
+        <canvas id="perfChart" height="220"></canvas>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#3b82f6"></div> Possum US</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#34d399"></div> Possum AU</div>
+        </div>
+      </div>
+    </section>
+    ` : ''}
+
+    <!-- Positions -->
+    <div class="two-col">
+      <section class="section">
+        <h2 class="section-title">📊 Equity Positions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Bot</th><th>Ticker</th><th>Dir</th><th>Variant</th><th>P&amp;L</th></tr></thead>
+            <tbody>${eqPosHtml}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">₿ Crypto Positions</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Symbol</th><th>Side</th><th>Variant</th><th>Entry</th><th>P&amp;L</th></tr></thead>
+            <tbody>${cryptoPosHtml}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
 
   </div>
 </div>
+
+${hasChart ? `
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('perfChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [${chartLabels}],
+      datasets: [
+        {
+          label: 'US Cumulative %',
+          data: [${chartUS}],
+          borderColor: '#3b82f6',
+          backgroundColor: '#3b82f620',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#3b82f6',
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: 'AU Cumulative %',
+          data: [${chartAU}],
+          borderColor: '#34d399',
+          backgroundColor: '#34d39920',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#34d399',
+          tension: 0.3,
+          fill: true,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1d27',
+          borderColor: '#2a2d3a',
+          borderWidth: 1,
+          titleColor: '#e2e2ee',
+          bodyColor: '#e2e2ee',
+          padding: 10,
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: '#ffffff08' },
+          ticks: { color: '#64647a', font: { size: 10 } },
+        },
+        y: {
+          grid: { color: '#ffffff08' },
+          ticks: {
+            color: '#64647a',
+            font: { size: 10 },
+            callback: v => v.toFixed(1) + '%',
+          },
+        },
+      },
+    },
+  });
+</script>
+` : ''}
+
+<script>setTimeout(() => location.reload(), 30000);</script>
 </body>
 </html>`);
 });
