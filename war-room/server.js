@@ -2355,13 +2355,14 @@ app.get('/leaderboard', async (req, res) => {
     const emoji = botEmojis[b.name] || '🤖';
     const link = botLinks[b.name] || '#';
     const medal = medals[i] || `#${i+1}`;
-    const ret = compActive ? b.competition_return : b.cumulative_pct;
+    const preComp = competition.pre_start;
+    const ret = preComp ? 0 : (compActive ? b.competition_return : b.cumulative_pct);
     const retStr = fmtPct(ret);
     const retColor = pnlColor(ret);
     const regime = b.regime || '—';
-    const dailyPnl = b.daily_pnl;
+    const dailyPnl = preComp ? null : b.daily_pnl;
     const dailyCurr = b.currency_label === 'USD' ? '$' : 'A$';
-    const trades = b.total_trades ?? 0;
+    const trades = preComp ? 0 : (b.total_trades ?? 0);
     const regimeExtra = b.regime_extra ? ` · ${b.regime_extra}` : '';
 
     return `<tr>
