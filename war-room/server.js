@@ -441,7 +441,7 @@ app.get('/', (req, res) => {
       <a href="/possum-us" class="btn-ideas" style="color:#34d399;background:#10b98110;border-color:#10b98130">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn-ideas" style="color:#f59e0b;background:#f59e0b10;border-color:#f59e0b30">₿ Crypto</a>
       <a href="/possum-pm" class="btn-ideas" style="color:#a78bfa;background:#a78bfa10;border-color:#a78bfa30">🎯 Possum PM</a>
-      <a href="http://192.168.68.63:8080/leaderboard" class="btn-ideas" style="color:#fbbf24;background:#fbbf2410;border-color:#fbbf2430" target="_blank">🏆 Leaderboard</a>
+      <a href="/leaderboard" class="btn-ideas" style="color:#fbbf24;background:#fbbf2410;border-color:#fbbf2430">🏆 Leaderboard</a>
       <a href="/ideas" class="btn-ideas">💡 Ideas</a>
       <div class="live"><div class="dot-pulse"></div> Live · ${lastMod}</div>
       <a href="/" class="btn-refresh">↻ Refresh</a>
@@ -586,7 +586,7 @@ app.get('/ideas', (req, res) => {
   <a href="/possum-us" style="color:#34d399;border-color:#10b98130;background:#10b98110">🇺🇸 Possum US</a>
   <a href="/possum-crypto" style="color:#f59e0b;border-color:#f59e0b30;background:#f59e0b10">₿ Crypto</a>
   <a href="/possum-pm" style="color:#a78bfa;border-color:#a78bfa30;background:#a78bfa10">🎯 Possum PM</a>
-  <a href="http://192.168.68.63:8080/leaderboard" style="color:#fbbf24;border-color:#fbbf2430;background:#fbbf2410" target="_blank">🏆 Leaderboard</a>
+  <a href="/leaderboard" style="color:#fbbf24;border-color:#fbbf2430;background:#fbbf2410">🏆 Leaderboard</a>
 </div>
 <h1>💡 All Ideas</h1>
 <p class="sub">Every SaaS idea suggested — tracked over time.</p>
@@ -885,7 +885,7 @@ app.get('/possum-au', (req, res) => {
       <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
       <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
       <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
-      <a href="http://192.168.68.63:8080/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440" target="_blank">🏆 Leaderboard</a>
+      <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
       <a href="/possum-au" class="btn btn-accent">↻ Refresh</a>
     </div>
   </header>
@@ -1251,7 +1251,7 @@ app.get('/possum-us', async (req, res) => {
       <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
       <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
       <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
-      <a href="http://192.168.68.63:8080/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440" target="_blank">🏆 Leaderboard</a>
+      <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
       <a href="/possum-us" class="btn btn-accent">↻ Refresh</a>
     </div>
   </header>
@@ -1530,7 +1530,7 @@ app.get('/possum-crypto', (req, res) => {
     const latestSig = recentSignals.find(s => s.symbol === sym);
     const openPos = openPositions.find(p => p.symbol === sym);
     const sigColor = latestSig?.signal === 'buy' ? '#10b981' : latestSig?.signal === 'sell' ? '#ef4444' : '#6b7280';
-    return `<div style="background:#0d0d1a;border:1px solid #1e1e3a;border-radius:10px;padding:16px;flex:1;min-width:180px">
+    return `<div class="asset-card">
       <div style="font-size:0.75rem;color:var(--muted);margin-bottom:4px">${sym}</div>
       <div style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:8px">${latestSig?.price_at_signal ? 'A$'+Number(latestSig.price_at_signal).toLocaleString('en-AU',{minimumFractionDigits:2}) : '—'}</div>
       <div style="font-size:0.7rem;margin-bottom:4px">Last signal: <span style="color:${sigColor};font-weight:600">${latestSig?.signal?.toUpperCase()||'—'}</span> <span style="color:var(--muted)">(${latestSig?.variant||'—'})</span></div>
@@ -1544,54 +1544,146 @@ app.get('/possum-crypto', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Possum Crypto — War Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #070711; --surface: #0d0d1a; --border: #1e1e3a;
-      --text: #e2e2f0; --muted: #64647a; --accent: #f59e0b;
+      --bg: #070711;
+      --surface: #0f0f1a;
+      --surface2: #13131f;
+      --surface3: #191926;
+      --border: #ffffff09;
+      --border2: #ffffff13;
+      --text: #e2e2ee;
+      --muted: #64647a;
+      --dim: #2a2a3a;
+      --accent: #f59e0b;
+      --accent2: #fbbf24;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --blue: #60a5fa;
+      --red: #ef4444;
+      --r: 10px;
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; background: #0a0a18; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+    .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border2);
+      background: #07071180;
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
     .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { font-size: 1.4rem; }
-    .logo-name { font-size: 1rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
-    .logo-name em { font-style: normal; color: var(--accent); }
-    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.72rem; font-weight: 500; color: var(--muted); text-decoration: none; background: transparent; cursor: pointer; transition: all .15s; }
-    .btn:hover { color: var(--text); border-color: #3a3a5a; }
-    .btn-accent { color: #a3a3c0; border-color: #2a2a4a; }
-    .live { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 600; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-    .dot-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .page { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-    .stat-label { font-size: 0.65rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-    .stat-val { font-size: 1.4rem; font-weight: 700; color: #fff; }
-    .stat-sub { font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
-    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-    .section-title { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-    th { text-align: left; padding: 8px 10px; font-size: 0.62rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
-    td { padding: 9px 10px; border-bottom: 1px solid #13132a; }
+    .logo-mark {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 0 20px #f59e0b30;
+    }
+    .logo-name { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-name em { color: #fbbf24; font-style: normal; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--muted); }
+    .dot-pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+    .btn { font-family: inherit; font-size: 0.72rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border2); padding: 5px 12px; border-radius: 6px; cursor: pointer; text-decoration: none; transition: all .15s; }
+    .btn:hover { background: var(--surface2); color: var(--text); }
+    .btn-accent { color: #34d399; background: #10b98110; border-color: #10b98130; }
+    .btn-accent:hover { background: #10b98120; }
+
+    .content { padding: 28px; flex: 1; max-width: 1400px; width: 100%; }
+
+    /* Hero stats */
+    .hero { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 16px; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; inset: 0; background: var(--glow, transparent); opacity: .07; pointer-events: none; }
+    .stat-card[data-g="green"] { --glow: var(--green); }
+    .stat-card[data-g="red"] { --glow: var(--red); }
+    .stat-card[data-g="amber"] { --glow: var(--amber); }
+    .stat-card[data-g="blue"] { --glow: var(--blue); }
+    .stat-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.zero { color: var(--muted); }
+    .stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 5px; }
+    .stat-icon { position: absolute; top: 12px; right: 14px; font-size: 1.1rem; opacity: .4; }
+
+    /* Section headings */
+    .section-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section { margin-bottom: 36px; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--border2); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    thead tr { border-bottom: 1px solid var(--border2); }
+    th { padding: 10px 14px; text-align: left; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; white-space: nowrap; }
+    td { padding: 11px 14px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #0f0f20; }
-    .empty-cell { color: var(--muted); font-style: italic; text-align: center; padding: 20px; }
-    .variant-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; background: #1a1a2e; border: 1px solid #2a2a4a; color: var(--accent); }
-    .dir-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; border: 1px solid; }
-    .rationale { font-size: 0.68rem; color: var(--muted); max-width: 300px; }
-    .lb-rank { font-size: 0.9rem; }
-    .lb-code { font-weight: 600; }
+    tr:hover td { background: #ffffff03; }
+
+    .variant-badge {
+      font-size: 0.65rem; font-weight: 700; font-family: monospace;
+      background: #f59e0b15; color: var(--accent2);
+      border: 1px solid #f59e0b30; padding: 2px 7px; border-radius: 4px;
+    }
+    .dir-badge {
+      font-size: 0.62rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 99px; border: 1px solid;
+      letter-spacing: .05em;
+    }
+    .empty-cell { color: var(--muted); text-align: center; padding: 24px; font-size: 0.8rem; }
+
+    .error-banner {
+      background: #ef444410; border: 1px solid #ef444430; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 24px; color: #ef4444; font-size: 0.8rem;
+    }
+
     .asset-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-    .regime-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
-    .regime-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; border: 1px solid; }
+    .asset-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 16px; flex: 1; min-width: 180px;
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
   </style>
 </head>
 <body>
+<div class="app">
 <header>
   <div class="logo">
-    <div class="logo-icon">₿</div>
+    <div class="logo-mark">₿</div>
     <div class="logo-name">Possum <em>Crypto</em></div>
   </div>
   <div class="header-right">
@@ -1600,130 +1692,129 @@ app.get('/possum-crypto', (req, res) => {
     <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
     <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
     <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
-    <a href="/possum-crypto" class="btn btn-accent" style="color:var(--accent);border-color:#f59e0b40">↻ Refresh</a>
+    <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
+    <a href="/possum-crypto" class="btn btn-accent">↻ Refresh</a>
   </div>
 </header>
 
-<div class="page">
+  <div class="content">
+    ${!dbExists ? '<div class="error-banner">⚠️ Crypto DB not found at expected path.</div>' : ''}
 
-  ${!dbExists ? '<div style="background:#1a0a0a;border:1px solid #ef444440;border-radius:10px;padding:16px;color:#ef4444;margin-bottom:20px">⚠️ Crypto DB not found at expected path.</div>' : ''}
+    <!-- Hero Stats -->
+    <div class="hero">
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💵</div>
+        <div class="stat-label">Capital</div>
+        <div class="stat-value blue">A$15,000</div>
+        <div class="stat-sub">Competition cap</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">🌊</div>
+        <div class="stat-label">Regime</div>
+        <div class="stat-value" style="color:${regimeColor};font-size:1rem;text-transform:capitalize">${regimeLabel}</div>
+        <div class="stat-sub">${regime.fgi_label || '—'}</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">😰</div>
+        <div class="stat-label">Fear & Greed</div>
+        <div class="stat-value amber">${regime.fgi_value != null ? regime.fgi_value : '—'}</div>
+        <div class="stat-sub">Crypto FGI</div>
+      </div>
+      <div class="stat-card" data-g="${openPositions.length ? 'green' : 'blue'}">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Open Positions</div>
+        <div class="stat-value ${openPositions.length ? 'green' : 'blue'}">${openPositions.length}</div>
+        <div class="stat-sub">of 3 assets</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">🔢</div>
+        <div class="stat-label">Total Trades</div>
+        <div class="stat-value amber">${recentTrades.length > 0 ? recentTrades.length + '+' : '0'}</div>
+        <div class="stat-sub">last 10 shown</div>
+      </div>
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💸</div>
+        <div class="stat-label">API Cost (7d)</div>
+        <div class="stat-value blue" style="font-size:1rem">${totalCost}</div>
+        <div class="stat-sub">Grok / xAI</div>
+      </div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">🧬</div>
+        <div class="stat-label">Variants</div>
+        <div class="stat-value green">9</div>
+        <div class="stat-sub">M1-3 · MR1-3 · S1-3</div>
+      </div>
+    </div>
 
-  <!-- Regime Bar -->
-  <div class="regime-bar">
-    <span style="font-size:0.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Market Regime</span>
-    <span class="regime-pill" style="color:${regimeColor};border-color:${regimeColor}40;background:${regimeColor}12">${regimeLabel}</span>
-    ${regime.fgi_value != null ? `<span style="font-size:0.8rem">Fear &amp; Greed: <strong style="color:${fgiColor}">${regime.fgi_value}</strong> <span style="color:var(--muted);font-size:0.7rem">(${regime.fgi_label||''})</span></span>` : ''}
-    ${regime.btc_dominance_pct != null ? `<span style="font-size:0.7rem;color:var(--muted)">BTC Dom: <strong style="color:#fff">${Number(regime.btc_dominance_pct).toFixed(1)}%</strong></span>` : ''}
-    ${regime.timestamp_utc ? `<span style="font-size:0.65rem;color:var(--muted);margin-left:auto">Updated ${regime.timestamp_utc.slice(0,16).replace('T',' ')} UTC</span>` : ''}
-  </div>
+    <!-- Asset Cards -->
+    <div class="asset-row">${assetCards}</div>
 
-  <!-- Asset Cards -->
-  <div class="asset-row">${assetCards}</div>
+    <!-- Open Positions -->
+    <section class="section">
+      <h2 class="section-title">🟢 Open Positions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Symbol</th><th>Side</th><th>Variant</th><th>Entry Price</th>
+            <th>Qty</th><th>Stop Loss</th><th>Take Profit</th><th>Unrealised P&amp;L</th><th>Mode</th>
+          </tr></thead>
+          <tbody>${openRows}</tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- Stats -->
-  <div class="stat-grid">
-    <div class="stat-card">
-      <div class="stat-label">Capital</div>
-      <div class="stat-val" style="color:#60a5fa">A$15,000</div>
-      <div class="stat-sub">Competition cap</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Open Positions</div>
-      <div class="stat-val" style="color:${openPositions.length ? '#10b981' : 'var(--muted)'}">${openPositions.length}</div>
-      <div class="stat-sub">of 3 assets</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Total Signals</div>
-      <div class="stat-val">${recentSignals.length > 0 ? recentSignals.length + '+' : '0'}</div>
-      <div class="stat-sub">last 15 shown</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Total Trades</div>
-      <div class="stat-val">${recentTrades.length > 0 ? recentTrades.length + '+' : '0'}</div>
-      <div class="stat-sub">last 10 shown</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">API Cost (7d)</div>
-      <div class="stat-val" style="font-size:1rem">${totalCost}</div>
-      <div class="stat-sub">Grok / xAI</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Assets</div>
-      <div class="stat-val" style="font-size:1rem">BTC ETH SOL</div>
-      <div class="stat-sub">AUD pairs</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Variants</div>
-      <div class="stat-val" style="font-size:1rem">9</div>
-      <div class="stat-sub">M1-3 · MR1-3 · S1-3</div>
-    </div>
-  </div>
+    <!-- Recent Signals -->
+    <section class="section">
+      <h2 class="section-title">📡 Recent Signals <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Time</th><th>Symbol</th><th>Signal</th><th>Variant</th>
+            <th>Confidence</th><th>Regime</th><th>FGI</th><th>Reasoning</th>
+          </tr></thead>
+          <tbody>${sigRows}</tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- Open Positions -->
-  <div class="section">
-    <h2 class="section-title">🟢 Open Positions</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Symbol</th><th>Side</th><th>Variant</th><th>Entry Price</th>
-          <th>Qty</th><th>Stop Loss</th><th>Take Profit</th><th>Unrealised P&amp;L</th><th>Mode</th>
-        </tr></thead>
-        <tbody>${openRows}</tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Variant Leaderboard -->
+    <section class="section">
+      <h2 class="section-title">🏆 Variant Activity</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rank</th><th>Variant</th><th>Signals</th><th>Executed</th></tr></thead>
+          <tbody>${lbRows}</tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- Recent Signals -->
-  <div class="section">
-    <h2 class="section-title">📡 Recent Signals <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Time</th><th>Symbol</th><th>Signal</th><th>Variant</th>
-          <th>Confidence</th><th>Regime</th><th>FGI</th><th>Reasoning</th>
-        </tr></thead>
-        <tbody>${sigRows}</tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Recent Trades -->
+    <section class="section">
+      <h2 class="section-title">🔄 Recent Trades <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Time</th><th>Symbol</th><th>Side</th><th>Qty</th>
+            <th>Price</th><th>Notional</th><th>Variant</th><th>Mode</th>
+          </tr></thead>
+          <tbody>${tradeRows}</tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- Variant Leaderboard -->
-  <div class="section">
-    <h2 class="section-title">🏆 Variant Activity</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Rank</th><th>Variant</th><th>Signals</th><th>Executed</th></tr></thead>
-        <tbody>${lbRows}</tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Closed Positions -->
+    <section class="section">
+      <h2 class="section-title">✅ Closed Positions <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symbol</th><th>Variant</th><th>Realised P&amp;L</th><th>Close Reason</th><th>Date</th></tr></thead>
+          <tbody>${closedRows}</tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- Recent Trades -->
-  <div class="section">
-    <h2 class="section-title">🔄 Recent Trades <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Time</th><th>Symbol</th><th>Side</th><th>Qty</th>
-          <th>Price</th><th>Notional</th><th>Variant</th><th>Mode</th>
-        </tr></thead>
-        <tbody>${tradeRows}</tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Closed Positions -->
-  <div class="section">
-    <h2 class="section-title">✅ Closed Positions <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Symbol</th><th>Variant</th><th>Realised P&amp;L</th><th>Close Reason</th><th>Date</th></tr></thead>
-        <tbody>${closedRows}</tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
+  </div><!-- .content -->
+</div><!-- .app -->
 
 <script>setTimeout(() => location.reload(), 30000);</script>
 </body>
@@ -1871,53 +1962,129 @@ app.get('/possum-pm', (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🎯 Possum PM — War Room</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#070711;color:#c4c4d4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-a{color:inherit;text-decoration:none}
+<title>Possum PM — War Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070711;
+      --surface: #0f0f1a;
+      --surface2: #13131f;
+      --surface3: #191926;
+      --border: #ffffff09;
+      --border2: #ffffff13;
+      --text: #e2e2ee;
+      --muted: #64647a;
+      --dim: #2a2a3a;
+      --accent: #a78bfa;
+      --accent2: #c4b5fd;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --blue: #60a5fa;
+      --red: #ef4444;
+      --r: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+    .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border2);
+      background: #07071180;
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-mark {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #7c6ff7, #a78bfa);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 0 20px #a78bfa30;
+    }
+    .logo-name { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-name em { color: #a78bfa; font-style: normal; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--muted); }
+    .dot-pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+    .btn { font-family: inherit; font-size: 0.72rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border2); padding: 5px 12px; border-radius: 6px; cursor: pointer; text-decoration: none; transition: all .15s; }
+    .btn:hover { background: var(--surface2); color: var(--text); }
+    .btn-accent { color: #34d399; background: #10b98110; border-color: #10b98130; }
+    .btn-accent:hover { background: #10b98120; }
 
-header{background:#0d0d1a;border-bottom:1px solid #1e1e3a;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{font-size:1.4rem}
-.logo-name{font-size:1rem;font-weight:700;color:#e0e0f0;letter-spacing:-0.02em}
-.logo-name em{font-style:normal;color:#a78bfa}
-.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.btn{padding:5px 12px;border:1px solid #1e1e3a;border-radius:6px;font-size:0.8rem;color:#c4c4d4;background:transparent;cursor:pointer;transition:all .15s}
-.btn:hover{background:#1e1e3a;color:#fff}
-.btn-accent{color:#a78bfa;border-color:#a78bfa30;background:#a78bfa08}
-.live{display:flex;align-items:center;gap:6px;font-size:0.75rem;color:#64647a}
-.dot-pulse{width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 6px #a78bfa80;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .content { padding: 28px; flex: 1; max-width: 1400px; width: 100%; }
 
-.page{max-width:1300px;margin:0 auto;padding:24px}
+    .hero { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 16px; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; inset: 0; background: var(--glow, transparent); opacity: .07; pointer-events: none; }
+    .stat-card[data-g="green"] { --glow: var(--green); }
+    .stat-card[data-g="red"] { --glow: var(--red); }
+    .stat-card[data-g="amber"] { --glow: var(--amber); }
+    .stat-card[data-g="blue"] { --glow: var(--blue); }
+    .stat-card[data-g="purple"] { --glow: var(--accent); }
+    .stat-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; line-height: 1; letter-spacing: -0.5px; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.purple { color: var(--accent); }
+    .stat-value.zero { color: var(--muted); }
+    .stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 5px; }
+    .stat-icon { position: absolute; top: 12px; right: 14px; font-size: 1.1rem; opacity: .4; }
 
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
-.stat-card{background:#0d0d1a;border:1px solid #1e1e3a;border-radius:12px;padding:16px 18px}
-.stat-label{font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#64647a;margin-bottom:6px}
-.stat-value{font-size:1.5rem;font-weight:700;color:#a78bfa}
-.stat-sub{font-size:0.7rem;color:#64647a;margin-top:2px}
+    .section-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section { margin-bottom: 36px; }
 
-.section{margin-bottom:28px}
-.section-title{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#64647a;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.section-title::after{content:'';flex:1;height:1px;background:#1e1e3a}
+    .table-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--border2); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    thead tr { border-bottom: 1px solid var(--border2); }
+    th { padding: 10px 14px; text-align: left; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; white-space: nowrap; }
+    td { padding: 11px 14px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #ffffff03; }
 
-.contract-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-bottom:24px}
+    .empty-cell { color: var(--muted); text-align: center; padding: 24px; font-size: 0.8rem; }
+    .empty-msg { color: var(--muted); text-align: center; padding: 24px; font-size: 0.8rem; }
+    .contract-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px; margin-bottom: 24px; }
 
-.table-wrap{overflow-x:auto;border:1px solid #1e1e3a;border-radius:10px}
-table{width:100%;border-collapse:collapse;font-size:0.8rem}
-th{background:#0d0d1a;color:#64647a;font-weight:600;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.07em;padding:10px 12px;text-align:left;border-bottom:1px solid #1e1e3a;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid #12122a;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#0d0d1a}
+    .error-banner {
+      background: #ef444410; border: 1px solid #ef444430; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 24px; color: #ef4444; font-size: 0.8rem;
+    }
 
-.empty-msg{color:#64647a;font-size:0.85rem;padding:24px;text-align:center}
-
-.err-banner{background:#1a0a0a;border:1px solid #ef444440;border-radius:10px;padding:16px;color:#ef4444;margin-bottom:20px}
-</style>
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+  </style>
 </head>
 <body>
-
+<div class="app">
 <header>
   <div class="logo">
     <div class="logo-mark">🎯</div>
@@ -1926,55 +2093,62 @@ tr:hover td{background:#0d0d1a}
   <div class="header-right">
     <div class="live"><div class="dot-pulse"></div> PAPER mode</div>
     <a href="/" class="btn">← War Room</a>
-    <a href="/possum-au" class="btn">🦘 Possum AU</a>
-    <a href="/possum-us" class="btn">🇺🇸 Possum US</a>
-    <a href="/possum-crypto" class="btn" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+    <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
+    <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
+    <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+    <a href="/leaderboard" class="btn" style="color:#fbbf24;border-color:#fbbf2440">🏆 Leaderboard</a>
     <a href="/possum-pm" class="btn btn-accent">↻ Refresh</a>
   </div>
 </header>
 
-<div class="page">
+  <div class="content">
+    ${!dbExists ? '<div class="error-banner">⚠️ Possum PM DB not found. Run the bot at least once.</div>' : ''}
 
-  ${!dbExists ? '<div class="err-banner">⚠️ Possum PM DB not found. Run the bot at least once to generate data.</div>' : ''}
-
-  <!-- Stat Cards -->
-  <div class="stat-grid">
-    <div class="stat-card">
-      <div class="stat-label">Capital</div>
-      <div class="stat-value" style="color:#60a5fa;font-size:1.4rem;font-weight:700">A$15,000</div>
-      <div class="stat-sub">Competition cap</div>
+    <!-- Hero Stats -->
+    <div class="hero">
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💵</div>
+        <div class="stat-label">Capital</div>
+        <div class="stat-value blue">A$15,000</div>
+        <div class="stat-sub">Competition cap</div>
+      </div>
+      <div class="stat-card" data-g="purple">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label">Active Contracts</div>
+        <div class="stat-value purple">${contracts.length}</div>
+        <div class="stat-sub">in contracts.json</div>
+      </div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">Open Trades</div>
+        <div class="stat-value green">${openTrades}</div>
+        <div class="stat-sub">paper positions</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">🔢</div>
+        <div class="stat-label">Total Decisions</div>
+        <div class="stat-value amber">${totalDecisions}</div>
+        <div class="stat-sub">pipeline runs</div>
+      </div>
+      <div class="stat-card" data-g="amber">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Trades Logged</div>
+        <div class="stat-value amber">${totalTrades}</div>
+        <div class="stat-sub">all time</div>
+      </div>
+      <div class="stat-card" data-g="blue">
+        <div class="stat-icon">💸</div>
+        <div class="stat-label">API Cost (7d)</div>
+        <div class="stat-value blue" style="font-size:1rem">$${Number(apiCost7d).toFixed(4)}</div>
+        <div class="stat-sub">USD</div>
+      </div>
+      <div class="stat-card" data-g="purple">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">Phase</div>
+        <div class="stat-value purple" style="font-size:1rem">Phase 1</div>
+        <div class="stat-sub">pipeline intelligence</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Active Contracts</div>
-      <div class="stat-value">${contracts.length}</div>
-      <div class="stat-sub">in contracts.json</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Open Trades</div>
-      <div class="stat-value">${openTrades}</div>
-      <div class="stat-sub">paper positions</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Total Decisions</div>
-      <div class="stat-value">${totalDecisions}</div>
-      <div class="stat-sub">pipeline runs logged</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Trades Logged</div>
-      <div class="stat-value">${totalTrades}</div>
-      <div class="stat-sub">all time</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">API Cost 7d</div>
-      <div class="stat-value" style="font-size:1.2rem">$${Number(apiCost7d).toFixed(4)}</div>
-      <div class="stat-sub">USD</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Phase</div>
-      <div class="stat-value" style="font-size:1.2rem">Phase 1</div>
-      <div class="stat-sub">pipeline intelligence</div>
-    </div>
-  </div>
 
   <!-- Contracts Panel -->
   <div class="section">
@@ -2040,9 +2214,233 @@ tr:hover td{background:#0d0d1a}
       </div>`}
   </div>
 
-</div>
+  </div><!-- .content -->
+</div><!-- .app -->
 
 <script>setTimeout(() => location.reload(), 30000);</script>
+</body>
+</html>`);
+});
+
+// ── Leaderboard ──────────────────────────────────────────────────────────────
+async function getLeaderboardData() {
+  try {
+    const res = await fetch('http://localhost:8080/api/leaderboard', { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+app.get('/leaderboard', async (req, res) => {
+  const data = await getLeaderboardData();
+  const bots = data?.ranked || [];
+  const competition = data?.competition || {};
+  const compActive = competition.active || false;
+  const today = data?.today || new Date().toISOString().slice(0, 10);
+  const timestamp = data?.timestamp || new Date().toISOString();
+
+  const botColors = { 'Possum US': '#3b82f6', 'Possum AU': '#f59e0b', 'Possum Crypto': '#a855f7', 'Possum PM': '#14b8a6' };
+  const botEmojis = { 'Possum US': '🇺🇸', 'Possum AU': '🦘', 'Possum Crypto': '₿', 'Possum PM': '🎯' };
+  const medals = ['🥇', '🥈', '🥉'];
+
+  function fmtPct(n) {
+    if (n == null) return '—';
+    return (n > 0 ? '+' : '') + Number(n).toFixed(2) + '%';
+  }
+
+  const botCards = bots.map((b, i) => {
+    const color = botColors[b.name] || '#64647a';
+    const emoji = botEmojis[b.name] || '🤖';
+    const rank = i + 1;
+    const medal = medals[i] || `#${rank}`;
+    const ret = b.competition_return;
+    const retColor = ret > 0 ? '#10b981' : ret < 0 ? '#ef4444' : '#64647a';
+    const regime = b.regime || '—';
+    const online = b.online !== false;
+    const statusDot = online ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b98180"></span>' : '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ef4444"></span>';
+
+    if (compActive) {
+      return `<div class="lb-card" style="border-left:3px solid ${color}">
+        <div class="lb-rank">${medal}</div>
+        <div class="lb-info">
+          <div class="lb-name" style="color:${color}">${emoji} ${b.name}</div>
+          <div class="lb-type">${b.type || '—'}</div>
+        </div>
+        <div class="lb-stats">
+          <div class="lb-return" style="color:${retColor}">${fmtPct(ret)}</div>
+          <div class="lb-regime">${regime}</div>
+        </div>
+        <div class="lb-status">${statusDot}</div>
+      </div>`;
+    } else {
+      return `<div class="lb-card" style="border-left:3px solid ${color}">
+        <div class="lb-dot" style="background:${color}"></div>
+        <div class="lb-info">
+          <div class="lb-name" style="color:${color}">${emoji} ${b.name}</div>
+          <div class="lb-type">${b.type || '—'}</div>
+        </div>
+        <div class="lb-stats">
+          <div class="lb-regime">${regime}</div>
+        </div>
+        <div class="lb-status">${statusDot} ${online ? 'ONLINE' : 'OFFLINE'}</div>
+      </div>`;
+    }
+  }).join('');
+
+  const compBanner = compActive
+    ? `<div class="comp-banner green">🏁 Competition Active — Started ${competition.start_date || '—'} · Ends ${competition.end_date || '—'}</div>`
+    : `<div class="comp-banner amber">⏳ Competition starts ${competition.start_date || 'soon'} — All bots on A$15,000 starting capital</div>`;
+
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="30">
+  <title>Fleet Leaderboard — War Room</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070711;
+      --surface: #0f0f1a;
+      --surface2: #13131f;
+      --surface3: #191926;
+      --border: #ffffff09;
+      --border2: #ffffff13;
+      --text: #e2e2ee;
+      --muted: #64647a;
+      --dim: #2a2a3a;
+      --accent: #fbbf24;
+      --accent2: #f59e0b;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --blue: #60a5fa;
+      --red: #ef4444;
+      --r: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+    .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border2);
+      background: #07071180;
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-mark {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      box-shadow: 0 0 20px #fbbf2430;
+    }
+    .logo-name { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-name em { color: #fbbf24; font-style: normal; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--muted); }
+    .dot-pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+    .btn { font-family: inherit; font-size: 0.72rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border2); padding: 5px 12px; border-radius: 6px; cursor: pointer; text-decoration: none; transition: all .15s; }
+    .btn:hover { background: var(--surface2); color: var(--text); }
+    .btn-accent { color: #34d399; background: #10b98110; border-color: #10b98130; }
+    .btn-accent:hover { background: #10b98120; }
+
+    .content { padding: 28px; flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; }
+
+    .comp-banner {
+      border-radius: var(--r); padding: 14px 20px; margin-bottom: 24px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .comp-banner.green { background: #10b98110; border: 1px solid #10b98130; color: #34d399; }
+    .comp-banner.amber { background: #f59e0b10; border: 1px solid #f59e0b30; color: #fbbf24; }
+
+    .lb-card {
+      display: grid; grid-template-columns: 44px 1fr auto auto;
+      align-items: center; gap: 16px;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--r); padding: 16px 20px; margin-bottom: 10px;
+      transition: border-color .15s;
+    }
+    .lb-card:hover { border-color: var(--accent); }
+    .lb-rank { font-size: 1.3rem; text-align: center; }
+    .lb-dot { width: 10px; height: 10px; border-radius: 50%; margin: 0 auto; }
+    .lb-name { font-size: 0.9rem; font-weight: 700; }
+    .lb-type { font-size: 0.65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 2px; }
+    .lb-return { font-size: 1.5rem; font-weight: 800; text-align: right; letter-spacing: -0.5px; }
+    .lb-regime { font-size: 0.7rem; color: var(--muted); text-transform: capitalize; text-align: right; margin-top: 2px; }
+    .lb-status { font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+
+    .section-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted); margin-bottom: 14px; margin-top: 32px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .meta-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; font-size: 0.75rem; color: var(--muted);
+    }
+    .meta-row a { color: var(--muted); text-decoration: none; }
+    .meta-row a:hover { color: var(--text); }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-mark">🏆</div>
+      <div class="logo-name">Fleet <em>Leaderboard</em></div>
+    </div>
+    <div class="header-right">
+      <div class="live"><div class="dot-pulse"></div> Auto-refresh 30s</div>
+      <a href="/" class="btn">← War Room</a>
+      <a href="/possum-au" class="btn btn-accent">🦘 Possum AU</a>
+      <a href="/possum-us" class="btn btn-accent">🇺🇸 Possum US</a>
+      <a href="/possum-crypto" class="btn btn-accent" style="color:#f59e0b;border-color:#f59e0b40">₿ Crypto</a>
+      <a href="/possum-pm" class="btn btn-accent" style="color:#a78bfa;border-color:#a78bfa40">🎯 Possum PM</a>
+      <a href="/leaderboard" class="btn btn-accent" style="color:#fbbf24;border-color:#fbbf2440">↻ Refresh</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="meta-row">
+      <span>Possum Fleet Showdown · A$15,000 per bot</span>
+      <span>${today} · ${timestamp.slice(11,19)} UTC</span>
+    </div>
+
+    ${compBanner}
+
+    <h2 class="section-title">🏆 Scoreboard</h2>
+    ${botCards || '<div style="color:var(--muted);text-align:center;padding:32px">Could not load leaderboard data. Is the dashboard API running?</div>'}
+
+  </div>
+</div>
 </body>
 </html>`);
 });
