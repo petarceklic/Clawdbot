@@ -46,6 +46,23 @@ class Trader:
 
         # Calculate quantity based on max position size
         max_aud = self.cfg.trading.max_position_size_aud
+
+        # Check portfolio-level exposure cap
+        if self.cfg.trading.competition_capital_aud > 0:
+            from database.db import get_db
+            db = get_db()
+            row = db.fetch_one(
+                "SELECT COALESCE(SUM(quantity * entry_price), 0) as total "
+                "FROM positions WHERE status = 'open'"
+            )
+            current_exposure = row["total"] if row else 0
+            if current_exposure + max_aud > self.cfg.trading.competition_capital_aud:
+                logger.warning(
+                    "Would exceed capital cap: A$%.2f + A$%.2f > A$%.2f",
+                    current_exposure, max_aud, self.cfg.trading.competition_capital_aud,
+                )
+                return {"action": "rejected", "reason": "capital_cap_exceeded"}
+
         quantity = max_aud / fill_price
 
         # Estimate fee
@@ -86,6 +103,22 @@ class Trader:
 
         exchange = get_exchange()
         max_aud = self.cfg.trading.max_position_size_aud
+
+        # Check portfolio-level exposure cap
+        if self.cfg.trading.competition_capital_aud > 0:
+            from database.db import get_db
+            db = get_db()
+            row = db.fetch_one(
+                "SELECT COALESCE(SUM(quantity * entry_price), 0) as total "
+                "FROM positions WHERE status = 'open'"
+            )
+            current_exposure = row["total"] if row else 0
+            if current_exposure + max_aud > self.cfg.trading.competition_capital_aud:
+                logger.warning(
+                    "Would exceed capital cap: A$%.2f + A$%.2f > A$%.2f",
+                    current_exposure, max_aud, self.cfg.trading.competition_capital_aud,
+                )
+                return {"action": "rejected", "reason": "capital_cap_exceeded"}
 
         try:
             # Get current price for quantity calculation

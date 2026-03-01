@@ -41,8 +41,9 @@ class TradingSettings(BaseSettings):
     universe: list[str] = ["BTC/AUD", "ETH/AUD", "SOL/AUD"]
 
     # Risk management
-    max_position_size_aud: float = 100.0    # Max per trade during paper phase
+    max_position_size_aud: float = 5000.0    # Max per trade (A$15k / 3 positions)
     max_positions: int = 3                   # One per asset max
+    competition_capital_aud: float = 15000.0 # Total portfolio cap
     stop_loss_pct: float = 0.05              # 5% hard stop
     take_profit_pct: float = 0.10            # 10% default take profit
 
