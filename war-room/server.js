@@ -20,6 +20,12 @@ function isCompetitionActive() {
   } catch { return false; }
 }
 
+function getCompetitionStartDate() {
+  try {
+    return JSON.parse(fs.readFileSync(COMPETITION_JSON, 'utf8')).competition.start_date;
+  } catch { return '2026-03-02'; }
+}
+
 // ── Data: Claude usage from session files ─────────────────────────────────────
 const CONTEXT_WINDOW = 1000000; // claude-sonnet-4-6 (1M token context)
 
@@ -621,6 +627,153 @@ app.post('/api/brave-hit', (req, res) => {
   } catch { res.json({ ok: false }); }
 });
 
+// ── Variant Chart Helpers ────────────────────────────────────────────────────
+const US_RESULTS_DIR = path.join(__dirname, '../trading-bot-possum/results');
+
+const US_VARIANT_NAMES = {
+  'A': 'Swing', 'C': 'Mean Rev', 'D': 'Momentum', 'E2': 'Sentiment',
+  'E3': 'Contrarian', 'F': 'PEAD', 'P2': 'Pattern', 'G': 'Vol Div', 'N1': 'News'
+};
+const AU_VARIANT_NAMES = {
+  'V1': 'US Lead-Lag', 'V2': 'Sector Rotation', 'V3': 'Pairs Trade',
+  'V4': 'FX Sensitivity', 'V5': 'Industry Mom', 'V6': 'Yield Curve',
+  'V7': 'Commodity Beta', 'V8': 'Pre-Earnings', 'V9': 'Index Rebalance',
+  'V10': 'Short Interest', 'V11': 'Calendar', 'V12': 'Dividend',
+  'V13': 'ESG Flow', 'V14': 'Broker Upgrade'
+};
+const CRYPTO_VARIANT_NAMES = {
+  'M1': 'EMA Cross', 'M2': 'RSI Mom', 'M3': 'Breakout',
+  'MR1': 'BB Revert', 'MR2': 'RSI Extreme', 'MR3': 'FGI Contra',
+  'S1': 'Grok Dir', 'S2': 'Grok+Tech', 'S3': 'Grok Contra',
+};
+
+const VARIANT_COLORS_9 = [
+  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+  '#ec4899', '#06b6d4', '#f97316', '#6366f1'
+];
+const VARIANT_COLORS_14 = [
+  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+  '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#14b8a6',
+  '#f43f5e', '#84cc16', '#a855f7', '#0ea5e9'
+];
+
+/**
+ * Build daily cumulative P&L per variant from archive JSONs (US & AU).
+ * Returns { dates: ['03-02', ...], series: { 'A': [0, 12.5, ...], ... } }
+ */
+function getVariantHistory(resultsDir, filePrefix, startDate) {
+  const result = { dates: [], series: {} };
+  try {
+    const regex = new RegExp(`^${filePrefix}_(\\d{4}-\\d{2}-\\d{2})\\.json$`);
+    const files = fs.readdirSync(resultsDir)
+      .filter(f => regex.test(f))
+      .sort();
+
+    const cumulative = {};  // running sum per variant
+
+    for (const file of files) {
+      const dateStr = file.match(regex)[1];
+      if (dateStr < startDate) continue;
+
+      let data;
+      try { data = JSON.parse(fs.readFileSync(path.join(resultsDir, file), 'utf-8')); } catch { continue; }
+
+      // Aggregate daily P&L by variant
+      const dailyPnl = {};
+      for (const pos of (data.positions || [])) {
+        const v = pos.primary_variant;
+        if (!v) continue;
+        dailyPnl[v] = (dailyPnl[v] || 0) + (pos.net_pnl || 0);
+      }
+
+      // Update cumulative for all known variants
+      for (const v of Object.keys(dailyPnl)) {
+        cumulative[v] = (cumulative[v] || 0) + dailyPnl[v];
+      }
+
+      result.dates.push(dateStr.slice(5)); // MM-DD
+      for (const v of Object.keys(cumulative)) {
+        if (!result.series[v]) result.series[v] = new Array(result.dates.length - 1).fill(0);
+        result.series[v].push(Math.round(cumulative[v] * 100) / 100);
+      }
+      // Pad any variant that didn't appear this day
+      for (const v of Object.keys(result.series)) {
+        if (result.series[v].length < result.dates.length) {
+          result.series[v].push(result.series[v][result.series[v].length - 1] || 0);
+        }
+      }
+    }
+  } catch {}
+  return result;
+}
+
+/**
+ * Build daily cumulative P&L per variant from crypto positions table.
+ */
+function getCryptoVariantHistory(startDate) {
+  const result = { dates: [], series: {} };
+  try {
+    // Closed positions grouped by close date + variant
+    const closed = cryptoQuery(
+      `SELECT DATE(close_timestamp_utc) as d, variant, SUM(realised_pnl_aud) as pnl
+       FROM positions WHERE status='closed' AND DATE(close_timestamp_utc) >= '${startDate}'
+       GROUP BY d, variant ORDER BY d`
+    );
+
+    // Collect all dates
+    const dateSet = new Set();
+    for (const row of closed) dateSet.add(row.d);
+    const dates = [...dateSet].sort();
+
+    if (dates.length === 0) return result;
+
+    // Build daily P&L map
+    const dailyMap = {};  // { date: { variant: pnl } }
+    for (const row of closed) {
+      if (!dailyMap[row.d]) dailyMap[row.d] = {};
+      dailyMap[row.d][row.variant] = row.pnl || 0;
+    }
+
+    // Build cumulative series
+    const cumulative = {};
+    for (const date of dates) {
+      result.dates.push(date.slice(5));
+      const day = dailyMap[date] || {};
+      for (const v of Object.keys(day)) {
+        cumulative[v] = (cumulative[v] || 0) + day[v];
+      }
+      for (const v of Object.keys(cumulative)) {
+        if (!result.series[v]) result.series[v] = new Array(result.dates.length - 1).fill(0);
+        result.series[v].push(Math.round(cumulative[v] * 100) / 100);
+      }
+      for (const v of Object.keys(result.series)) {
+        if (result.series[v].length < result.dates.length) {
+          result.series[v].push(result.series[v][result.series[v].length - 1] || 0);
+        }
+      }
+    }
+  } catch {}
+  return result;
+}
+
+/**
+ * Build Chart.js datasets array from variant history data.
+ */
+function buildVariantChartDatasets(history, nameMap, colors) {
+  const codes = Object.keys(history.series).sort();
+  return codes.map((code, i) => ({
+    label: `${code} ${nameMap[code] || ''}`.trim(),
+    data: history.series[code],
+    borderColor: colors[i % colors.length],
+    backgroundColor: colors[i % colors.length] + '20',
+    borderWidth: 2,
+    pointRadius: 2,
+    pointBackgroundColor: colors[i % colors.length],
+    tension: 0.3,
+    fill: false,
+  }));
+}
+
 // ── Possum AU ─────────────────────────────────────────────────────────────────
 const POSSUM_RESULTS_DIR = path.join(__dirname, '../trading-bot-possum-au/results');
 
@@ -676,6 +829,12 @@ app.get('/possum-au', (req, res) => {
   const compLive = isCompetitionActive();
   const allDays = getPossumAUData();
   const leaderboard = buildVariantLeaderboard(allDays);
+
+  // Variant performance chart data
+  const startDate = getCompetitionStartDate();
+  const auVariantHistory = compLive ? getVariantHistory(POSSUM_RESULTS_DIR, 'possum_au', startDate) : { dates: [], series: {} };
+  const auChartDatasets = buildVariantChartDatasets(auVariantHistory, AU_VARIANT_NAMES, VARIANT_COLORS_14);
+  const hasAuChart = auVariantHistory.dates.length > 0;
 
   // Latest day = today's data
   let today = null;
@@ -976,6 +1135,16 @@ app.get('/possum-au', (req, res) => {
       </div>
     </section>
 
+    <!-- Variant Performance Chart -->
+    <section class="section">
+      <h2 class="section-title">📈 Variant Performance</h2>
+      ${hasAuChart ? `
+      <div style="position:relative;height:280px;margin-bottom:8px">
+        <canvas id="variantChart"></canvas>
+      </div>
+      ` : '<div style="text-align:center;padding:40px 0;color:var(--muted)">Chart will appear once trading begins</div>'}
+    </section>
+
     <!-- Today's Signals -->
     <section class="section">
       <h2 class="section-title">📡 Today's Signals — ${today?.date || 'N/A'}</h2>
@@ -1019,6 +1188,30 @@ app.get('/possum-au', (req, res) => {
   </div>
 </div>
 
+${hasAuChart ? `
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('variantChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [${auVariantHistory.dates.map(d => `"${d}"`).join(',')}],
+      datasets: ${JSON.stringify(auChartDatasets)}
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#a0a0b8', font: { size: 10 }, boxWidth: 12, padding: 10 } },
+        tooltip: { backgroundColor: '#1a1d27', borderColor: '#2a2d3a', borderWidth: 1, titleColor: '#e2e2ee', bodyColor: '#e2e2ee', padding: 10 },
+      },
+      scales: {
+        x: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 } } },
+        y: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 }, callback: v => 'A$' + v.toFixed(0) } },
+      },
+    },
+  });
+</script>
+` : ''}
 <script>setTimeout(() => location.reload(), 30000);</script>
 </body>
 </html>`);
@@ -1060,6 +1253,12 @@ app.get('/possum-us', async (req, res) => {
   const positions = data?.positions || [];
   const recentTrades = (data?.recent_trades || []).slice(0, 10);
   const activeVariants = data?.active_variants || [];
+
+  // Variant performance chart data
+  const startDate = getCompetitionStartDate();
+  const usVariantHistory = compLive ? getVariantHistory(US_RESULTS_DIR, 'possum_us', startDate) : { dates: [], series: {} };
+  const usChartDatasets = buildVariantChartDatasets(usVariantHistory, US_VARIANT_NAMES, VARIANT_COLORS_9);
+  const hasUsChart = usVariantHistory.dates.length > 0;
 
   const pclr = (n) => n > 0 ? '#10b981' : n < 0 ? '#ef4444' : '#64647a';
   const statusColor = botStatus === 'ACTIVE' ? '#10b981' : '#ef4444';
@@ -1350,6 +1549,16 @@ app.get('/possum-us', async (req, res) => {
       </div>
     </section>
 
+    <!-- Variant Performance Chart -->
+    <section class="section">
+      <h2 class="section-title">📈 Variant Performance</h2>
+      ${hasUsChart ? `
+      <div style="position:relative;height:280px;margin-bottom:8px">
+        <canvas id="variantChart"></canvas>
+      </div>
+      ` : '<div style="text-align:center;padding:40px 0;color:var(--muted)">Chart will appear once trading begins</div>'}
+    </section>
+
     <!-- Open Positions -->
     <section class="section">
       <h2 class="section-title">📌 Open Positions <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none;letter-spacing:0">(${positions.length})</span></h2>
@@ -1395,6 +1604,30 @@ app.get('/possum-us', async (req, res) => {
   </div>
 </div>
 
+${hasUsChart ? `
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('variantChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [${usVariantHistory.dates.map(d => `"${d}"`).join(',')}],
+      datasets: ${JSON.stringify(usChartDatasets)}
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#a0a0b8', font: { size: 10 }, boxWidth: 12, padding: 10 } },
+        tooltip: { backgroundColor: '#1a1d27', borderColor: '#2a2d3a', borderWidth: 1, titleColor: '#e2e2ee', bodyColor: '#e2e2ee', padding: 10 },
+      },
+      scales: {
+        x: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 } } },
+        y: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 }, callback: v => '$' + v.toFixed(0) } },
+      },
+    },
+  });
+</script>
+` : ''}
 <script>setTimeout(() => location.reload(), 30000);</script>
 </body>
 </html>`);
@@ -1445,6 +1678,12 @@ app.get('/possum-crypto', (req, res) => {
   const compLive = isCompetitionActive();
   const dbExists = fs.existsSync(CRYPTO_DB);
 
+  // Variant performance chart data
+  const startDate = getCompetitionStartDate();
+  const cryptoVariantHistory = compLive ? getCryptoVariantHistory(startDate) : { dates: [], series: {} };
+  const cryptoChartDatasets = buildVariantChartDatasets(cryptoVariantHistory, CRYPTO_VARIANT_NAMES, VARIANT_COLORS_9);
+  const hasCryptoChart = cryptoVariantHistory.dates.length > 0;
+
   // Fetch data
   const regimeRows = cryptoQuery('SELECT * FROM crypto_regime_log ORDER BY timestamp_utc DESC LIMIT 1');
   const regime = regimeRows[0] || {};
@@ -1457,11 +1696,6 @@ app.get('/possum-crypto', (req, res) => {
   const apiCosts = cryptoQuery("SELECT SUM(estimated_cost_usd) as total, SUM(input_tokens) as tin, SUM(output_tokens) as tout FROM api_costs WHERE timestamp_utc >= datetime('now', '-7 days')");
 
   // Variant P&L leaderboard (real P&L, not just signal counts)
-  const CRYPTO_VARIANT_NAMES = {
-    'M1': 'EMA Cross', 'M2': 'RSI Mom', 'M3': 'Breakout',
-    'MR1': 'BB Revert', 'MR2': 'RSI Extreme', 'MR3': 'FGI Contra',
-    'S1': 'Grok Dir', 'S2': 'Grok+Tech', 'S3': 'Grok Contra',
-  };
   const closedByVariant = cryptoQuery(
     `SELECT variant, COUNT(*) as total,
             SUM(CASE WHEN realised_pnl_aud > 0 THEN 1 ELSE 0 END) as wins,
@@ -1861,6 +2095,16 @@ app.get('/possum-crypto', (req, res) => {
       </div>
     </section>
 
+    <!-- Variant Performance Chart -->
+    <section class="section">
+      <h2 class="section-title">📈 Variant Performance</h2>
+      ${hasCryptoChart ? `
+      <div style="position:relative;height:280px;margin-bottom:8px">
+        <canvas id="variantChart"></canvas>
+      </div>
+      ` : '<div style="text-align:center;padding:40px 0;color:var(--muted)">Chart will appear once trading begins</div>'}
+    </section>
+
     <!-- Recent Trades -->
     <section class="section">
       <h2 class="section-title">🔄 Recent Trades <span style="font-weight:400;font-size:0.65rem;color:var(--muted);text-transform:none">(last 10)</span></h2>
@@ -1890,6 +2134,30 @@ app.get('/possum-crypto', (req, res) => {
   </div><!-- .content -->
 </div><!-- .app -->
 
+${hasCryptoChart ? `
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('variantChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [${cryptoVariantHistory.dates.map(d => `"${d}"`).join(',')}],
+      datasets: ${JSON.stringify(cryptoChartDatasets)}
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#a0a0b8', font: { size: 10 }, boxWidth: 12, padding: 10 } },
+        tooltip: { backgroundColor: '#1a1d27', borderColor: '#2a2d3a', borderWidth: 1, titleColor: '#e2e2ee', bodyColor: '#e2e2ee', padding: 10 },
+      },
+      scales: {
+        x: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 } } },
+        y: { grid: { color: '#ffffff08' }, ticks: { color: '#64647a', font: { size: 10 }, callback: v => 'A$' + v.toFixed(0) } },
+      },
+    },
+  });
+</script>
+` : ''}
 <script>setTimeout(() => location.reload(), 30000);</script>
 </body>
 </html>`);
