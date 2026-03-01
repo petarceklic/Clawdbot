@@ -2324,8 +2324,8 @@ app.get('/leaderboard', async (req, res) => {
 
   // Variant leaderboard data
   const variantLeaderboard = data?.variant_leaderboard || [];
-  const variantsWithTrades = variantLeaderboard.filter(v => v.total_trades > 0);
-  const topVariant = variantLeaderboard.length > 0 ? variantLeaderboard[0] : null;
+  const variantsWithTrades = compActive ? variantLeaderboard.filter(v => v.total_trades > 0) : [];
+  const topVariant = compActive && variantLeaderboard.length > 0 ? variantLeaderboard[0] : null;
 
   // Per-bot raw data
   const usData = data?.us || {};
