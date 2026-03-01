@@ -1272,7 +1272,7 @@ app.get('/possum-us', async (req, res) => {
   </header>
 
   <div class="content">
-    ${!data ? `<div class="error-banner">⚠️ Could not reach Possum US API at http://localhost:8080/api/status — bot may be offline or API not running.</div>` : ''}
+    ${!data && compLive ? `<div class="error-banner">⚠️ Could not reach Possum US API at http://localhost:8080/api/status — bot may be offline or API not running.</div>` : ''}
 
     <!-- Hero Stats -->
     <div class="hero">
@@ -1717,7 +1717,7 @@ app.get('/possum-crypto', (req, res) => {
 </header>
 
   <div class="content">
-    ${!dbExists ? '<div class="error-banner">⚠️ Crypto DB not found at expected path.</div>' : ''}
+    ${!dbExists && compLive ? '<div class="error-banner">⚠️ Crypto DB not found at expected path.</div>' : ''}
 
     <!-- Hero Stats -->
     <div class="hero">
@@ -2125,7 +2125,7 @@ app.get('/possum-pm', (req, res) => {
 </header>
 
   <div class="content">
-    ${!dbExists ? '<div class="error-banner">⚠️ Possum PM DB not found. Run the bot at least once.</div>' : ''}
+    ${!dbExists && compLive ? '<div class="error-banner">⚠️ Possum PM DB not found. Run the bot at least once.</div>' : ''}
 
     <!-- Hero Stats -->
     <div class="hero">
