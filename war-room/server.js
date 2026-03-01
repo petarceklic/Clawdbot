@@ -947,6 +947,12 @@ app.get('/possum-au', (req, res) => {
         <div class="stat-value green">${compLive ? (today?.num_trades ?? '—') : '0'}</div>
         <div class="stat-sub">Signals generated</div>
       </div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Top Strategy</div>
+        <div class="stat-value green" style="font-size:0.95rem">${compLive && leaderboard.length > 0 && leaderboard[0].trades > 0 ? leaderboard[0].code : '—'}</div>
+        <div class="stat-sub">${compLive && leaderboard.length > 0 && leaderboard[0].trades > 0 ? fmtAud(leaderboard[0].totalPnl) + ' · ' + leaderboard[0].trades + ' trades' : '14 variants · V1-V14'}</div>
+      </div>
     </div>
 
     ${compLive ? `
@@ -1312,11 +1318,11 @@ app.get('/possum-us', async (req, res) => {
         <div class="stat-value amber">$${Number(apiSpend).toFixed(3)}</div>
         <div class="stat-sub">Today's cost</div>
       </div>
-      <div class="stat-card" data-g="${botStatus === 'ACTIVE' ? 'green' : 'red'}">
-        <div class="stat-icon">🤖</div>
-        <div class="stat-label">Bot Status</div>
-        <div class="stat-value" style="color:${statusColor};font-size:0.9rem">${botStatus}</div>
-        <div class="stat-sub">${activeVariants.length} active variant${activeVariants.length !== 1 ? 's' : ''}</div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Top Strategy</div>
+        <div class="stat-value green" style="font-size:0.95rem">${compLive && variants.length > 0 && variants[0].trades > 0 ? variants[0].code + ' ' + (variants[0].name || '') : '—'}</div>
+        <div class="stat-sub">${compLive && variants.length > 0 && variants[0].trades > 0 ? '$' + Number(variants[0].pnl || 0).toFixed(2) + ' · ' + variants[0].trades + ' trades' : '9 variants active'}</div>
       </div>
     </div>
 
@@ -1450,7 +1456,48 @@ app.get('/possum-crypto', (req, res) => {
   const dailyPnl = cryptoQuery('SELECT * FROM daily_pnl ORDER BY date DESC LIMIT 14');
   const apiCosts = cryptoQuery("SELECT SUM(estimated_cost_usd) as total, SUM(input_tokens) as tin, SUM(output_tokens) as tout FROM api_costs WHERE timestamp_utc >= datetime('now', '-7 days')");
 
-  const leaderboard = buildCryptoLeaderboard(recentSignals);
+  // Variant P&L leaderboard (real P&L, not just signal counts)
+  const CRYPTO_VARIANT_NAMES = {
+    'M1': 'EMA Cross', 'M2': 'RSI Mom', 'M3': 'Breakout',
+    'MR1': 'BB Revert', 'MR2': 'RSI Extreme', 'MR3': 'FGI Contra',
+    'S1': 'Grok Dir', 'S2': 'Grok+Tech', 'S3': 'Grok Contra',
+  };
+  const closedByVariant = cryptoQuery(
+    `SELECT variant, COUNT(*) as total,
+            SUM(CASE WHEN realised_pnl_aud > 0 THEN 1 ELSE 0 END) as wins,
+            COALESCE(SUM(realised_pnl_aud), 0) as pnl,
+            SUM(CASE WHEN realised_pnl_aud > 0 THEN realised_pnl_aud ELSE 0 END) as gp,
+            SUM(CASE WHEN realised_pnl_aud < 0 THEN ABS(realised_pnl_aud) ELSE 0 END) as gl
+     FROM positions WHERE status='closed' GROUP BY variant`
+  );
+  const openByVariant = cryptoQuery(
+    `SELECT variant, COALESCE(SUM(unrealised_pnl_aud), 0) as unrealised
+     FROM positions WHERE status='open' GROUP BY variant`
+  );
+  const closedMap = {};
+  for (const r of closedByVariant) closedMap[r.variant] = r;
+  const openMap = {};
+  for (const r of openByVariant) openMap[r.variant] = r.unrealised || 0;
+
+  const cryptoVariantPnl = CRYPTO_VARIANTS.map(code => {
+    const c = closedMap[code] || {};
+    const total = c.total || 0;
+    const wins = c.wins || 0;
+    const realised = c.pnl || 0;
+    const unrealised = openMap[code] || 0;
+    const gp = c.gp || 0;
+    const gl = c.gl || 0;
+    const pf = gl > 0 ? (gp / gl) : (gp > 0 ? 99 : 0);
+    return {
+      code, name: CRYPTO_VARIANT_NAMES[code] || code,
+      trades: total, wins, realised, unrealised,
+      totalPnl: realised + unrealised,
+      winRate: total > 0 ? (wins / total * 100).toFixed(1) : '—',
+      pf: total > 0 ? pf.toFixed(2) : '—',
+    };
+  }).sort((a, b) => b.totalPnl - a.totalPnl);
+
+  const topCryptoVariant = cryptoVariantPnl.find(v => v.trades > 0) || null;
 
   // Regime badge
   const regimeColors = {
@@ -1530,13 +1577,19 @@ app.get('/possum-crypto', (req, res) => {
   }).join('') || '<tr><td colspan="5" class="empty-cell">No closed positions yet</td></tr>';
 
   // Variant leaderboard rows
-  const lbRows = leaderboard.map((v,i) => {
+  const lbRows = cryptoVariantPnl.map((v,i) => {
     const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    const pnlC = v.totalPnl > 0 ? '#10b981' : v.totalPnl < 0 ? '#ef4444' : 'var(--muted)';
     return `<tr>
       <td class="lb-rank">${medal}</td>
       <td><span class="variant-badge">${v.code}</span></td>
-      <td>${v.signals||0}</td>
-      <td>${v.executed||0}</td>
+      <td>${v.name}</td>
+      <td>${v.trades}</td>
+      <td style="color:${pnlC};font-weight:600">A$${v.realised.toFixed(2)}</td>
+      <td style="color:${v.unrealised >= 0 ? '#10b981' : '#ef4444'}">A$${v.unrealised.toFixed(2)}</td>
+      <td style="color:${pnlC};font-weight:700">A$${v.totalPnl.toFixed(2)}</td>
+      <td>${v.winRate}${v.winRate !== '—' ? '%' : ''}</td>
+      <td>${v.pf}</td>
     </tr>`;
   }).join('');
 
@@ -1758,10 +1811,10 @@ app.get('/possum-crypto', (req, res) => {
         <div class="stat-sub">Grok / xAI</div>
       </div>
       <div class="stat-card" data-g="green">
-        <div class="stat-icon">🧬</div>
-        <div class="stat-label">Variants</div>
-        <div class="stat-value green">9</div>
-        <div class="stat-sub">M1-3 · MR1-3 · S1-3</div>
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Top Strategy</div>
+        <div class="stat-value green" style="font-size:0.95rem">${compLive && topCryptoVariant ? topCryptoVariant.code + ' ' + topCryptoVariant.name : '—'}</div>
+        <div class="stat-sub">${compLive && topCryptoVariant ? 'A$' + topCryptoVariant.totalPnl.toFixed(2) + ' · ' + topCryptoVariant.trades + ' trades' : '9 variants · M1-3 MR1-3 S1-3'}</div>
       </div>
     </div>
 
@@ -1799,10 +1852,10 @@ app.get('/possum-crypto', (req, res) => {
 
     <!-- Variant Leaderboard -->
     <section class="section">
-      <h2 class="section-title">🏆 Variant Activity</h2>
+      <h2 class="section-title">🏆 Variant Leaderboard</h2>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Rank</th><th>Variant</th><th>Signals</th><th>Executed</th></tr></thead>
+          <thead><tr><th>Rank</th><th>Code</th><th>Strategy</th><th>Trades</th><th>Realised</th><th>Unrealised</th><th>Total P&amp;L</th><th>Win%</th><th>PF</th></tr></thead>
           <tbody>${lbRows}</tbody>
         </table>
       </div>
@@ -2269,6 +2322,11 @@ app.get('/leaderboard', async (req, res) => {
   const score = data?.score || {};
   const feeDrag = data?.fee_drag || {};
 
+  // Variant leaderboard data
+  const variantLeaderboard = data?.variant_leaderboard || [];
+  const variantsWithTrades = variantLeaderboard.filter(v => v.total_trades > 0);
+  const topVariant = variantLeaderboard.length > 0 ? variantLeaderboard[0] : null;
+
   // Per-bot raw data
   const usData = data?.us || {};
   const auData = data?.au || {};
@@ -2320,6 +2378,37 @@ app.get('/leaderboard', async (req, res) => {
       <td style="color:var(--muted)">${trades}</td>
     </tr>`;
   }).join('');
+
+  // Build variant leaderboard rows
+  const botBadgeStyles = {
+    'US': { bg: 'rgba(59,130,246,0.15)', color: '#3b82f6', emoji: '🇺🇸' },
+    'AU': { bg: 'rgba(52,211,153,0.15)', color: '#34d399', emoji: '🦘' },
+    'CRYPTO': { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', emoji: '₿' },
+  };
+  const variantMedals = ['🥇', '🥈', '🥉'];
+
+  const variantRowsHtml = variantsWithTrades.length > 0
+    ? variantLeaderboard.map((v, i) => {
+        const badge = botBadgeStyles[v.bot] || { bg: 'rgba(100,100,122,0.15)', color: '#64647a', emoji: '🤖' };
+        const rank = variantMedals[i] || `#${i + 1}`;
+        const currSym = v.currency === 'AUD' ? 'A$' : '$';
+        const pnlVal = v.pnl ?? 0;
+        const pnlStr = (pnlVal < 0 ? '-' : pnlVal > 0 ? '+' : '') + currSym + Math.abs(pnlVal).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const pnlClr = pnlColor(pnlVal);
+        const wr = v.win_rate != null ? Number(v.win_rate).toFixed(1) + '%' : '—';
+        const pf = v.profit_factor != null ? Number(v.profit_factor).toFixed(2) : '—';
+        return `<tr>
+          <td style="text-align:center;font-size:1.1rem;width:44px">${rank}</td>
+          <td><span class="variant-badge">${v.variant_code || '—'}</span></td>
+          <td style="font-weight:600">${v.variant_name || '—'}</td>
+          <td><span class="bot-badge" style="background:${badge.bg};color:${badge.color}">${badge.emoji} ${v.bot}</span></td>
+          <td style="color:${pnlClr};font-weight:700">${pnlStr}</td>
+          <td>${v.total_trades ?? 0}</td>
+          <td>${wr}</td>
+          <td>${pf}</td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="8" class="empty-cell">Strategy rankings will appear once trading begins</td></tr>';
 
   // Competition info
   const daysLeft = competition.days_remaining;
@@ -2485,6 +2574,18 @@ app.get('/leaderboard', async (req, res) => {
     tr:hover td { background: #ffffff03; }
     .empty-cell { color: var(--muted); text-align: center; padding: 24px; font-size: 0.8rem; }
 
+    /* Badges */
+    .bot-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .variant-badge {
+      font-size: 0.65rem; font-weight: 700; font-family: 'SF Mono', monospace;
+      background: #7c6ff715; color: #a78bfa;
+      border: 1px solid #7c6ff730; padding: 2px 7px; border-radius: 4px;
+    }
+
     /* Chart */
     .chart-wrap {
       background: var(--surface); border: 1px solid var(--border2);
@@ -2553,23 +2654,45 @@ app.get('/leaderboard', async (req, res) => {
         <div class="stat-value amber">${daysLeft != null ? daysLeft : '—'}</div>
         <div class="stat-sub">${competition.start_date || '—'} → ${competition.end_date || '—'}</div>
       </div>
-      <div class="stat-card" data-g="blue">
-        <div class="stat-icon">⚔️</div>
-        <div class="stat-label">US vs AU Score</div>
-        <div class="stat-value blue" style="font-size:1rem">${score.us_wins ?? 0} - ${score.draws ?? 0} - ${score.au_wins ?? 0}</div>
-        <div class="stat-sub">${score.total ?? 0} trading days</div>
+      <div class="stat-card" data-g="green">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">Top Strategy</div>
+        <div class="stat-value green" style="font-size:1rem">${compActive && topVariant && topVariant.total_trades > 0 ? topVariant.variant_name + ' (' + topVariant.bot + ')' : '—'}</div>
+        <div class="stat-sub">${compActive && topVariant && topVariant.total_trades > 0 ? (topVariant.currency === 'AUD' ? 'A$' : '$') + Number(topVariant.pnl || 0).toFixed(2) + ' P&L' : 'Awaiting first trade'}</div>
       </div>
       <div class="stat-card" data-g="blue">
-        <div class="stat-icon">💰</div>
-        <div class="stat-label">Fee Drag Today</div>
-        <div class="stat-value blue" style="font-size:1rem">${feeDrag.us_fees_today != null ? '$' + Number(feeDrag.us_fees_today).toFixed(2) : '—'} / ${feeDrag.au_fees_today != null ? 'A$' + Number(feeDrag.au_fees_today).toFixed(2) : '—'}</div>
-        <div class="stat-sub">US / AU fees</div>
+        <div class="stat-icon">🧬</div>
+        <div class="stat-label">Strategies Active</div>
+        <div class="stat-value blue">${variantsWithTrades.length}</div>
+        <div class="stat-sub">${variantsWithTrades.length === 0 ? '0 of 32' : 'of 32 strategies'}</div>
       </div>
     </div>
 
-    <!-- Scoreboard Table -->
+    <!-- Strategy Leaderboard (Primary) -->
     <section class="section">
-      <h2 class="section-title">🏆 Scoreboard</h2>
+      <h2 class="section-title">🧬 Strategy Leaderboard</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:44px">Rank</th>
+            <th>Code</th>
+            <th>Strategy</th>
+            <th>Bot</th>
+            <th>P&amp;L</th>
+            <th>Trades</th>
+            <th>Win Rate</th>
+            <th>Profit Factor</th>
+          </tr></thead>
+          <tbody>
+            ${variantRowsHtml}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Bot Summary (Secondary) -->
+    <section class="section">
+      <h2 class="section-title">🤖 Bot Summary</h2>
       <div class="table-wrap">
         <table>
           <thead><tr>
