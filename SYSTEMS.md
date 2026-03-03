@@ -24,11 +24,11 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 
 ---
 
-## 3. Clawdbot Update Check — Daily
+## 3. OpenClaw Update Check — Daily
 - **Cron ID:** 0d45117f-5da6-4208-8362-2a97631de87e
 - **Schedule:** 3:00 AM daily
-- **What it does:** Checks current vs latest npm version. If security update found → updates immediately any day. If only bug fixes/features → only updates on Mondays. Silent if already up to date.
-- **Status:** ✅ Active
+- **What it does:** Checks current vs latest `openclaw` npm version. If security update found → updates immediately any day. If only bug fixes/features → only updates on Mondays. Silent if already up to date.
+- **Status:** ✅ Active (updated from clawdbot → openclaw 2026-03-03)
 
 ---
 
@@ -173,6 +173,24 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 - **Zones:** Family Area, Master Bed, Gaystation, Ozren, Filip
 - **What it does:** Turns off the MHI AC unit silently every morning. If already off, does nothing. If script fails, alerts Petar via Telegram.
 - **Status:** ✅ Active
+
+---
+
+## 13. Sanitize Sessions — Nightly
+- **Cron ID:** 5efb3223-d3a4-42db-930a-04cc30499ba7
+- **Schedule:** 2:00 AM daily (Australia/Perth)
+- **Script:** ~/clawd/scripts/sanitize-sessions.sh
+- **What it does:** Strips thinking/redacted_thinking blocks from all openclaw session transcripts. Prevents transcript corruption after version upgrades. Silent if clean; alerts Petar on error.
+- **Status:** ✅ Active (added 2026-03-03)
+
+---
+
+## 14. Backup Sessions to GitHub — Nightly
+- **Cron ID:** 760127cd-ca84-42e8-9cce-62475167c4f6
+- **Schedule:** 3:30 AM daily (Australia/Perth) — runs after sanitize (#13)
+- **Script:** ~/clawd/scripts/backup-sessions.sh
+- **What it does:** Backs up last 7 days of sessions + memory files to GitHub (petarceklic/Clawdbot). 7-day retention to avoid repo bloat. Silent if clean; alerts Petar on error.
+- **Status:** ✅ Active (added 2026-03-03)
 
 ---
 
