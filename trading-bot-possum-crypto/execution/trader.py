@@ -47,21 +47,29 @@ class Trader:
         # Calculate quantity based on max position size
         max_aud = self.cfg.trading.max_position_size_aud
 
-        # Check portfolio-level exposure cap
-        if self.cfg.trading.competition_capital_aud > 0:
-            from database.db import get_db
-            db = get_db()
-            row = db.fetch_one(
-                "SELECT COALESCE(SUM(quantity * entry_price), 0) as total "
-                "FROM positions WHERE status = 'open'"
+        # Per-variant position limit (sub-portfolio mode)
+        from database.db import get_db
+        db = get_db()
+        row = db.fetch_one(
+            "SELECT COUNT(*) as cnt FROM positions WHERE status = 'open' AND variant = ?",
+            (signal.variant,),
+        )
+        variant_count = row["cnt"] if row else 0
+        if variant_count >= self.cfg.trading.max_positions_per_variant:
+            logger.warning(
+                "Variant %s at max positions (%d >= %d)",
+                signal.variant, variant_count, self.cfg.trading.max_positions_per_variant,
             )
-            current_exposure = row["total"] if row else 0
-            if current_exposure + max_aud > self.cfg.trading.competition_capital_aud:
-                logger.warning(
-                    "Would exceed capital cap: A$%.2f + A$%.2f > A$%.2f",
-                    current_exposure, max_aud, self.cfg.trading.competition_capital_aud,
-                )
-                return {"action": "rejected", "reason": "capital_cap_exceeded"}
+            return {"action": "rejected", "reason": f"variant_{signal.variant}_at_max_positions"}
+
+        # Global safety ceiling
+        row_global = db.fetch_one(
+            "SELECT COUNT(*) as cnt FROM positions WHERE status = 'open'"
+        )
+        global_count = row_global["cnt"] if row_global else 0
+        if global_count >= self.cfg.trading.max_positions:
+            logger.warning("Global safety limit reached (%d >= %d)", global_count, self.cfg.trading.max_positions)
+            return {"action": "rejected", "reason": "global_position_limit"}
 
         quantity = max_aud / fill_price
 
@@ -104,21 +112,29 @@ class Trader:
         exchange = get_exchange()
         max_aud = self.cfg.trading.max_position_size_aud
 
-        # Check portfolio-level exposure cap
-        if self.cfg.trading.competition_capital_aud > 0:
-            from database.db import get_db
-            db = get_db()
-            row = db.fetch_one(
-                "SELECT COALESCE(SUM(quantity * entry_price), 0) as total "
-                "FROM positions WHERE status = 'open'"
+        # Per-variant position limit (sub-portfolio mode)
+        from database.db import get_db
+        db = get_db()
+        row = db.fetch_one(
+            "SELECT COUNT(*) as cnt FROM positions WHERE status = 'open' AND variant = ?",
+            (signal.variant,),
+        )
+        variant_count = row["cnt"] if row else 0
+        if variant_count >= self.cfg.trading.max_positions_per_variant:
+            logger.warning(
+                "Variant %s at max positions (%d >= %d)",
+                signal.variant, variant_count, self.cfg.trading.max_positions_per_variant,
             )
-            current_exposure = row["total"] if row else 0
-            if current_exposure + max_aud > self.cfg.trading.competition_capital_aud:
-                logger.warning(
-                    "Would exceed capital cap: A$%.2f + A$%.2f > A$%.2f",
-                    current_exposure, max_aud, self.cfg.trading.competition_capital_aud,
-                )
-                return {"action": "rejected", "reason": "capital_cap_exceeded"}
+            return {"action": "rejected", "reason": f"variant_{signal.variant}_at_max_positions"}
+
+        # Global safety ceiling
+        row_global = db.fetch_one(
+            "SELECT COUNT(*) as cnt FROM positions WHERE status = 'open'"
+        )
+        global_count = row_global["cnt"] if row_global else 0
+        if global_count >= self.cfg.trading.max_positions:
+            logger.warning("Global safety limit reached (%d >= %d)", global_count, self.cfg.trading.max_positions)
+            return {"action": "rejected", "reason": "global_position_limit"}
 
         try:
             # Get current price for quantity calculation

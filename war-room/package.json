@@ -1,0 +1,14 @@
+{
+  "name": "war-room",
+  "version": "1.0.0",
+  "description": "Mia's War Room Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "marked": "^9.1.6",
+    "chokidar": "^3.5.3"
+  }
+}

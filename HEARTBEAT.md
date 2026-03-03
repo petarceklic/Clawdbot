@@ -1,4 +1,5 @@
 # HEARTBEAT.md
 
-# Keep this file empty (or with only comments) to skip heartbeat API calls.
-# Add tasks below when you want the agent to check something periodically.
+## Periodic Systems Check (every ~4 hours)
+Read SYSTEMS.md and compare against live cron jobs. If any cron listed in SYSTEMS.md
+is missing or disabled, alert Petar and recreate it immediately.

@@ -1,0 +1,18 @@
+{
+  "ukraine-ceasefire-2026": {
+    "contract_name": "Ukraine ceasefire by September 2026",
+    "resolution_date": "2026-09-30",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "greenland-acquisition-2026": {
+    "contract_name": "US acquires Greenland by December 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  }
+}

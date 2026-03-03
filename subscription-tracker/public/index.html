@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Tracker 💳</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        .stat-card {
+            @apply bg-white rounded-lg shadow-sm p-6 border border-gray-100;
+        }
+        .insight-card {
+            @apply bg-white rounded-lg shadow-sm p-5 border-l-4 mb-4;
+        }
+        .insight-urgent { border-color: #ef4444; background: #fef2f2; }
+        .insight-high { border-color: #f59e0b; background: #fffbeb; }
+        .insight-medium { border-color: #3b82f6; background: #eff6ff; }
+        .insight-low { border-color: #10b981; background: #f0fdf4; }
+        
+        .status-active { @apply bg-green-100 text-green-800; }
+        .status-trial { @apply bg-blue-100 text-blue-800; }
+        .status-cancelled { @apply bg-gray-100 text-gray-800; }
+        .status-likely-cancelled { @apply bg-amber-100 text-amber-800; }
+
+        .source-csv { @apply bg-emerald-100 text-emerald-800; }
+        .source-email { @apply bg-sky-100 text-sky-800; }
+
+        .confidence-high { @apply text-green-600; }
+        .confidence-medium { @apply text-amber-600; }
+        .confidence-low { @apply text-red-600; }
+        
+        .category-badge {
+            @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">💳 Subscription Tracker</h1>
+                    <p class="text-sm text-gray-500" id="account-info">Loading...</p>
+                </div>
+                <div class="flex gap-3">
+                    <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="uploadCSV(event)" />
+                    <button onclick="document.getElementById('csv-upload').click()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition">
+                        📤 Upload Statement
+                    </button>
+                    <button onclick="scanNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition">
+                        🔄 Scan Gmail
+                    </button>
+                    <button onclick="exportCSV()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition">
+                        📥 Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Overview -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4" id="stats-grid">
+                <div class="text-center">
+                    <div class="text-3xl font-bold" id="stat-monthly">$0</div>
+                    <div class="text-sm opacity-90">Monthly Cost</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold" id="stat-yearly">$0</div>
+                    <div class="text-sm opacity-90">Yearly Cost</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold" id="stat-active">0</div>
+                    <div class="text-sm opacity-90">Active Subs</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold" id="stat-upcoming">0</div>
+                    <div class="text-sm opacity-90">Bills This Month</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-300" id="stat-savings">$0</div>
+                    <div class="text-sm opacity-90">Potential Savings</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-red-300" id="stat-trials">0</div>
+                    <div class="text-sm opacity-90">Trials Expiring</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Insights Panel -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">💡 Smart Insights</h2>
+            <div id="insights-container">
+                <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+                    Loading insights...
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Category Breakdown -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">📊 Spending by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <!-- Monthly Spending Trend -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Monthly Spending Trend</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div class="flex gap-3">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search subscriptions..." 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onkeyup="handleSearch()"
+                />
+                <select 
+                    id="category-filter" 
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    onchange="handleFilter()"
+                >
+                    <option value="">All Categories</option>
+                </select>
+                <select
+                    id="status-filter"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    onchange="handleFilter()"
+                >
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Likely Cancelled">Likely Cancelled</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Trial">Trial</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Subscriptions List -->
+        <div>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">All Subscriptions</h2>
+            <div id="subscriptions-list" class="space-y-3">
+                <!-- Subscriptions will be inserted here -->
+            </div>
+            <div id="empty-state" class="hidden bg-white rounded-lg shadow-sm p-12 text-center">
+                <div class="text-6xl mb-4">💳</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">No subscriptions found</h3>
+                <p class="text-gray-500">Try scanning your inbox or adjusting your filters</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Edit Subscription</h3>
+            <input type="hidden" id="edit-id" />
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Amount ($)</label>
+                    <input type="number" id="edit-amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                    <select id="edit-frequency" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Weekly">Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Yearly">Yearly</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="edit-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Productivity">Productivity</option>
+                        <option value="Cloud/Hosting">Cloud/Hosting</option>
+                        <option value="Software/Tools">Software/Tools</option>
+                        <option value="Storage">Storage</option>
+                        <option value="Domains/Hosting">Domains/Hosting</option>
+                        <option value="Memberships">Memberships</option>
+                        <option value="Fitness">Fitness</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="edit-status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Active">Active</option>
+                        <option value="Likely Cancelled">Likely Cancelled</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Trial">Trial</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeEditModal()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="saveEdit()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 text-center">
+            <div class="text-4xl mb-3">💳</div>
+            <div class="text-lg font-semibold">Processing...</div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

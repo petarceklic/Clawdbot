@@ -1,0 +1,101 @@
+[
+  {
+    "id": "li-20260225-p1",
+    "date": "2026-02-25",
+    "pillar": 1,
+    "pillarLabel": "Client Attraction",
+    "title": "Australian SaaS Founders Waited Too Long",
+    "opener": "The door has slammed. That's the exact phrase a prominent Australian VC just used to describe the state of local SaaS. Valuations down. Founders gone. Some of our most promising software companies can't get to market. Most people blame the funding environment. I think the problem started earlier — in the product itself.",
+    "where": "The SaaS products that survived had a tight, well-defined core. No scope creep. Design that made complex workflows feel effortless from day one. Soft CTA for founders building now.",
+    "news": "SMH, Feb 23 — 'The door has slammed': What happened to Australia's next crop of ultra-wealthy tech founders?",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260225-p2",
+    "date": "2026-02-25",
+    "pillar": 2,
+    "pillarLabel": "Design / AI & Tech",
+    "title": "Which SaaS Products Survive the AI Agent Era",
+    "opener": "A single research paper dropped Monday and wiped billions off US tech stocks. The scenario: AI agents get good enough that businesses stop paying for SaaS tools. They just automate around them. Monday.com. Zapier. Asana. Named directly. Here's what nobody's saying about this: the products that survive won't be the smartest. They'll be the ones that were designed for genuine complexity.",
+    "where": "Simple workflow tools are exactly what AI agents replace. But products built for real operational complexity have a design moat. Agents can't replace a well-designed system that makes hard things navigable.",
+    "news": "The Guardian, Feb 24 — 'A feedback loop with no brake': how an AI doomsday report shook US markets (Citrini Research)",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260225-p3",
+    "date": "2026-02-25",
+    "pillar": 3,
+    "pillarLabel": "Opinion",
+    "title": "Australia Has a $1.25 Billion IT Problem (And It's the Same Problem Every Time)",
+    "opener": "Victoria's government IT projects have blown out by $1.25 billion. Over a decade. 1,035 completed projects. 40% over budget. 61% delayed. One project came in at 12 times its original estimate. And I'm not surprised. Not even a little.",
+    "where": "Same pattern as the $96M weather site — big specs, long contracts, no incentive to validate early. The fix isn't auditors. It's building small, shipping fast, killing what doesn't work. Government IT never learns it.",
+    "news": "ABC News, Feb 23 — Victorian IT projects blow out by $1.25bn over a decade",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260228-p1",
+    "date": "2026-02-28",
+    "pillar": 1,
+    "pillarLabel": "Client Attraction",
+    "title": "The Work Most Designers Won't Take On",
+    "opener": "Most designers will turn down your project. Not because they can't do it. Because it's complicated. There's no clean use case. The data is messy. The user journeys span dozens of states. The edge cases are the main cases. That's exactly the work I'm looking for.",
+    "where": "Explains the specific shape of complex systems work — SaaS, IoT, agtech — why generalist designers struggle with it, and why 20 years of doing this means he patterns differently. Soft CTA: currently available for a new engagement.",
+    "news": null,
+    "status": "pending"
+  },
+  {
+    "id": "li-20260228-p2",
+    "date": "2026-02-28",
+    "pillar": 2,
+    "pillarLabel": "Design / AI & Tech",
+    "title": "Google Built a Robotics Company for 5 Years. Then Undid It.",
+    "opener": "In 2021, Alphabet spun out a robotics company called Intrinsic. Independent. Moonshot. Free to move fast. Yesterday they folded it back into Google. Five years of building in isolation — and now they need Gemini and Google Cloud to be the brain. You can't bolt integration on later.",
+    "where": "When you build capability in isolation from the ecosystem it needs to serve, you eventually pay to undo it. Integration isn't an engineering task. It's a product decision that needs to be made on day one.",
+    "news": "Alphabet folds Intrinsic into Google to accelerate 'Physical AI' — Feb 26, 2026",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260228-p3",
+    "date": "2026-02-28",
+    "pillar": 3,
+    "pillarLabel": "Opinion",
+    "title": "$1.25 Billion. 40% Over Budget. One Project: 12x Its Original Cost.",
+    "opener": "Victoria's government just revealed $1.25 billion in IT blowouts over the last decade. One project ballooned from $7 million to $91 million. Another is running 14 months late. None of it surprises me. Because we keep treating software like it's a bridge.",
+    "where": "Governments plan software like infrastructure — scope everything upfront, hand to a vendor, measure by delivery date. The $1.25bn isn't a budget problem. It's a product philosophy problem. No amount of money fixes a waterfall mindset.",
+    "news": "ABC News — Victorian IT projects blow out by $1.25bn over a decade — Feb 23, 2026",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260303-p1",
+    "date": "2026-03-03",
+    "pillar": 1,
+    "pillarLabel": "Client Attraction",
+    "title": "Founders hire designers for the wrong reason",
+    "opener": "Most founders hire a designer when the product looks bad. That's too late. And it's the wrong problem. The products that are genuinely hard to use — the dashboards, the SaaS platforms, the IoT tools — they don't fail because of aesthetics. They fail because nobody thought about how a real human would move through a complex system. That's a different skill. And most designers don't have it.",
+    "where": "What it actually looks like to design for complexity (not just clean it up), and what to look for when hiring. Ends with a clear signal to the right clients.",
+    "news": null,
+    "status": "pending"
+  },
+  {
+    "id": "li-20260303-p2",
+    "date": "2026-03-03",
+    "pillar": 2,
+    "pillarLabel": "Design / AI & Tech",
+    "title": "Big tech is spending $655B on AI. None of it is going to UX.",
+    "opener": "The four biggest tech companies are spending $655 billion on AI this year. Infrastructure. Compute. Models. And the interfaces are still a mess. I've watched smart people stare blankly at tools that are genuinely powerful. They close the tab. Not because the AI failed. Because they had no idea what to do next.",
+    "where": "The real race in AI isn't intelligence — it's usability. Everyone's building the engine. Nobody's designing the cockpit. The designers who crack this will define the next decade of software.",
+    "news": "Big Tech AI capex confirmed at $655B for 2026 — March 2026",
+    "status": "pending"
+  },
+  {
+    "id": "li-20260303-p3",
+    "date": "2026-03-03",
+    "pillar": 3,
+    "pillarLabel": "Opinion",
+    "title": "Australia just wasted $64M on a bus ticket app",
+    "opener": "Australia just spent $64 million on a transit ticketing system that still doesn't fully work. The ACT Government's MyWay+ was described by its own parliamentary inquiry as 'clearly not ready for launch.' They launched it anyway. Sound familiar?",
+    "where": "Connects to the $96M weather site — not a tech problem, a culture problem. Governments keep shipping before ready because nobody's accountable for the user experience. Sharp ending: the cost of not testing is always higher than the cost of testing.",
+    "news": "Canberra Times — MyWay+ inquiry findings + Auditor-General review announced — March 2026",
+    "status": "pending"
+  }
+]

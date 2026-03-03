@@ -1,0 +1,10 @@
+{
+  "name": "last-30-days",
+  "version": "1.0.0",
+  "description": "Research challenges and pain points from Reddit and X over the last 30 days",
+  "author": "Built for @teknoperf",
+  "license": "MIT",
+  "bin": {
+    "last-30-days": "./search-last-30-days.js"
+  }
+}

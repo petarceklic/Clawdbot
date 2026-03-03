@@ -1,0 +1,217 @@
+{
+  "ga": {
+    "ellenceklic.com": {
+      "site": "ellenceklic.com",
+      "source": "GA_DOM",
+      "api_intercepts": 0,
+      "tab_data": {
+        "Active users25": {
+          "value": 66.7,
+          "direction": null,
+          "change_pct": null
+        },
+        "Event count94": {
+          "value": 91.8,
+          "direction": null,
+          "change_pct": null
+        },
+        "New users24": {
+          "value": 60,
+          "direction": null,
+          "change_pct": null
+        }
+      },
+      "active_users": 66.7,
+      "active_users_pct": null,
+      "event_count": 91.8,
+      "new_users": 60,
+      "new_users_pct": null,
+      "no_data": false
+    },
+    "petarceklic.com": {
+      "site": "petarceklic.com",
+      "source": "GA_DOM",
+      "api_intercepts": 0,
+      "tab_data": {
+        "Active users61": {
+          "value": 13,
+          "direction": null,
+          "change_pct": null
+        },
+        "New users59": {
+          "value": 9.3,
+          "direction": null,
+          "change_pct": null
+        },
+        "Event count212": {
+          "value": 18.4,
+          "direction": null,
+          "change_pct": null
+        }
+      },
+      "active_users": 13,
+      "active_users_pct": null,
+      "new_users": 9.3,
+      "new_users_pct": null,
+      "event_count": 18.4,
+      "no_data": false
+    }
+  },
+  "sc": {
+    "petarceklic.com": {
+      "site": "petarceklic.com",
+      "source": "SC_DOM",
+      "api_intercepts": 0,
+      "clicks": 32.0,
+      "impressions": 2.0,
+      "ctr": 1.1,
+      "position": 11.0,
+      "top_queries": [
+        {
+          "query": "ux design perth",
+          "clicks": "1"
+        },
+        {
+          "query": "ui ux designer perth",
+          "clicks": "1"
+        },
+        {
+          "query": "ux ui perth",
+          "clicks": "1"
+        },
+        {
+          "query": "freelance website designer",
+          "clicks": "1"
+        },
+        {
+          "query": "mobile app development companies in perth",
+          "clicks": "1"
+        },
+        {
+          "query": "freelance web developer perth",
+          "clicks": "0"
+        },
+        {
+          "query": "ux agency perth",
+          "clicks": "0"
+        },
+        {
+          "query": "ui design perth",
+          "clicks": "0"
+        },
+        {
+          "query": "ui ux design company perth",
+          "clicks": "0"
+        },
+        {
+          "query": "user interface designer perth",
+          "clicks": "0"
+        }
+      ],
+      "page_text_preview": "\ue8fd\n\t\ue7f5\n3\n\ue5c5\nhome\nOverview\nlightbulb_2\nInsights\ntrending_up\nPerformance\nsearch\nURL inspection\nIndexing\nfile_copy\nPages\naccount_tree\nSitemaps\nvisibility_off\nRemovals\nExperience\nspeed\nCore Web Vitals\nlock\nHTTPS\nSecurity & Manual Actions\nlink_2\nLinks\ntrophy\nAchievements\nsettings\nSettings\nfeedback\nSubmit fe"
+    },
+    "ellenceklic.com": {
+      "site": "ellenceklic.com",
+      "source": "SC_DOM",
+      "api_intercepts": 0,
+      "clicks": 8.0,
+      "impressions": 95.0,
+      "ctr": 8.4,
+      "position": 30.7,
+      "top_queries": [
+        {
+          "query": "how to manage customer churn",
+          "clicks": "0"
+        },
+        {
+          "query": "ceklic",
+          "clicks": "0"
+        },
+        {
+          "query": "data visualisation consultancy",
+          "clicks": "0"
+        },
+        {
+          "query": "drivers of customer churn",
+          "clicks": "0"
+        },
+        {
+          "query": "churn management basics",
+          "clicks": "0"
+        },
+        {
+          "query": "hr analytics for retention",
+          "clicks": "0"
+        },
+        {
+          "query": "key components of customer churn",
+          "clicks": "0"
+        },
+        {
+          "query": "predictive analytics consultants",
+          "clicks": "0"
+        }
+      ],
+      "page_text_preview": "\ue8fd\n\t\ue7f5\n12\n\ue5c5\nhome\nOverview\nlightbulb_2\nInsights\ntrending_up\nPerformance\nsearch\nURL inspection\nIndexing\nfile_copy\nPages\naccount_tree\nSitemaps\nvisibility_off\nRemovals\nExperience\nspeed\nCore Web Vitals\nlock\nHTTPS\nSecurity & Manual Actions\nlink_2\nLinks\ntrophy\nAchievements\nsettings\nSettings\nfeedback\nSubmit f"
+    },
+    "thedatafusion.com": {
+      "site": "thedatafusion.com",
+      "source": "SC_DOM",
+      "api_intercepts": 0,
+      "clicks": 1.0,
+      "impressions": 398.0,
+      "ctr": 0.3,
+      "position": 47.6,
+      "top_queries": [
+        {
+          "query": "data fusion",
+          "clicks": "0"
+        },
+        {
+          "query": "datafusion",
+          "clicks": "0"
+        },
+        {
+          "query": "data fusion machine learning",
+          "clicks": "0"
+        },
+        {
+          "query": "data fusion market",
+          "clicks": "0"
+        },
+        {
+          "query": "data fusion news",
+          "clicks": "0"
+        },
+        {
+          "query": "market data aws integration",
+          "clicks": "0"
+        }
+      ],
+      "page_text_preview": "\ue8fd\n\t\ue7f5\n5\n\ue5c5\nhome\nOverview\nlightbulb_2\nInsights\ntrending_up\nPerformance\nsearch\nURL inspection\nIndexing\nfile_copy\nPages\naccount_tree\nSitemaps\nvisibility_off\nRemovals\nExperience\nspeed\nCore Web Vitals\nlock\nHTTPS\nSecurity & Manual Actions\nlink_2\nLinks\ntrophy\nAchievements\nsettings\nSettings\nfeedback\nSubmit fe"
+    },
+    "disruptis.io": {
+      "site": "disruptis.io",
+      "source": "SC_DOM",
+      "api_intercepts": 0,
+      "clicks": 0.0,
+      "impressions": 8.0,
+      "ctr": 0.0,
+      "position": 3.0,
+      "error": "no_access_or_no_data",
+      "page_text_preview": "\ue8fd\n\t\ue7f5\n2\n\ue5c5\nhome\nOverview\nlightbulb_2\nInsights\ntrending_up\nPerformance\nsearch\nURL inspection\nIndexing\nfile_copy\nPages\naccount_tree\nSitemaps\nvisibility_off\nRemovals\nExperience\nspeed\nCore Web Vitals\nlock\nHTTPS\nSecurity & Manual Actions\nlink_2\nLinks\ntrophy\nAchievements\nsettings\nSettings\nfeedback\nSubmit fe"
+    },
+    "travelabindex.com": {
+      "site": "travelabindex.com",
+      "source": "SC_DOM",
+      "api_intercepts": 0,
+      "clicks": 0.0,
+      "impressions": 0.0,
+      "ctr": 0.0,
+      "position": 0.0,
+      "error": "no_access_or_no_data",
+      "page_text_preview": "\ue8fd\n\t\ue7f5\n\ue5c5\nhome\nOverview\nlightbulb_2\nInsights\ntrending_up\nPerformance\nsearch\nURL inspection\nIndexing\nfile_copy\nPages\naccount_tree\nSitemaps\nvisibility_off\nRemovals\nExperience\nspeed\nCore Web Vitals\nlock\nHTTPS\nSecurity & Manual Actions\nlink_2\nLinks\ntrophy\nAchievements\nsettings\nSettings\nfeedback\nSubmit feed"
+    }
+  },
+  "last_run": "2026-03-02T09:02:21.835940"
+}

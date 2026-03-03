@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+*.log
+logs/
+**/logs/
+
+# Databases
+*.db
+*.db-shm
+*.db-wal
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+venvs/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Process IDs
+*.pid
+.*.pid
+
+# Build artifacts
+dist/
+*.egg-info/
+
+# Sensitive — separate .env files in subfolders
+trading-bot-possum-pm/.env
+trading-bot-possum-crypto/.env
+
+# Embedded git repos / subprojects with own .git
+disruptis/
+package-tracker/
+trading-bot-possum-au/
+trading-bot-possum/
+travel-lab-index/
+war-room/
+subscription-tracker/
+skills/last-30-days/

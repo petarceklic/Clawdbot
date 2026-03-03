@@ -1,0 +1,86 @@
+[
+  {
+    "id": "iran-strike-2026",
+    "name": "US strikes Iran by June 2026",
+    "polymarket_slug": "us-strikes-iran-by",
+    "manifold_search_term": "Iran strike",
+    "contract_type": "military",
+    "resolution_date": "2026-06-30",
+    "keywords": ["iran", "strike", "military", "persian gulf", "centcom", "irgc"],
+    "keywords_subject": [
+      "iran", "iranian", "irgc", "tehran", "natanz", "fordow",
+      "khamenei", "persian gulf", "strait of hormuz"
+    ],
+    "keywords_event": [
+      "strike", "strikes", "military action", "attack", "air strike",
+      "bomb", "bombing", "cruise missile", "ballistic missile",
+      "centcom", "carrier group", "fifth fleet", "carrier strike",
+      "nuclear", "enrichment", "sanctions", "air defense",
+      "military option", "war", "conflict", "deployment",
+      "escalation", "retaliation", "pentagon iran"
+    ],
+    "gdelt_themes": [
+      "ARMEDCONFLICT", "MILITARY", "WMD", "SANCTIONS",
+      "EMBARGO", "BLOCKADE", "THREAT",
+      "WB_585_DEFENSE_AND_SECURITY"
+    ],
+    "enrichment_sources": ["centcom", "federal_register", "congress"],
+    "active": false,
+    "resolved": "YES",
+    "resolved_date": "2026-02-28",
+    "resolved_note": "Resolved YES before competition start (01/03/2026)"
+  },
+  {
+    "id": "ukraine-ceasefire-2026",
+    "name": "Ukraine ceasefire by September 2026",
+    "polymarket_slug": "russia-x-ukraine-ceasefire-before-2027",
+    "manifold_search_term": "Ukraine ceasefire",
+    "contract_type": "diplomatic",
+    "resolution_date": "2026-09-30",
+    "keywords": ["ukraine", "ceasefire", "russia", "peace", "negotiations", "minsk"],
+    "keywords_subject": [
+      "ukraine", "ukrainian", "kyiv", "kiev", "zelensky",
+      "donbas", "donbass", "crimea", "zaporizhzhia"
+    ],
+    "keywords_event": [
+      "ceasefire", "peace", "peace deal", "peace plan",
+      "negotiations", "talks", "truce", "armistice",
+      "peace agreement", "peace framework", "peace summit",
+      "war", "conflict", "frontline", "offensive",
+      "russia", "russian", "putin", "moscow", "kremlin",
+      "nato", "minsk", "istanbul", "geneva"
+    ],
+    "gdelt_themes": [
+      "CEASEFIRE", "PEACE", "NEGOTIATE", "ARMEDCONFLICT",
+      "DIPLOMAT", "LEADER",
+      "WB_2432_FRAGILITY_CONFLICT_AND_VIOLENCE"
+    ],
+    "enrichment_sources": ["federal_register", "congress"],
+    "active": true
+  },
+  {
+    "id": "greenland-acquisition-2026",
+    "name": "US acquires Greenland by December 2026",
+    "polymarket_slug": "will-the-us-acquire-any-part-of-greenland-in-2026",
+    "manifold_search_term": "Greenland acquisition US",
+    "contract_type": "diplomatic",
+    "resolution_date": "2026-12-31",
+    "keywords": ["greenland", "acquisition", "denmark", "arctic", "territorial"],
+    "keywords_subject": [
+      "greenland", "greenlandic", "nuuk", "kalaallit"
+    ],
+    "keywords_event": [
+      "acquisition", "acquire", "purchase", "buy", "buying",
+      "denmark", "danish", "arctic", "territorial",
+      "sovereignty", "independence", "referendum",
+      "trump greenland", "us greenland",
+      "military base", "thule", "pituffik"
+    ],
+    "gdelt_themes": [
+      "SOVEREIGNTY", "LEADER", "DIPLOMAT", "NEGOTIATE",
+      "GENERAL_GOVERNMENT"
+    ],
+    "enrichment_sources": ["congress", "federal_register"],
+    "active": true
+  }
+]

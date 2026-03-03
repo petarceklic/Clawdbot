@@ -8,6 +8,10 @@
     "gog": {
       "version": "1.0.0",
       "installedAt": 1769379298486
+    },
+    "reddit-insights": {
+      "version": "1.2.0",
+      "installedAt": 1770957564454
     }
   }
 }

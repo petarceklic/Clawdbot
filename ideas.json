@@ -1,0 +1,106 @@
+[
+  {
+    "id": "bom-digest",
+    "name": "BOM Digest",
+    "type": "SaaS / B2B",
+    "date": "2026-02-18",
+    "status": "idea",
+    "explored": true,
+    "summary": "Hyper-local Aussie weather alerts for tradies, parents, event planners, construction sites. BOM data is free — the UX and delivery is the product. Tiers from $5–$49/mo. Moat is audience + tuned alert logic.",
+    "tags": ["weather", "B2B", "Australia", "SMS", "alerts"]
+  },
+  {
+    "id": "figma-comment-digest",
+    "name": "Figma Comment Digest",
+    "type": "SaaS / Productivity",
+    "date": "2026-02-18",
+    "status": "idea",
+    "explored": false,
+    "summary": "Morning rollup of Figma comments across all projects, sorted by file and urgency. Sent to email or Slack. Designers constantly miss client feedback buried in notification floods.",
+    "tags": ["figma", "design", "productivity", "digest"]
+  },
+  {
+    "id": "calendly-conflict-guard",
+    "name": "Calendly Conflict Guard",
+    "type": "SaaS / Productivity",
+    "date": "2026-02-18",
+    "status": "idea",
+    "explored": false,
+    "summary": "Detects when a Calendly booking lands on an existing calendar event. Fires an instant alert + 1-click reschedule link. Dead simple, real pain point for solo consultants.",
+    "tags": ["calendly", "calendar", "scheduling", "automation"]
+  },
+  {
+    "id": "travel-packing-app",
+    "name": "Travel Packing App",
+    "type": "SaaS / Consumer",
+    "date": "2026-02-17",
+    "status": "idea",
+    "explored": true,
+    "summary": "Gap in market: smart quantity rules (1 pair socks/day, jeans every 3 days), weather + activity combined, real family group packing, bag weight/space logic, habit learning over time. MVP opportunity: smart quantity calculator. Research confirms: collaborative packing (couples/families sharing real-time lists) is the clearest gap — no dominant player. Also: itinerary-aware AI lists (TripIt integration) is most-requested feature. Minimalist/one-bag niche (r/HerOneBag) vocal and underserved. Most users default to Trello/Excel — no killer feature yet.",
+    "tags": ["travel", "consumer", "packing", "AI", "collaborative"]
+  },
+  {
+    "id": "signature-stylizer",
+    "name": "Signature Stylizer",
+    "type": "SaaS / Consumer",
+    "date": "2026-02-19",
+    "status": "idea",
+    "explored": true,
+    "summary": "Upload your existing handwritten signature, get back 3-5 stylised/calligraphic versions that still look like yours. Sell each for $2-5. Gap confirmed: no one does upload-and-stylise well. Artlogo charges $19 with human calligraphers. AI tools all fail at identity preservation. Smart path: start with humans, train model on your own orders. Vector-path approach more reliable than diffusion models for maintaining signature identity.",
+    "tags": ["AI", "design", "consumer", "signature", "calligraphy"]
+  },
+  {
+    "id": "woolworths-assistant",
+    "name": "Woolworths Shopping Assistant",
+    "type": "SaaS / Consumer",
+    "date": "2026-02-19",
+    "status": "idea",
+    "explored": true,
+    "summary": "AI assistant that manages Woolworths online orders. Tracks purchase history and frequency, accepts additions via iMessage or Telegram, auto-builds cart and checks out. Browser automation confirmed working — can search, add to cart. Needs logged-in account for checkout. Could expand to other grocers.",
+    "tags": ["grocery", "automation", "browser", "consumer", "Australia"]
+  },
+  {
+    "id": "pdf-form-filler",
+    "name": "PDF Form Filler",
+    "type": "SaaS / Consumer",
+    "date": "2026-02-19",
+    "status": "idea",
+    "explored": true,
+    "summary": "Upload any old-school PDF form (doctor, government, insurance, real estate), AI reads the fields, fills everything from your saved profile — one and done. Vision AI handles non-fillable flat PDFs. Free tier 1 form/month, Pro $5-9/mo unlimited. B2B angle: clinics pre-fill for patients. No competitor nails this specific use case.",
+    "tags": ["AI", "PDF", "consumer", "productivity", "B2B"]
+  },
+  {
+    "id": "inspection-iq",
+    "name": "InspectionIQ",
+    "type": "SaaS / Consumer",
+    "date": "2026-02-23",
+    "status": "idea",
+    "explored": false,
+    "signal": "high",
+    "note": "Petar received a RedBookInspect report this morning — said this is exactly what he's dealing with",
+    "summary": "Upload any pre-purchase inspection report (car or property), get a plain-English summary with a risk score, estimated repair costs, and a buy / negotiate / walk away recommendation. Buyers hate reading these reports.",
+    "tags": ["AI", "consumer", "property", "car", "inspection", "document"]
+  },
+  {
+    "id": "timezone-safe",
+    "name": "TimezoneSafe",
+    "type": "SaaS / Productivity",
+    "date": "2026-02-23",
+    "status": "idea",
+    "explored": false,
+    "signal": "high",
+    "note": "Petar had a 6:30 AM Teams call this morning — said this is exactly what he's dealing with",
+    "summary": "Calendar assistant that flags when a meeting is brutal for one participant (e.g. 6:30 AM) and suggests 3 alternative slots that work for everyone. Pitched at remote teams booking across AU/UK/US.",
+    "tags": ["calendar", "timezone", "productivity", "scheduling", "remote"]
+  },
+  {
+    "id": "founder-forecast",
+    "name": "FounderForecast",
+    "type": "SaaS / B2B",
+    "date": "2026-02-23",
+    "status": "idea",
+    "explored": false,
+    "summary": "Lightweight churn prediction for indie SaaS. Connect Stripe + one analytics source, get a weekly digest: these 3 customers are about to leave and here is why. Enterprise tools do this — no one has made it dead simple for solo founders.",
+    "tags": ["SaaS", "B2B", "churn", "analytics", "founders", "Stripe"]
+  }
+]

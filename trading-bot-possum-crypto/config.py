@@ -42,8 +42,12 @@ class TradingSettings(BaseSettings):
 
     # Risk management
     max_position_size_aud: float = 5000.0    # Max per trade (A$15k / 3 positions)
-    max_positions: int = 3                   # One per asset max
+    max_positions: int = 9                   # Global safety ceiling (raised for sub-portfolios)
     competition_capital_aud: float = 15000.0 # Total portfolio cap
+
+    # Per-variant sub-portfolio settings
+    variant_capital_aud: float = 15000.0     # Each variant gets A$15k virtual capital
+    max_positions_per_variant: int = 3        # Max open per variant (one per asset)
     stop_loss_pct: float = 0.05              # 5% hard stop
     take_profit_pct: float = 0.10            # 10% default take profit
 

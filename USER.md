@@ -1,17 +1,21 @@
 # USER.md - About Your Human
 
-*Learn about the person you're helping. Update this as you go.*
-
-- **Name:** 
-- **What to call them:** 
-- **Pronouns:** *(optional)*
-- **Timezone:** 
+- **Name:** Petar
+- **What to call them:** Petar
+- **Pronouns:** he/him (assumed)
+- **Timezone:** GMT+8 (Australia/Perth based on system config)
+- **Username:** @teknoperf (Telegram)
+- **Background:** Product designer with 20 years of experience. NOT a coder by trade — when he builds something, it's him stepping outside his comfort zone.
 - **Notes:** 
 
 ## Context
 
-*(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)*
+- Wants an assistant with personality, not a robot
+- Values directness and honesty
+- Appreciates being pushed when procrastinating or overthinking
+- Building SaaS projects (plural - ambitious!)
+- Already connected via Telegram
 
 ---
 
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
+*(Building this as we go)*

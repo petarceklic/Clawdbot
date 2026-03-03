@@ -1,0 +1,15 @@
+{
+  "status": "ordered",
+  "items": [],
+  "ellenPendingList": [],
+  "sentAt": null,
+  "deadline": null,
+  "lastOrder": {
+    "orderId": "294496254",
+    "orderReference": "2MR4Q-6S5DPH",
+    "total": 134.82,
+    "deliverySlot": "Today 26 Feb 4:00pm–5:00pm",
+    "placedAt": "2026-02-26T04:49:00+08:00"
+  },
+  "version": 1
+}

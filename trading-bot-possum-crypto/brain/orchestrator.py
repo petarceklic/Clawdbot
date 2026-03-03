@@ -222,39 +222,56 @@ class Orchestrator:
                 "grok_confidence": grok_conf,
             }
 
-        # Execute the highest-confidence signal
-        best = max(signals, key=lambda s: s.confidence)
+        # Sort by confidence (highest first)
+        signals.sort(key=lambda s: s.confidence, reverse=True)
+        best = signals[0]
+
         logger.info(
-            "Best signal: %s %s (variant %s, conf %.2f)",
-            best.side, symbol, best.variant, best.confidence,
+            "Best signal: %s %s (variant %s, conf %.2f) | %d variants triggered",
+            best.side, symbol, best.variant, best.confidence, len(signals),
         )
 
-        trade_result = trader.execute_signal(best, ticker)
+        # Execute ALL triggered variants independently (sub-portfolio mode).
+        # Each variant has its own position limits enforced by trader.
+        trade_results = []
+        placed_variants = []
 
-        # Mark executed signal in DB
-        trade_logger.log_signal(
-            symbol=best.symbol,
-            variant=best.variant,
-            signal=best.side,
-            confidence=best.confidence,
-            grok_direction=grok_dir,
-            grok_confidence=grok_conf,
-            regime=regime_data.get("regime", "NEUTRAL"),
-            fgi_value=regime_data.get("fgi_value"),
-            price=indicators.get("current_price", 0),
-            reasoning=best.reasoning,
-            executed=True,
-        )
+        for sig in signals:
+            trade_result = trader.execute_signal(sig, ticker)
+            trade_results.append(trade_result)
+
+            executed = trade_result.get("action") in ("simulated_fill", "trade_placed")
+            if executed:
+                placed_variants.append(sig.variant)
+
+            # Log each signal with its execution status
+            trade_logger.log_signal(
+                symbol=sig.symbol,
+                variant=sig.variant,
+                signal=sig.side,
+                confidence=sig.confidence,
+                grok_direction=grok_dir,
+                grok_confidence=grok_conf,
+                regime=regime_data.get("regime", "NEUTRAL"),
+                fgi_value=regime_data.get("fgi_value"),
+                price=indicators.get("current_price", 0),
+                reasoning=sig.reasoning,
+                executed=executed,
+            )
+
+        primary_result = trade_results[0] if trade_results else {}
+        action = primary_result.get("action", "no_trade") if placed_variants else primary_result.get("action", "no_trade")
 
         return {
             "symbol": symbol,
-            "action": trade_result.get("action", "error"),
-            "variant": best.variant,
+            "action": action,
+            "variant": placed_variants[0] if placed_variants else best.variant,
+            "variants_placed": placed_variants,
             "side": best.side,
             "confidence": best.confidence,
             "grok_signal": grok_dir,
             "grok_confidence": grok_conf,
-            "trade_result": trade_result,
+            "trade_results": trade_results,
             "all_signals": [
                 {"variant": s.variant, "side": s.side, "confidence": s.confidence}
                 for s in signals

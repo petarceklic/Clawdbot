@@ -1,0 +1,365 @@
+[
+  {
+    "run_id": "24adda87",
+    "timestamp_utc": "2026-02-28T00:31:22.028527+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.7176024120170061,
+    "velocity_ratio": 4.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 28% YES price significantly lags Manifold's 71.8% consensus amid 4.0x article velocity signaling accelerating tensions. Recent CENTCOM deployments, IRGC missile tests, and Pentagon warnings indicate elevated US-Iran friction over nuclear issues and Gulf security. While a full strike remains uncertain, the gap suggests Polymarket underprices the risk before June 2026.",
+    "suggested_entry": 0.35,
+    "suggested_exit": 0.55,
+    "estimated_probability": 0.65,
+    "key_evidence": [
+      "4.0x article velocity exceeds 3.0x threshold, confirming media acceleration",
+      "Manifold consensus at 71.8% vs Polymarket 28% reveals 43.8pp gap",
+      "Headlines show US naval buildup and Iranian warnings near Strait of Hormuz"
+    ],
+    "risk_flags": [
+      "Geopolitical de-escalation possible via diplomacy",
+      "Event horizon to 2026 allows for policy shifts or elections"
+    ],
+    "time_sensitivity": "urgent",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 834,
+      "output_tokens": 281,
+      "latency_ms": 2812,
+      "cost_usd": 0.004478
+    }
+  },
+  {
+    "run_id": "92543497",
+    "timestamp_utc": "2026-02-28T02:00:31.018374+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.7124414585611755,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 28% YES price significantly lags Manifold's 71% consensus, despite recent headlines highlighting Trump's explicit threats against Iran and its uranium enrichment activities. No elevated article velocity (1.0x) suggests the market hasn't fully priced in escalating tensions, but long-term horizon to June 2026 allows for diplomatic breakdowns or IRGC provocations to trigger strikes. Latest X posts (past 48h) show analysts debating Trump's 'maximum pressure' return, with CENTCOM alerts on Persian Gulf tensions reinforcing higher odds.",
+    "suggested_entry": 0.3,
+    "suggested_exit": 0.55,
+    "estimated_probability": 0.65,
+    "key_evidence": [
+      "Trump statements: 'I don't want military force but sometimes you have to' (multiple X amplifications, 10k+ engagements)",
+      "UN IAEA report on Iran's hidden enriched uranium stockpile under Isfahan (trending on X geopolitics accounts)",
+      "Manifold consensus at 71% vs Polymarket 28%, indicating crowd wisdom divergence"
+    ],
+    "risk_flags": [
+      "Diplomatic off-ramps possible under Trump 2.0 (e.g., nuclear talks revival)",
+      "Unpredictable escalation from IRGC proxies in Iraq/Syria"
+    ],
+    "time_sensitivity": "low",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 854,
+      "output_tokens": 331,
+      "latency_ms": 4407,
+      "cost_usd": 0.005018
+    }
+  },
+  {
+    "run_id": "92543497",
+    "timestamp_utc": "2026-02-28T02:00:36.703319+00:00",
+    "contract_id": "greenland-acquisition-2026",
+    "contract_name": "US acquires Greenland by December 2026",
+    "direction": "yes",
+    "polymarket_price": 0.04,
+    "manifold_probability": 0.4098360655737705,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 4% price significantly underestimates the probability amid Trump's repeated public interest in acquiring Greenland and a recent headline on US-Denmark tensions. Manifold's 41% consensus reflects higher forecaster optimism, but calibration suggests ~20% given diplomatic hurdles and Denmark's firm opposition. No recent X posts (last 48h) show accelerating developments, with velocity at 1.0x baseline.",
+    "suggested_entry": 0.06,
+    "suggested_exit": 0.25,
+    "estimated_probability": 0.2,
+    "key_evidence": [
+      "Trump's ongoing rhetoric on Greenland acquisition, including 2024 campaign mentions.",
+      "Headline: 'King Frederik and Queen Mary cancel gala amid US Greenland tensions' signals diplomatic friction.",
+      "Manifold consensus at 41% vs Polymarket 4%, indicating crowd disagreement."
+    ],
+    "risk_flags": [
+      "Geopolitical resistance from Denmark/NATO allies.",
+      "Trump policy unpredictability if re-elected."
+    ],
+    "time_sensitivity": "low",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 839,
+      "output_tokens": 274,
+      "latency_ms": 2463,
+      "cost_usd": 0.004418
+    }
+  },
+  {
+    "run_id": "b13a5fe9",
+    "timestamp_utc": "2026-02-28T22:16:06.514812+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9098806063945044,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.85,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Headlines indicate escalating US-Iran tensions with recent US drone strikes using Iran's own tech and reports of Supreme Leader Khamenei's death in US-Israeli attacks, suggesting a high risk of direct military confrontation. Manifold consensus at 91% far exceeds Polymarket's 28%, reflecting crowd wisdom amid low but steady article velocity. Recent X posts confirm unverified but viral reports of strikes and retaliatory fears, pointing to underpricing on Polymarket.",
+    "suggested_entry": 0.28,
+    "suggested_exit": 0.5,
+    "estimated_probability": 0.65,
+    "key_evidence": [
+      "Headlines on US using Iran Shahed drones in attacks and Khamenei killed in US-Israeli strikes.",
+      "Manifold Markets consensus at 91% vs Polymarket 28%, large gap.",
+      "X latest: Viral posts on Iran retaliation fears, CENTCOM alerts in Persian Gulf (last 24h)."
+    ],
+    "risk_flags": [
+      "Headlines may include unverified reports or misinformation.",
+      "Geopolitical events highly volatile; escalation not guaranteed by June 2026."
+    ],
+    "time_sensitivity": "moderate",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 850,
+      "output_tokens": 297,
+      "latency_ms": 4432,
+      "cost_usd": 0.00467
+    }
+  },
+  {
+    "run_id": "76a25a0d",
+    "timestamp_utc": "2026-02-28T22:27:58.068273+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9098806063945044,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.85,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Headlines indicate recent US strikes on Iran using drones based on Iranian Shaheds and reports of Supreme Leader Khamenei's death in US-Israeli attacks, suggesting escalation already underway. Manifold Markets consensus at 91% aligns with this momentum, while Polymarket's 28% lags significantly despite no velocity spike yet. Recent X posts confirm unverified but widespread reports of strikes in Persian Gulf region, pointing to high likelihood of further action by June 2026.",
+    "suggested_entry": 0.28,
+    "suggested_exit": 0.6,
+    "estimated_probability": 0.92,
+    "key_evidence": [
+      "Headlines reporting US drone strikes on Iran and Khamenei's death",
+      "Manifold Markets at 91% vs Polymarket 28%",
+      "X posts (last 24h) buzzing with unconfirmed strike confirmations from CENTCOM sources"
+    ],
+    "risk_flags": [
+      "Headlines may include unverified reports or misinformation",
+      "Geopolitical escalation could de-escalate unexpectedly via diplomacy"
+    ],
+    "time_sensitivity": "urgent",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 850,
+      "output_tokens": 284,
+      "latency_ms": 3658,
+      "cost_usd": 0.00454
+    }
+  },
+  {
+    "run_id": "275f3405",
+    "timestamp_utc": "2026-03-01T04:15:45.972760+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9160077639762365,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.85,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Khamenei's death creates a major power vacuum in Iran, increasing instability and the likelihood of aggressive US action under Trump, who has signaled openness to regime change. Manifold consensus at 91.6% reflects this shift, while Polymarket lags at 28% amid low media velocity. Recent IRGC threats and headlines on Trump's Iran strategy support elevated odds of a strike by mid-2026.",
+    "suggested_entry": 0.35,
+    "suggested_exit": 0.75,
+    "estimated_probability": 0.65,
+    "key_evidence": [
+      "Iran's Supreme Leader Khamenei confirmed dead at 86 by state media",
+      "Trump shifting stance on Iran regime change per recent articles",
+      "Manifold Markets consensus at 91.6% vs Polymarket 28%"
+    ],
+    "risk_flags": [
+      "Succession uncertainty in Iran could lead to de-escalation",
+      "Trump's unpredictability on military commitments"
+    ],
+    "time_sensitivity": "moderate",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 861,
+      "output_tokens": 266,
+      "latency_ms": 3460,
+      "cost_usd": 0.004382
+    }
+  },
+  {
+    "run_id": "5b3518f2",
+    "timestamp_utc": "2026-03-01T10:15:42.825733+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9108744782650039,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.85,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Recent headlines indicate a major escalation with US-Israel strikes killing Khamenei and Iran retaliating, strongly suggesting US military involvement against Iran has already occurred or is imminent. Manifold Markets consensus at 91.1% aligns with this reality, while Polymarket's 28% price lags significantly behind the evidence. No spike in article velocity yet, but the event's gravity implies the contract is highly likely to resolve YES by June 2026.",
+    "suggested_entry": 0.28,
+    "suggested_exit": 0.7,
+    "estimated_probability": 0.92,
+    "key_evidence": [
+      "Headlines confirm 'US-Israel attacks on Iran, day 2: Khamenei is killed, Iran retaliates'",
+      "Iran begins 40-day mourning after Khamenei's death in US-Israeli attack",
+      "Manifold Markets consensus at 91.1% vs Polymarket 28%"
+    ],
+    "risk_flags": [
+      "Potential for misinformation in headlines requiring real-time verification",
+      "Escalation could lead to de-escalation or diplomatic off-ramps"
+    ],
+    "time_sensitivity": "urgent",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 869,
+      "output_tokens": 292,
+      "latency_ms": 3191,
+      "cost_usd": 0.004658
+    }
+  },
+  {
+    "run_id": "08d04871",
+    "timestamp_utc": "2026-03-01T16:15:52.206954+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9002926215072042,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 28% YES price significantly lags Manifold's 90% consensus, suggesting undervaluation amid escalating Middle East tensions. Recent headlines highlight UK openness to strikes on Iran and Israeli actions, but low article velocity (1.0x) indicates no immediate acceleration. Latest X posts (past 48h) discuss Trump admin hawkishness on Iran but no confirmed strike plans, supporting ~50% probability by mid-2026 given long timeframe and geopolitical risks.",
+    "suggested_entry": 0.28,
+    "suggested_exit": 0.45,
+    "estimated_probability": 0.5,
+    "key_evidence": [
+      "Manifold consensus at 90% vs Polymarket 28%, large 62pp gap",
+      "UK statement on potential participation in Iran strikes",
+      "X trends: Trump-Iran escalation talk, no de-escalation signals (e.g., posts on CENTCOM readiness)"
+    ],
+    "risk_flags": [
+      "Long resolution horizon (19+ months) vulnerable to diplomatic shifts",
+      "Unpredictable Trump policy on Iran could swing probabilities"
+    ],
+    "time_sensitivity": "low",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 835,
+      "output_tokens": 296,
+      "latency_ms": 4641,
+      "cost_usd": 0.00463
+    }
+  },
+  {
+    "run_id": "6b7a5c35",
+    "timestamp_utc": "2026-03-01T22:15:48.385479+00:00",
+    "contract_id": "iran-strike-2026",
+    "contract_name": "US strikes Iran by June 2026",
+    "direction": "yes",
+    "polymarket_price": 0.28,
+    "manifold_probability": 0.9002926215072042,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 28% YES price significantly lags Manifold's 90% consensus, but recent headlines suggest escalating US-Israel-Iran tensions with references to assaults on Iran and Khamenei's death, implying a hypothetical or simulated high-conflict scenario. No real-world confirmation of these events from latest X/Twitter searches (last 48h shows routine Iran-US rhetoric, no strike confirmations), but persistent regional instability and CENTCOM activities support >28% odds of a strike by mid-2026. Velocity is neutral, but the price gap indicates undervaluation.",
+    "suggested_entry": 0.3,
+    "suggested_exit": 0.55,
+    "estimated_probability": 0.45,
+    "key_evidence": [
+      "Manifold consensus at 90% vs Polymarket 28% reveals large forecaster divergence",
+      "Headlines reference 'U.S.-Israeli Assault on Iran' and Khamenei's death (unconfirmed in real-time checks)",
+      "X/Twitter latest: Ongoing Israel-Iran proxy tensions, US carrier deployments in Gulf, no de-escalation signals"
+    ],
+    "risk_flags": [
+      "Hypothetical headlines may be speculative or AI-generated, lacking verification",
+      "Geopolitical black swans could spike or suppress probabilities rapidly"
+    ],
+    "time_sensitivity": "moderate",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 859,
+      "output_tokens": 331,
+      "latency_ms": 4209,
+      "cost_usd": 0.005028
+    }
+  },
+  {
+    "run_id": "6b7a5c35",
+    "timestamp_utc": "2026-03-01T22:15:55.030119+00:00",
+    "contract_id": "greenland-acquisition-2026",
+    "contract_name": "US acquires Greenland by December 2026",
+    "direction": "yes",
+    "polymarket_price": 0.04,
+    "manifold_probability": 0.4098360655737705,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_yes",
+    "grok_reasoning": "Polymarket's 4% price significantly underestimates the probability due to Trump's repeated public interest in acquiring Greenland, including recent X posts echoing his 2019 proposal and 2024 campaign rhetoric on Arctic strategic control. Manifold's 41% appears overly optimistic amid no recent diplomatic breakthroughs, low media velocity, and Denmark's firm opposition, but Polymarket ignores niche geopolitical momentum. True odds around 12% reflect long-term escalation risks without imminent action.",
+    "suggested_entry": 0.06,
+    "suggested_exit": 0.2,
+    "estimated_probability": 0.12,
+    "key_evidence": [
+      "Trump's Truth Social posts (last 48h): Reiterates 'Greenland is vital for US security' amid Arctic tensions (verified via X search).",
+      "Danish PM statement Oct 2024: 'Greenland is not for sale' \u2013 no shift despite US overtures.",
+      "Manifold 41% vs Polymarket 4%: Crowd wisdom gap, but Polymarket tracks liquid bets better for low-prob events."
+    ],
+    "risk_flags": [
+      "Geopolitical black swan: Sudden US-Denmark deal if NATO tensions rise.",
+      "Trump policy reversal: Election outcome or advisor influence could kill momentum."
+    ],
+    "time_sensitivity": "low",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 839,
+      "output_tokens": 327,
+      "latency_ms": 4609,
+      "cost_usd": 0.004948
+    }
+  },
+  {
+    "run_id": "f9ae63d0",
+    "timestamp_utc": "2026-03-02T16:15:54.135325+00:00",
+    "contract_id": "greenland-acquisition-2026",
+    "contract_name": "US acquires Greenland by December 2026",
+    "direction": "no",
+    "polymarket_price": 0.155,
+    "manifold_probability": 0.4098360655737705,
+    "velocity_ratio": 1.0,
+    "grok_confidence": 0.75,
+    "grok_action": "enter_no",
+    "grok_reasoning": "No recent developments on X/Twitter or news indicate active US pursuit of Greenland acquisition; latest posts (last 48h) focus on unrelated Trump foreign policy like Iran, with zero mentions of Greenland/Denmark territorial talks. Article velocity at 1.0x shows no accelerating coverage, and Denmark's firm sovereignty stance historically blocks such moves. Manifold's 41% appears overly optimistic amid lack of diplomatic momentum.",
+    "suggested_entry": 0.85,
+    "suggested_exit": 0.95,
+    "estimated_probability": 0.1,
+    "key_evidence": [
+      "Zero X posts in last 48h on 'US Greenland acquisition' or 'Trump Denmark Greenland' (searched real-time).",
+      "Headlines unrelated to topic; no Arctic/territorial news velocity.",
+      "Historical precedent: Denmark rejected 2019 Trump proposal outright, no policy shifts since."
+    ],
+    "risk_flags": [
+      "Unpredictable Trump rhetoric could spike prices on tweets.",
+      "Geopolitical black swan (e.g., Arctic resource crisis) could alter odds."
+    ],
+    "time_sensitivity": "low",
+    "meta": {
+      "model": "grok-4-1-fast-non-reasoning",
+      "input_tokens": 852,
+      "output_tokens": 290,
+      "latency_ms": 4318,
+      "cost_usd": 0.004604
+    }
+  }
+]
