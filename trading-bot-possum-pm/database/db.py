@@ -47,6 +47,7 @@ class Database:
             ("realised_pnl_usd", "REAL"),
             ("close_price_usd", "REAL"),
             ("close_timestamp_utc", "TEXT"),
+            ("variant", "TEXT DEFAULT 'V1'"),
         ]
 
         added = []

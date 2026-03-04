@@ -1,12 +1,13 @@
 """
 Possum PM — Pipeline Orchestrator
-5-stage pipeline per contract:
+6-stage pipeline per contract:
 
   Stage 1 — Velocity Check (article velocity vs 30-day baseline)
   Stage 2 — Manifold + Polymarket Price (forecaster consensus + market price)
   Stage 3 — Alert Gate (velocity >= threshold OR gap >= 15pp)
   Stage 4 — Grok Evaluation (real-time X/Twitter search + analysis)
-  Stage 5 — Paper Trade Logging (JSON + SQLite)
+  Stage 5 — Variant Engine (V1-V5 independent evaluation)
+  Stage 6 — Paper Trade Logging (JSON + SQLite, per variant)
 """
 
 import logging
@@ -22,6 +23,8 @@ class PMOrchestrator:
     def __init__(self):
         from config import get_config
         self.cfg = get_config()
+        self._price_history: dict[str, list[dict]] = {}  # contract_id → [{timestamp, price}]
+        self._load_price_history()
 
     def run_pipeline(self, dry_run: bool = False) -> dict:
         """
@@ -375,36 +378,73 @@ class PMOrchestrator:
             direction, confidence, action,
         )
 
-        # ── Stage 5: Paper Trade Logging ──
-        trade_logged = False
+        # ── Stage 5: Variant Engine ──
+        from variants.variant_engine import get_pm_variant_engine
+        engine = get_pm_variant_engine()
 
-        if action in ("enter_yes", "enter_no"):
-            trade_direction = "yes" if action == "enter_yes" else "no"
+        # Load price history for V4 momentum
+        price_history = self._get_price_history(contract_id)
 
+        signals = engine.evaluate(
+            contract=contract,
+            velocity_ratio=velocity_ratio,
+            manifold_prob=manifold_prob,
+            polymarket_price=polymarket_price,
+            grok_response=grok_response,
+            price_history=price_history,
+        )
+
+        logger.info(
+            "  Stage 5 — Variants: %d triggered (%s)",
+            len(signals),
+            ", ".join(f"{s.variant}→{s.direction}" for s in signals) if signals else "none",
+        )
+
+        # ── Stage 6: Paper Trade Logging (per variant) ──
+        trades_logged = 0
+
+        for signal in signals:
             if dry_run:
-                logger.info("  Stage 5 — DRY RUN: would log %s trade for %s", trade_direction, contract_id)
+                logger.info(
+                    "  Stage 6 — DRY RUN: would log %s %s [%s] (conf=%.2f)",
+                    signal.direction.upper(), contract_id, signal.variant, signal.confidence,
+                )
             else:
-                trade_logged = log_paper_trade(
+                logged = log_paper_trade(
                     run_id=run_id,
                     contract=contract,
-                    direction=trade_direction,
+                    direction=signal.direction,
                     polymarket_price=polymarket_price,
                     manifold_probability=manifold_prob,
                     velocity_ratio=velocity_ratio,
                     grok_response=grok_response,
+                    variant=signal.variant,
                 )
-                if trade_logged:
-                    logger.info("  Stage 5 — Paper trade logged: %s %s", trade_direction.upper(), contract_id)
+                if logged:
+                    trades_logged += 1
+                    logger.info(
+                        "  Stage 6 — Paper trade logged: %s %s [%s]",
+                        signal.direction.upper(), contract_id, signal.variant,
+                    )
                 else:
-                    logger.info("  Stage 5 — Trade skipped (duplicate or at limit): %s %s", trade_direction.upper(), contract_id)
-        else:
-            logger.info("  Stage 5 — Grok says PASS, no trade logged")
+                    logger.info(
+                        "  Stage 6 — Trade skipped (dup/limit): %s %s [%s]",
+                        signal.direction.upper(), contract_id, signal.variant,
+                    )
+
+        if not signals:
+            logger.info("  Stage 6 — No variants triggered, no trade logged")
+
+        # Record price snapshot for V4 momentum history
+        if polymarket_price is not None:
+            self._record_price(contract_id, polymarket_price)
 
         # Log decision regardless
+        variant_codes = [s.variant for s in signals]
         log_decision(
             run_id=run_id,
             contract=contract,
-            stage_reached=5,
+            stage_reached=6,
             velocity_ratio=velocity_ratio,
             velocity_triggered=velocity_triggered,
             manifold_probability=manifold_prob,
@@ -413,7 +453,7 @@ class PMOrchestrator:
             gap_triggered=gap_triggered,
             alert_passed=True,
             grok_response=grok_response,
-            action_taken="trade_logged" if trade_logged else "pass",
+            action_taken=f"trades_logged:{trades_logged}" if trades_logged > 0 else "pass",
         )
 
         return {
@@ -425,5 +465,58 @@ class PMOrchestrator:
             "grok_direction": direction,
             "grok_confidence": confidence,
             "grok_action": action,
-            "trade_logged": trade_logged,
+            "trade_logged": trades_logged > 0,
+            "trades_logged": trades_logged,
+            "variants_triggered": variant_codes,
         }
+
+    # ── Price History for V4 Momentum ──
+
+    _PRICE_HISTORY_FILE = None  # set lazily
+
+    def _get_price_history_path(self):
+        if self._PRICE_HISTORY_FILE is None:
+            from pathlib import Path
+            self.__class__._PRICE_HISTORY_FILE = Path(__file__).parent.parent / "data" / "price_history.json"
+        return self._PRICE_HISTORY_FILE
+
+    def _load_price_history(self):
+        """Load price history from disk (persists across runs for V4 momentum)."""
+        import json
+        path = self._get_price_history_path()
+        try:
+            if path.exists():
+                with open(path) as f:
+                    self._price_history = json.load(f)
+                logger.debug("Loaded price history: %d contracts", len(self._price_history))
+        except Exception:
+            self._price_history = {}
+
+    def _save_price_history(self):
+        """Persist price history to disk."""
+        import json
+        path = self._get_price_history_path()
+        try:
+            with open(path, "w") as f:
+                json.dump(self._price_history, f, indent=2)
+        except Exception as e:
+            logger.warning("Failed to save price history: %s", e)
+
+    def _record_price(self, contract_id: str, price: float):
+        """Record a price snapshot for V4 momentum tracking."""
+        if contract_id not in self._price_history:
+            self._price_history[contract_id] = []
+
+        self._price_history[contract_id].append({
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "price": price,
+        })
+
+        # Keep last 20 snapshots (enough for momentum detection)
+        self._price_history[contract_id] = self._price_history[contract_id][-20:]
+        self._save_price_history()
+
+    def _get_price_history(self, contract_id: str) -> list[dict] | None:
+        """Get price history for a contract (for V4 momentum)."""
+        history = self._price_history.get(contract_id)
+        return history if history else None

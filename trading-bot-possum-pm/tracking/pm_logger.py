@@ -26,6 +26,7 @@ def log_paper_trade(
     manifold_probability: float | None,
     velocity_ratio: float,
     grok_response: dict,
+    variant: str = "V1",
 ) -> bool:
     """
     Log a paper trade to both JSON and SQLite with P&L tracking.
@@ -36,10 +37,10 @@ def log_paper_trade(
     cfg = get_config()
     db = get_db()
 
-    # Dedup: skip if already have an open position for this contract + direction
+    # Dedup: skip if already have an open position for this contract + direction + variant
     existing = db.fetch_one(
-        "SELECT id FROM pm_trades WHERE contract_id = ? AND direction = ? AND status = 'open'",
-        (contract["id"], direction),
+        "SELECT id FROM pm_trades WHERE contract_id = ? AND direction = ? AND variant = ? AND status = 'open'",
+        (contract["id"], direction, variant),
     )
     if existing:
         logger.info(
@@ -83,6 +84,7 @@ def log_paper_trade(
         "contract_id": contract["id"],
         "contract_name": contract["name"],
         "direction": direction,
+        "variant": variant,
         "polymarket_price": polymarket_price,
         "manifold_probability": manifold_probability,
         "velocity_ratio": velocity_ratio,
@@ -105,15 +107,15 @@ def log_paper_trade(
     try:
         db.execute_insert(
             """INSERT INTO pm_trades
-               (run_id, timestamp_utc, contract_id, contract_name, direction,
+               (run_id, timestamp_utc, contract_id, contract_name, direction, variant,
                 polymarket_price, manifold_probability, velocity_ratio,
                 grok_confidence, grok_action, grok_reasoning,
                 suggested_entry, suggested_exit,
                 entry_price_usd, notional_usd, quantity,
                 current_price_usd, unrealised_pnl_usd)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)""",
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)""",
             (
-                run_id, now, contract["id"], contract["name"], direction,
+                run_id, now, contract["id"], contract["name"], direction, variant,
                 polymarket_price, manifold_probability, velocity_ratio,
                 grok_response.get("confidence"),
                 grok_response.get("action"),
@@ -130,9 +132,10 @@ def log_paper_trade(
         logger.error("Failed to write trade to SQLite: %s", e)
 
     logger.info(
-        "Paper trade logged: %s %s @ $%.2f (entry=$%.4f, notional=$%.0f, qty=%.2f)",
+        "Paper trade logged: %s %s [%s] @ $%.2f (entry=$%.4f, notional=$%.0f, qty=%.2f)",
         direction.upper(),
         contract["id"],
+        variant,
         polymarket_price or 0,
         entry_price or 0,
         notional or 0,

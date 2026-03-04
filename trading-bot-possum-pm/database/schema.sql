@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS pm_trades (
     contract_id TEXT NOT NULL,
     contract_name TEXT NOT NULL,
     direction TEXT NOT NULL,          -- 'yes' or 'no'
+    variant TEXT DEFAULT 'V1',        -- variant code (V1-V5)
     polymarket_price REAL,
     manifold_probability REAL,
     velocity_ratio REAL,
