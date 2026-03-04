@@ -2073,17 +2073,20 @@ app.get('/possum-crypto', async (req, res) => {
      FROM positions WHERE status='closed' AND entry_timestamp_utc >= '${startDate}' GROUP BY variant`
   );
   const openByVariant = cryptoQuery(
-    `SELECT variant, COALESCE(SUM(unrealised_pnl_aud), 0) as unrealised
+    `SELECT variant, COUNT(*) as open_count, COALESCE(SUM(unrealised_pnl_aud), 0) as unrealised
      FROM positions WHERE status='open' AND entry_timestamp_utc >= '${startDate}' GROUP BY variant`
   );
   const closedMap = {};
   for (const r of closedByVariant) closedMap[r.variant] = r;
   const openMap = {};
-  for (const r of openByVariant) openMap[r.variant] = r.unrealised || 0;
+  const openCountMap = {};
+  for (const r of openByVariant) { openMap[r.variant] = r.unrealised || 0; openCountMap[r.variant] = r.open_count || 0; }
 
   const cryptoVariantPnl = CRYPTO_VARIANTS.map(code => {
     const c = closedMap[code] || {};
-    const total = c.total || 0;
+    const closedTotal = c.total || 0;
+    const openCount = openCountMap[code] || 0;
+    const total = closedTotal + openCount;
     const wins = c.wins || 0;
     const realised = c.pnl || 0;
     const unrealised = openMap[code] || 0;
@@ -2092,10 +2095,11 @@ app.get('/possum-crypto', async (req, res) => {
     const pf = gl > 0 ? (gp / gl) : (gp > 0 ? 99 : 0);
     return {
       code, name: CRYPTO_VARIANT_NAMES[code] || code,
-      trades: total, wins, realised, unrealised,
+      trades: total, closedTrades: closedTotal, openTrades: openCount,
+      wins, realised, unrealised,
       totalPnl: realised + unrealised,
-      winRate: total > 0 ? (wins / total * 100).toFixed(1) : '—',
-      pf: total > 0 ? pf.toFixed(2) : '—',
+      winRate: closedTotal > 0 ? (wins / closedTotal * 100).toFixed(1) : '—',
+      pf: closedTotal > 0 ? pf.toFixed(2) : '—',
     };
   }).sort((a, b) => b.totalPnl - a.totalPnl);
 
@@ -3125,6 +3129,7 @@ app.get('/leaderboard', async (req, res) => {
     const dailyCurr = b.currency_label === 'USD' ? '$' : 'A$';
     const trades = preComp ? 0 : (b.total_trades ?? 0);
     const regimeExtra = b.regime_extra ? ` · ${b.regime_extra}` : '';
+    const variants = b.variant_count ?? 0;
 
     return `<tr>
       <td style="font-size:1.1rem;text-align:center;width:44px">${medal}</td>
@@ -3135,6 +3140,7 @@ app.get('/leaderboard', async (req, res) => {
         </a>
       </td>
       <td style="font-size:0.75rem;color:var(--muted);text-transform:capitalize">${regime}${regimeExtra}</td>
+      <td style="text-align:center;color:var(--muted)">${variants}</td>
       <td style="font-weight:800;font-size:1.1rem;color:${retColor};letter-spacing:-0.5px">${retStr}</td>
       <td style="color:${pnlColor(dailyPnl)};font-weight:600">${dailyPnl != null ? fmtMoney(dailyPnl, dailyCurr) : '—'}</td>
       <td style="color:var(--muted)">${trades}</td>
@@ -3146,6 +3152,7 @@ app.get('/leaderboard', async (req, res) => {
     'US': { bg: 'rgba(59,130,246,0.15)', color: '#3b82f6', emoji: '🇺🇸' },
     'AU': { bg: 'rgba(52,211,153,0.15)', color: '#34d399', emoji: '🦘' },
     'CRYPTO': { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b', emoji: '₿' },
+    'PM': { bg: 'rgba(167,139,250,0.15)', color: '#a78bfa', emoji: '🎯' },
   };
   const variantMedals = ['🥇', '🥈', '🥉'];
 
@@ -3232,13 +3239,33 @@ app.get('/leaderboard', async (req, res) => {
     const pColor = pnlColor(t.unrealised_pnl_usd);
     const dir = (t.direction || '').toUpperCase();
     const dirColor = dir === 'YES' ? '#10b981' : '#ef4444';
+    const variant = t.variant || 'V1';
     return `<tr>
       <td style="font-weight:600;font-size:0.8rem">${t.contract_name || t.contract_id || '—'}</td>
+      <td><span style="background:rgba(167,139,250,0.15);color:#a78bfa;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:700">${variant}</span></td>
       <td><span style="color:${dirColor};font-size:0.65rem;font-weight:700;border:1px solid ${dirColor}40;padding:2px 7px;border-radius:99px">${dir}</span></td>
       <td style="color:var(--muted)">$${Number(t.entry_price_usd||0).toFixed(2)}</td>
       <td style="color:${pColor};font-weight:600">${t.unrealised_pnl_usd != null ? fmtMoney(t.unrealised_pnl_usd, '$') : '—'}</td>
     </tr>`;
-  }).join('') : '<tr><td colspan="4" class="empty-cell">No PM positions</td></tr>';
+  }).join('') : '<tr><td colspan="5" class="empty-cell">No PM positions</td></tr>';
+
+  // PM variant summary cards
+  const pmVariantNames = { V1: 'News Velocity', V2: 'Contrarian', V3: 'Time Decay', V4: 'Momentum', V5: 'Calibration' };
+  const pmVariantSummary = pmData.variant_summary || [];
+  const pmVariantCardsHtml = Object.entries(pmVariantNames).map(([code, name]) => {
+    const vs = pmVariantSummary.find(v => v.code === code) || { open: 0, closed: 0, total: 0, pnl_usd: 0, win_rate: 0 };
+    const hasTrades = vs.total > 0;
+    const pnlClr = pnlColor(vs.pnl_usd);
+    return `<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 8px;text-align:center">
+      <div style="font-size:1rem;font-weight:800;color:#a78bfa">${code}</div>
+      <div style="font-size:0.6rem;color:var(--muted);margin-bottom:6px">${name}</div>
+      ${hasTrades
+        ? `<div style="font-size:0.8rem;font-weight:700;color:${pnlClr}">${fmtMoney(vs.pnl_usd, '$')}</div>
+           <div style="font-size:0.6rem;color:var(--muted);margin-top:2px">${vs.open} open · ${vs.closed} closed</div>
+           ${vs.closed > 0 ? `<div style="font-size:0.6rem;color:var(--muted)">${vs.win_rate}% WR</div>` : ''}`
+        : `<div style="font-size:0.7rem;color:var(--muted);font-style:italic;margin-top:4px">No trades</div>`}
+    </div>`;
+  }).join('');
 
   res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -3484,12 +3511,13 @@ app.get('/leaderboard', async (req, res) => {
             <th style="width:44px">Rank</th>
             <th>Bot</th>
             <th>Regime</th>
+            <th style="text-align:center">Variants</th>
             <th>${compActive ? 'Return' : 'All-Time'}</th>
             <th>Today P&amp;L</th>
             <th>Trades</th>
           </tr></thead>
           <tbody>
-            ${botRows || '<tr><td colspan="6" class="empty-cell">Could not load leaderboard data</td></tr>'}
+            ${botRows || '<tr><td colspan="7" class="empty-cell">Could not load leaderboard data</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -3535,10 +3563,13 @@ app.get('/leaderboard', async (req, res) => {
     </div>
 
     <section class="section">
-      <h2 class="section-title">🎯 PM Positions</h2>
+      <h2 class="section-title">🎯 PM Variants</h2>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px">
+        ${pmVariantCardsHtml}
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Contract</th><th>Dir</th><th>Entry</th><th>P&amp;L</th></tr></thead>
+          <thead><tr><th>Contract</th><th>Variant</th><th>Dir</th><th>Entry</th><th>P&amp;L</th></tr></thead>
           <tbody>${pmPosHtml}</tbody>
         </table>
       </div>
