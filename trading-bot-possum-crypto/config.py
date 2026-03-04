@@ -89,12 +89,13 @@ class CostSettings(BaseSettings):
 
 
 # Regime-variant matrix: which variants can trade in each regime
+# M4 (ADX Momentum Breakout) is in ALL regimes — it self-gates on ADX > 25
 REGIME_VARIANT_MATRIX: dict[str, list[str]] = {
-    "EXTREME_FEAR":  ["MR1", "MR2", "MR3"],
-    "BEARISH":       ["MR1", "MR2", "MR3", "S1", "S2"],
-    "NEUTRAL":       ["M1", "M2", "M3", "MR1", "MR2", "MR3", "S1", "S2", "S3"],
-    "BULLISH":       ["M1", "M2", "M3", "S1", "S2", "S3"],
-    "EXTREME_GREED": ["MR1", "MR2", "MR3"],
+    "EXTREME_FEAR":  ["MR1", "MR2", "MR3", "M4"],
+    "BEARISH":       ["MR1", "MR2", "MR3", "S1", "S2", "M4"],
+    "NEUTRAL":       ["M1", "M2", "M3", "M4", "MR1", "MR2", "MR3", "S1", "S2", "S3"],
+    "BULLISH":       ["M1", "M2", "M3", "M4", "S1", "S2", "S3"],
+    "EXTREME_GREED": ["MR1", "MR2", "MR3", "M4"],
 }
 
 

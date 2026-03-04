@@ -12,10 +12,11 @@ logger = logging.getLogger("possum.crypto.variant_engine")
 
 
 def _load_all_variants() -> list[BaseVariant]:
-    """Lazily import and instantiate all 9 variants."""
+    """Lazily import and instantiate all 10 variants."""
     from variants.variant_m1 import VariantM1
     from variants.variant_m2 import VariantM2
     from variants.variant_m3 import VariantM3
+    from variants.variant_m4 import VariantM4
     from variants.variant_mr1 import VariantMR1
     from variants.variant_mr2 import VariantMR2
     from variants.variant_mr3 import VariantMR3
@@ -24,7 +25,7 @@ def _load_all_variants() -> list[BaseVariant]:
     from variants.variant_s3 import VariantS3
 
     return [
-        VariantM1(), VariantM2(), VariantM3(),
+        VariantM1(), VariantM2(), VariantM3(), VariantM4(),
         VariantMR1(), VariantMR2(), VariantMR3(),
         VariantS1(), VariantS2(), VariantS3(),
     ]
