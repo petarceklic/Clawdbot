@@ -2551,7 +2551,6 @@ app.get('/possum-pm', async (req, res) => {
   const openTrades = dbExists ? pmQuery("SELECT COUNT(*) as n FROM pm_trades WHERE status='open'")[0]?.n || 0 : 0;
   const totalDecisions = dbExists ? pmQuery("SELECT COUNT(*) as n FROM pm_decisions")[0]?.n || 0 : 0;
   const totalTrades = dbExists ? pmQuery("SELECT COUNT(*) as n FROM pm_trades WHERE status IN ('open','closed')")[0]?.n || 0 : 0;
-  const apiCost7d = dbExists ? pmQuery(`SELECT ROUND(SUM(estimated_cost_usd),4) as c FROM api_costs WHERE timestamp_utc >= datetime('now','-7 days')`)[0]?.c || 0 : 0;
 
   // P&L stats
   const pmCapitalAud = 15000;
@@ -2578,86 +2577,24 @@ app.get('/possum-pm', async (req, res) => {
   // Open paper trades
   const openTradeRows = dbExists ? pmQuery("SELECT * FROM pm_trades WHERE status='open' ORDER BY timestamp_utc DESC") : [];
 
-  // API cost history (last 15 entries)
-  const apiHistory = dbExists ? pmQuery("SELECT * FROM api_costs ORDER BY timestamp_utc DESC LIMIT 15") : [];
-
   // Traded contract ids
   const tradedIds = new Set((dbExists ? pmQuery("SELECT DISTINCT contract_id FROM pm_trades") : []).map(r => r.contract_id));
 
-  // ── GDELT feed data ──
-  const gdeltLastFile = dbExists ? pmQuery("SELECT filename, processed_at, articles_found FROM gdelt_processed_files ORDER BY filename DESC LIMIT 1") : [];
-  const gdeltTotalArticles = dbExists ? (pmQuery("SELECT COUNT(*) as n FROM gdelt_articles")[0]?.n || 0) : 0;
-
-  const gdeltPerContract = {};
-  if (dbExists) {
-    for (const c of contracts) {
-      const articles24h = pmQuery(`SELECT COUNT(*) as n FROM gdelt_articles WHERE contract_id='${c.id}' AND gkg_timestamp >= strftime('%Y%m%d%H%M%S', datetime('now','-1 day'))`);
-      const dailyVolume = pmQuery(`SELECT substr(gkg_timestamp,1,8) as day, COUNT(*) as n FROM gdelt_articles WHERE contract_id='${c.id}' GROUP BY day ORDER BY day DESC LIMIT 5`);
-      const headlines = pmQuery(`SELECT headline, source_name, source_tier, gkg_timestamp FROM gdelt_articles WHERE contract_id='${c.id}' AND headline IS NOT NULL AND headline != '' ORDER BY source_tier ASC, gkg_timestamp DESC LIMIT 3`);
-      const velocity = latestDecisions[c.id]?.velocity_ratio ?? null;
-      gdeltPerContract[c.id] = { articles24h: articles24h[0]?.n || 0, dailyVolume: dailyVolume.reverse(), headlines, velocity };
-    }
-  }
-
-  // GDELT feed status
-  let gdeltIsLive = false;
-  let gdeltLastUpdate = '—';
-  if (gdeltLastFile.length) {
-    const fn = gdeltLastFile[0].filename; // YYYYMMDDHHMMSS
-    const y = fn.slice(0,4), mo = fn.slice(4,6), d = fn.slice(6,8), h = fn.slice(8,10), mi = fn.slice(10,12);
-    const fileDate = new Date(`${y}-${mo}-${d}T${h}:${mi}:00Z`);
-    const ageMin = (Date.now() - fileDate.getTime()) / 60000;
-    gdeltIsLive = ageMin < 60;
-    gdeltLastUpdate = `${d}/${mo}/${y} ${h}:${mi} UTC`;
-  }
-
-  // Build GDELT cards HTML
-  const gdeltCardsHtml = contracts.map(c => {
-    const g = gdeltPerContract[c.id];
-    if (!g) return '';
-    const velStr = g.velocity != null ? g.velocity.toFixed(1) + 'x' : '—';
-    const velColor = g.velocity >= 3.0 ? '#10b981' : '#64647a';
-    const name = c.name.replace(/^(US |Will the US )/, '').slice(0, 35);
-
-    // Daily volume bars (normalize to max)
-    const maxVol = Math.max(...g.dailyVolume.map(d => d.n), 1);
-    const barsHtml = g.dailyVolume.map(d => {
-      const px = Math.max(Math.round((d.n / maxVol) * 24), 2);
-      const dayLabel = d.day.slice(6, 8) + '/' + d.day.slice(4, 6);
-      return `<div style="flex:1;text-align:center"><div class="gdelt-bar" style="height:${px}px"></div><div class="gdelt-bar-label">${dayLabel}</div></div>`;
-    }).join('');
-
-    // Headlines
-    const headlinesHtml = g.headlines.map(h => {
-      const tierClass = h.source_tier === 1 ? 'gdelt-tier1' : h.source_tier === 2 ? 'gdelt-tier2' : '';
-      const headline = (h.headline || '').slice(0, 90) + ((h.headline || '').length > 90 ? '…' : '');
-      const src = h.source_name || '';
-      return `<li>${headline} <span class="gdelt-src ${tierClass}">${src}</span></li>`;
-    }).join('');
-
-    return `<div class="gdelt-card">
-      <div class="gdelt-card-hdr">
-        <span class="gdelt-card-title">${name}</span>
-        <span class="gdelt-vel" style="color:${velColor}">⚡ ${velStr}</span>
-      </div>
-      <div class="gdelt-stat">${g.articles24h.toLocaleString()} <span style="font-size:0.6rem;color:var(--muted)">articles / 24h</span></div>
-      <div class="gdelt-bars">${barsHtml}</div>
-      <ul class="gdelt-headlines">${headlinesHtml}</ul>
-    </div>`;
-  }).join('');
-
-  const gdeltSectionHtml = `
-    <h3 class="section-title">📡 GDELT FEED</h3>
-    <div class="gdelt-status">
-      <span class="${gdeltIsLive ? 'gdelt-live' : 'gdelt-stale'}">● ${gdeltIsLive ? 'LIVE' : 'STALE'}</span>
-      <span style="color:var(--muted)">Last update: ${gdeltLastUpdate}</span>
-      <span style="color:var(--muted)">${Number(gdeltTotalArticles).toLocaleString()} articles ingested</span>
-    </div>
-    <div class="gdelt-grid">${gdeltCardsHtml}</div>`;
+  // PM variant summary
+  const PM_VARIANT_NAMES = { V1: 'News Velocity', V2: 'Contrarian', V3: 'Time Decay', V4: 'Momentum', V5: 'Calibration' };
+  const pmVariantSummary = Object.entries(PM_VARIANT_NAMES).map(([code, name]) => {
+    const activeTrades = dbExists ? pmQuery(`SELECT COUNT(*) as n FROM pm_trades WHERE status IN ('open','closed') AND COALESCE(variant,'V1')='${code}'`)[0]?.n || 0 : 0;
+    const openCount = dbExists ? pmQuery(`SELECT COUNT(*) as n FROM pm_trades WHERE status='open' AND COALESCE(variant,'V1')='${code}'`)[0]?.n || 0 : 0;
+    const closedCount = dbExists ? pmQuery(`SELECT COUNT(*) as n FROM pm_trades WHERE status='closed' AND COALESCE(variant,'V1')='${code}'`)[0]?.n || 0 : 0;
+    const realisedRow = dbExists ? pmQuery(`SELECT COALESCE(SUM(realised_pnl_usd),0) as t FROM pm_trades WHERE status='closed' AND COALESCE(variant,'V1')='${code}'`)[0] : null;
+    const unrealisedRow = dbExists ? pmQuery(`SELECT COALESCE(SUM(unrealised_pnl_usd),0) as t FROM pm_trades WHERE status='open' AND COALESCE(variant,'V1')='${code}'`)[0] : null;
+    const pnl = (realisedRow?.t || 0) + (unrealisedRow?.t || 0);
+    return { code, name, total: activeTrades, open: openCount, closed: closedCount, pnl };
+  });
 
   // Build contract card rows
   function stageBar(n) {
-    const total = 5;
+    const total = 6;
     const filled = Math.min(Math.max(Number(n) || 0, 0), total);
     let html = '<span style="display:inline-flex;gap:2px;vertical-align:middle">';
     for (let i = 1; i <= total; i++) {
@@ -2708,7 +2645,7 @@ app.get('/possum-pm', async (req, res) => {
         <span>Confidence: <strong>${grokConf}</strong></span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem">
-        <span style="color:#64647a">Stage ${stage}/5</span>
+        <span style="color:#64647a">Stage ${stage}/6</span>
         ${stageBar(stage)}
       </div>
     </div>`;
@@ -2748,16 +2685,15 @@ app.get('/possum-pm', async (req, res) => {
     const entryF = t.entry_price_usd != null ? '$' + Number(t.entry_price_usd).toFixed(4) : '—';
     const currentF = t.current_price_usd != null ? '$' + Number(t.current_price_usd).toFixed(4) : '—';
     const qtyF = t.quantity != null ? Number(t.quantity).toFixed(0) : '—';
+    const variant = t.variant || 'V1';
     return `<tr>
-      <td style="color:#64647a;font-size:0.7rem">${fmtTsAU(t.timestamp_utc)}</td>
       <td style="font-size:0.8rem">${t.contract_name||t.contract_id}</td>
+      <td><span style="background:rgba(167,139,250,0.15);color:#a78bfa;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:700">${variant}</span></td>
       <td><span style="color:${dirColor};background:${dirColor}20;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.75rem">${(t.direction||'').toUpperCase()}</span></td>
       <td>${entryF}</td>
       <td>${currentF}</td>
-      <td>${qtyF}</td>
       <td style="color:${pnlColor};font-weight:600">${pnlStr}</td>
       <td>${t.grok_confidence != null ? (Number(t.grok_confidence)*100).toFixed(0)+'%' : '—'}</td>
-      <td style="font-size:0.75rem;color:#a78bfa">${t.grok_action||'—'}</td>
     </tr>`;
   }).join('');
 
@@ -2882,25 +2818,6 @@ app.get('/possum-pm', async (req, res) => {
       padding: 12px 16px; margin-bottom: 24px; color: #ef4444; font-size: 0.8rem;
     }
 
-    /* GDELT Feed */
-    .gdelt-status { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); margin-bottom: 14px; font-size: 0.7rem; }
-    .gdelt-live { color: #10b981; font-weight: 700; }
-    .gdelt-stale { color: #f59e0b; font-weight: 700; }
-    .gdelt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 24px; }
-    .gdelt-card { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); padding: 12px 14px; }
-    .gdelt-card-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .gdelt-card-title { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-    .gdelt-stat { font-size: 1rem; font-weight: 800; }
-    .gdelt-vel { font-size: 0.65rem; font-weight: 600; }
-    .gdelt-bars { display: flex; align-items: flex-end; gap: 3px; height: 24px; margin: 6px 0; }
-    .gdelt-bar { flex: 1; background: #14b8a6; border-radius: 2px 2px 0 0; min-width: 8px; }
-    .gdelt-bar-label { font-size: 0.45rem; color: var(--muted); text-align: center; }
-    .gdelt-headlines { list-style: none; padding: 0; margin: 0; }
-    .gdelt-headlines li { font-size: 0.62rem; padding: 3px 0; border-bottom: 1px solid var(--border); color: var(--text); line-height: 1.3; }
-    .gdelt-headlines li:last-child { border-bottom: none; }
-    .gdelt-src { color: var(--muted); font-size: 0.55rem; }
-    .gdelt-tier1 { color: #10b981; }
-    .gdelt-tier2 { color: #3b82f6; }
 
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -2964,23 +2881,33 @@ app.get('/possum-pm', async (req, res) => {
         <div class="stat-value amber">${compLive ? totalTrades : 0}</div>
         <div class="stat-sub">all time</div>
       </div>
-      <div class="stat-card" data-g="blue">
-        <div class="stat-icon">💸</div>
-        <div class="stat-label">API Cost (7d)</div>
-        <div class="stat-value blue" style="font-size:1rem">$${Number(apiCost7d).toFixed(4)}</div>
-        <div class="stat-sub">USD</div>
-      </div>
       <div class="stat-card" data-g="purple">
-        <div class="stat-icon">🎯</div>
-        <div class="stat-label">Phase</div>
-        <div class="stat-value purple" style="font-size:1rem">Phase 1</div>
-        <div class="stat-sub">pipeline intelligence</div>
+        <div class="stat-icon">🧬</div>
+        <div class="stat-label">Variants</div>
+        <div class="stat-value purple">${Object.keys(PM_VARIANT_NAMES).length}</div>
+        <div class="stat-sub">V1–V5 strategies</div>
       </div>
     </div>
 
   ${compLive ? `
-  <!-- GDELT Feed -->
-  ${gdeltSectionHtml}
+  <!-- PM Variants -->
+  <div class="section">
+    <div class="section-title">🧬 PM Variants</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
+      ${pmVariantSummary.map(v => {
+        const hasTrades = v.total > 0;
+        const pnlClr = v.pnl > 0 ? '#10b981' : v.pnl < 0 ? '#ef4444' : 'var(--muted)';
+        return `<div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px 8px;text-align:center">
+          <div style="font-size:1.1rem;font-weight:800;color:#a78bfa">${v.code}</div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-bottom:8px">${v.name}</div>
+          ${hasTrades
+            ? `<div style="font-size:0.85rem;font-weight:700;color:${pnlClr}">${v.pnl >= 0 ? '+' : ''}$${Number(v.pnl).toFixed(2)}</div>
+               <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">${v.open} open · ${v.closed} closed</div>`
+            : `<div style="font-size:0.7rem;color:var(--muted);font-style:italic;margin-top:6px">No trades</div>`}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
 
   <!-- Contracts Panel -->
   <div class="section">
@@ -3015,36 +2942,14 @@ app.get('/possum-pm', async (req, res) => {
       : `<div class="table-wrap">
         <table>
           <thead><tr>
-            <th>Time</th><th>Contract</th><th>Direction</th><th>Entry $</th>
-            <th>Current $</th><th>Qty</th><th>Unrealised P&amp;L</th>
-            <th>Grok Conf</th><th>Grok Action</th>
+            <th>Contract</th><th>Variant</th><th>Direction</th><th>Entry $</th>
+            <th>Current $</th><th>Unrealised P&amp;L</th><th>Confidence</th>
           </tr></thead>
           <tbody>${openTradeHtml}</tbody>
         </table>
       </div>`}
   </div>
 
-  <!-- API Cost History -->
-  <div class="section">
-    <div class="section-title">💰 API Cost History (last 15)</div>
-    ${apiHistory.length === 0
-      ? '<div class="empty-msg">No API cost records yet.</div>'
-      : `<div class="table-wrap">
-        <table>
-          <thead><tr><th>Time</th><th>Provider</th><th>Model</th><th>Input Tok</th><th>Output Tok</th><th>Cost USD</th></tr></thead>
-          <tbody>
-            ${apiHistory.map(a => `<tr>
-              <td style="color:#64647a;font-size:0.7rem">${fmtTsAU(a.timestamp_utc)}</td>
-              <td>${a.provider||'—'}</td>
-              <td style="font-size:0.75rem;color:#a78bfa">${a.model||'—'}</td>
-              <td style="color:#64647a">${a.input_tokens||0}</td>
-              <td style="color:#64647a">${a.output_tokens||0}</td>
-              <td style="color:#10b981">$${Number(a.estimated_cost_usd||0).toFixed(4)}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`}
-  </div>
   ` : '<div style="color:var(--muted);text-align:center;padding:40px;font-size:0.85rem">📅 Competition starts soon — data sections will appear once trading begins</div>'}
 
   </div><!-- .content -->
