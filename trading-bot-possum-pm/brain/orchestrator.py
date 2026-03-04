@@ -216,6 +216,7 @@ class PMOrchestrator:
                         manifold_probability=manifold_prob,
                         velocity_ratio=velocity_ratio,
                         grok_response=grok_response,
+                        variant="V1",
                     )
                     if logged:
                         trades_logged += 1
