@@ -36,7 +36,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 - **Cron ID:** 28500056-99e6-4fb2-8ad3-a569fe46dc7e
 - **Schedule:** 9:00 AM, 14 March 2026
 - **What it does:** Reminds Petar to fill out Indonesia e-arrival card (travel is March 17). Need: AirAsia flight number (PER→DPS, code D7 or QZ) + Maya Ubud official hotel name
-- **Passports:** Petar PB5508067, Ellen PB1714943
+- **Passports:** see memory/passports.md
 - **Status:** ✅ Active (one-shot)
 
 ---
@@ -61,7 +61,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
   - Protein: if chicken breast >$22/kg, suggest turkey wings or lean beef
   - Avoid highly processed products
   - Delivery: aim $2 slot, avoid $15 express, fallback to Tuesday if needed
-- **Woolworths account:** eceklic@gmail.com / MOnday22
+- **Woolworths account:** eceklic@gmail.com / password in ~/.env as WOOLWORTHS_PASSWORD
 - **Delivery address:** 22 Franklin St, Leederville WA 6097
 - **Status:** ❌ Deleted (2026-03-03 — Petar removed, do not recreate)
 
@@ -191,6 +191,22 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 - **Script:** ~/clawd/scripts/backup-sessions.sh
 - **What it does:** Backs up last 7 days of sessions + memory files to GitHub (petarceklic/Clawdbot). 7-day retention to avoid repo bloat. Silent if clean; alerts Petar on error.
 - **Status:** ✅ Active (added 2026-03-03)
+
+---
+
+## 15. Weekly Site Monitor
+- **Cron ID:** a4983116-67c9-480c-b907-0daefcb6fc1e
+- **Schedule:** 9:00 AM every Monday (Australia/Perth)
+- **What it does:** Weekly check across Petar's sites (GA, Search Console, etc.)
+- **Status:** ✅ Active
+
+---
+
+## 16. Travelabindex SC Follow-up (One-shot)
+- **Cron ID:** 081276fb-105d-45eb-95d7-5e34cfac6fb6
+- **Schedule:** 9:00 AM, 6 March 2026 (one-shot)
+- **What it does:** Search Console follow-up task for travelabindex.com
+- **Status:** ✅ Scheduled (fires in ~2 days)
 
 ---
 

@@ -24,8 +24,8 @@ Last updated: 2026-03-03
 - Full name: Ellen Ceklic, nickname: Elle Bell
 - iMessage: +61411315424
 - Telegram ID: 8680578395 (joined 2026-02-23)
-- Woolworths: eceklic@gmail.com / MOnday22 (capital O)
-- Woolworths credit card Visa ending 4368, CVV: 787
+- Woolworths: eceklic@gmail.com / password in ~/.env as WOOLWORTHS_PASSWORD
+- Woolworths credit card Visa ending 4368, CVV: in ~/.env as WOOLWORTHS_CVV
 - Delivery address: 22 Franklin St, Leederville WA 6097
 - Passport: PB1714943 (see memory/passports.md for full details)
 - Prefers organic, avoids highly processed food with additive numbers
@@ -42,7 +42,7 @@ Last updated: 2026-03-03
 - **Woolworths uses nested shadow DOM** — wc-product-tile → wc-add-to-cart → button.add-to-cart-btn (pierce with .shadowRoot)
 - Cart API: POST /api/v3/ui/trolley/update {items: [{Stockcode, Quantity}]}
 - Search API: POST /apis/ui/Search/products
-- CVV: 787 (Visa 4368) — in cross-origin gr4vy iframe; find CDP target with "input.html?parentOrigin" in URL, inject via nativeInputValueSetter
+- CVV: in ~/.env as WOOLWORTHS_CVV (Visa 4368) — in cross-origin gr4vy iframe; find CDP target with "input.html?parentOrigin" in URL, inject via nativeInputValueSetter
 - **Delivery Unlimited is ACTIVE** on Ellen's account — delivery is FREE (saves $15)
 - Browser act/navigate/snapshot can time out — fall back to direct CDP WebSocket Node.js scripting
 - **Fruit & Veg: NO substitutions** — set "no substitute" on all produce items at checkout
@@ -58,7 +58,7 @@ Last updated: 2026-03-03
 - Check actual order history before adding recurring items
 
 ### Sensibo (Air Con)
-- API key: VYqiqxm5vmLBRRImJqxOKGANa636ao (in ~/.env as SENSIBO_API_KEY)
+- API key: in ~/.env as SENSIBO_API_KEY
 - Office pod: HxJbpzZN
 - Turn on/off: POST https://home.sensibo.com/api/v2/pods/HxJbpzZN/acStates?apiKey=KEY {"acState":{"on":true/false}}
 
