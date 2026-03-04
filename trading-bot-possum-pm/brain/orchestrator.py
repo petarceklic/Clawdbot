@@ -126,6 +126,132 @@ class PMOrchestrator:
             "results": results,
         }
 
+    def run_news_triggered_scan(self, dry_run: bool = False) -> dict:
+        """
+        Fast news-triggered scan: ask Grok to identify breaking stories,
+        then immediately evaluate flagged contracts — bypassing velocity gate.
+
+        Use this between regular pipeline runs to catch breaking news.
+        """
+        from agent.grok_agent import get_pm_grok_agent
+        from data.manifold import ManifoldChecker
+        from data.polymarket import PolymarketClient
+        from data.velocity import VelocityChecker
+        from tracking.pm_logger import log_paper_trade, log_decision
+
+        run_id = f"news-{str(uuid.uuid4())[:8]}"
+        contracts = self.cfg.contracts
+        grok = get_pm_grok_agent()
+
+        logger.info("=" * 60)
+        logger.info("NEWS-TRIGGERED SCAN — Run %s", run_id)
+        logger.info("=" * 60)
+
+        # Step 1: Single cheap Grok call to scan for breaking news
+        alerts = grok.scan_breaking_news(contracts)
+
+        if not alerts:
+            logger.info("No breaking news detected — skipping full evaluation")
+            return {
+                "status": "no_alerts",
+                "run_id": run_id,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "alerts": [],
+                "results": [],
+            }
+
+        # Step 2: For flagged contracts, run full evaluation (skip velocity gate)
+        velocity = VelocityChecker()
+        manifold = ManifoldChecker()
+        polymarket = PolymarketClient()
+
+        flagged_ids = {a["contract_id"] for a in alerts}
+        results = []
+        trades_logged = 0
+
+        for contract in contracts:
+            if contract["id"] not in flagged_ids:
+                continue
+
+            logger.info("-" * 40)
+            logger.info("URGENT evaluation: %s", contract["name"])
+
+            try:
+                # Get current data but SKIP the velocity gate
+                velocity_ratio = velocity.get_velocity_ratio(contract)
+                headlines = velocity.get_headline_sample(contract)
+
+                # Add breaking news headline from alert
+                for a in alerts:
+                    if a["contract_id"] == contract["id"]:
+                        headlines.insert(0, f"[BREAKING] {a.get('headline', '')}")
+                        break
+
+                manifold_prob, _ = manifold.get_probability(contract)
+                polymarket_price = polymarket.get_yes_price(contract)
+
+                # Direct to Grok (bypass gate)
+                grok_response = grok.evaluate_contract(
+                    contract=contract,
+                    velocity_ratio=velocity_ratio,
+                    headlines=headlines,
+                    manifold_probability=manifold_prob,
+                    polymarket_price=polymarket_price,
+                )
+
+                if grok_response is None:
+                    results.append({"contract_id": contract["id"], "status": "grok_failed"})
+                    continue
+
+                action = grok_response.get("action", "pass")
+                if action in ("enter_yes", "enter_no") and not dry_run:
+                    trade_direction = "yes" if action == "enter_yes" else "no"
+                    logged = log_paper_trade(
+                        run_id=run_id, contract=contract,
+                        direction=trade_direction,
+                        polymarket_price=polymarket_price,
+                        manifold_probability=manifold_prob,
+                        velocity_ratio=velocity_ratio,
+                        grok_response=grok_response,
+                    )
+                    if logged:
+                        trades_logged += 1
+
+                log_decision(
+                    run_id=run_id, contract=contract, stage_reached=5,
+                    velocity_ratio=velocity_ratio, velocity_triggered=True,
+                    manifold_probability=manifold_prob,
+                    polymarket_price=polymarket_price,
+                    gap_pp=abs((manifold_prob or 0) - (polymarket_price or 0)) * 100,
+                    gap_triggered=False, alert_passed=True,
+                    grok_response=grok_response,
+                    action_taken=f"news_triggered_{action}",
+                )
+
+                results.append({
+                    "contract_id": contract["id"],
+                    "status": "evaluated",
+                    "grok_action": action,
+                    "trade_logged": action in ("enter_yes", "enter_no"),
+                })
+
+            except Exception as e:
+                logger.error("Failed to process urgent %s: %s", contract["id"], e)
+                results.append({"contract_id": contract["id"], "status": "error"})
+
+        logger.info("=" * 60)
+        logger.info("NEWS SCAN COMPLETE: %d alerts, %d evaluated, %d trades", len(alerts), len(results), trades_logged)
+        logger.info("=" * 60)
+
+        return {
+            "status": "completed",
+            "run_id": run_id,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "alerts": alerts,
+            "results": results,
+            "trades_logged": trades_logged,
+        }
+
     def _process_contract(
         self,
         contract: dict,

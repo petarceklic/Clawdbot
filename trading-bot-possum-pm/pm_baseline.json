@@ -14,5 +14,69 @@
     "rolling_manifold": [],
     "rolling_polymarket": [],
     "rolling_gap": []
+  },
+  "china-taiwan-blockade-2026": {
+    "contract_name": "China blockade or invasion of Taiwan by December 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "us-recession-2026": {
+    "contract_name": "US recession in 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "trump-tariffs-china-60pct": {
+    "contract_name": "Trump imposes 60%+ tariffs on China in 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "fed-rate-cut-march-2026": {
+    "contract_name": "Fed cuts rates at March 2026 FOMC meeting",
+    "resolution_date": "2026-03-20",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "ai-regulation-us-2026": {
+    "contract_name": "US passes federal AI regulation by December 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "north-korea-nuclear-test-2026": {
+    "contract_name": "North Korea conducts nuclear test in 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "sp500-above-6000-eoy-2026": {
+    "contract_name": "S&P 500 above 6000 at end of 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
+  },
+  "bitcoin-above-150k-2026": {
+    "contract_name": "Bitcoin above $150,000 at any point in 2026",
+    "resolution_date": "2026-12-31",
+    "rolling_velocity": [],
+    "rolling_manifold": [],
+    "rolling_polymarket": [],
+    "rolling_gap": []
   }
 }

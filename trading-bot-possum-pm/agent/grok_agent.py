@@ -175,6 +175,84 @@ class PMGrokAgent:
         logger.warning("Could not parse JSON from Grok: %s...", raw_text[:200])
         return None
 
+    def scan_breaking_news(self, contracts: list[dict]) -> list[dict]:
+        """
+        Ask Grok to identify breaking news that could reprice any active contract.
+        Returns list of contracts flagged as needing urgent re-evaluation.
+
+        This is a single, cheap API call that screens ALL contracts at once.
+        """
+        if not contracts:
+            return []
+
+        contract_summaries = []
+        for c in contracts:
+            contract_summaries.append(
+                f"- {c['id']}: {c['name']} (type: {c.get('contract_type', 'unknown')}, "
+                f"resolves: {c.get('resolution_date', '?')})"
+            )
+
+        prompt = (
+            "You are monitoring prediction markets for breaking news. "
+            "Search X/Twitter for the latest posts and news from the last 2 hours.\n\n"
+            "Active contracts being tracked:\n"
+            + "\n".join(contract_summaries) + "\n\n"
+            "For each contract, determine if there is BREAKING NEWS in the last 2 hours "
+            "that would significantly move the probability (>5pp shift).\n\n"
+            "Return JSON:\n"
+            '{"alerts": [{"contract_id": "...", "headline": "...", "impact": "...", '
+            '"estimated_shift_pp": <number>, "urgency": "high"|"medium"|"low"}], '
+            '"no_alerts_reason": "..." }\n\n'
+            "If no breaking news affects any contract, return empty alerts array."
+        )
+
+        try:
+            response = self._client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a real-time news monitor for prediction markets. Search X/Twitter NOW for breaking stories."},
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.2,
+                max_tokens=1500,
+            )
+
+            text = response.choices[0].message.content
+            cost = self._estimate_cost(
+                response.usage.prompt_tokens,
+                response.usage.completion_tokens,
+            )
+            self._log_cost(
+                response.usage.prompt_tokens,
+                response.usage.completion_tokens,
+                cost,
+            )
+
+            parsed = self._parse_response(text)
+            if parsed and parsed.get("alerts"):
+                alerts = parsed["alerts"]
+                flagged = []
+                for alert in alerts:
+                    cid = alert.get("contract_id", "")
+                    shift = abs(alert.get("estimated_shift_pp", 0))
+                    urgency = alert.get("urgency", "low")
+                    if shift >= 5 or urgency == "high":
+                        flagged.append(alert)
+                        logger.info(
+                            "BREAKING NEWS for %s: %s (shift: %+.0fpp, urgency: %s)",
+                            cid, alert.get("headline", "?"), shift, urgency,
+                        )
+                return flagged
+            else:
+                reason = parsed.get("no_alerts_reason", "no breaking news") if parsed else "parse failed"
+                logger.info("News scan: no alerts (%s)", reason)
+                return []
+
+        except Exception as e:
+            logger.error("Breaking news scan failed: %s", e)
+            return []
+
     def _estimate_cost(self, input_tokens: int, output_tokens: int) -> float:
         rates = COST_TABLE.get(self.model, (5.0, 25.0))
         cost = (input_tokens * rates[0] / 1_000_000) + (output_tokens * rates[1] / 1_000_000)

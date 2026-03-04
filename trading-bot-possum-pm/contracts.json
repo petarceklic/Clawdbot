@@ -82,5 +82,194 @@
     ],
     "enrichment_sources": ["congress", "federal_register"],
     "active": true
+  },
+  {
+    "id": "china-taiwan-blockade-2026",
+    "name": "China blockade or invasion of Taiwan by December 2026",
+    "polymarket_slug": "will-china-invade-or-blockade-taiwan-in-2026",
+    "manifold_search_term": "China Taiwan invasion blockade 2026",
+    "contract_type": "military",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "taiwan", "taiwanese", "taipei", "tsai", "lai ching-te",
+      "china", "chinese", "beijing", "pla", "prc", "xi jinping"
+    ],
+    "keywords_event": [
+      "blockade", "invasion", "invade", "military exercises",
+      "taiwan strait", "strait crisis", "carrier group",
+      "amphibious", "reunification", "one china",
+      "semiconductor", "tsmc", "us taiwan", "arms sale",
+      "indo-pacific", "aukus", "quad"
+    ],
+    "gdelt_themes": [
+      "ARMEDCONFLICT", "MILITARY", "BLOCKADE", "THREAT",
+      "SOVEREIGNTY", "WB_585_DEFENSE_AND_SECURITY"
+    ],
+    "active": true
+  },
+  {
+    "id": "us-recession-2026",
+    "name": "US recession in 2026",
+    "polymarket_slug": "us-recession-in-2026",
+    "manifold_search_term": "US recession 2026",
+    "contract_type": "economic",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "united states", "us economy", "american economy",
+      "federal reserve", "fed", "gdp"
+    ],
+    "keywords_event": [
+      "recession", "economic downturn", "gdp decline",
+      "gdp contraction", "nber", "two consecutive quarters",
+      "unemployment rise", "layoffs", "job losses",
+      "consumer spending", "retail sales decline",
+      "economic slowdown", "soft landing", "hard landing",
+      "inverted yield curve", "credit crunch"
+    ],
+    "gdelt_themes": [
+      "ECON_BANKRUPTCY", "ECON_DEBT", "ECON_STOCKMARKET",
+      "ECON_WORLDCURRENCIES", "UNEMPLOYMENT",
+      "WB_475_DEBT_AND_FISCAL_RISKS"
+    ],
+    "active": true
+  },
+  {
+    "id": "trump-tariffs-china-60pct",
+    "name": "Trump imposes 60%+ tariffs on China in 2026",
+    "polymarket_slug": "will-trump-impose-60-tariffs-on-china",
+    "manifold_search_term": "Trump 60% tariffs China",
+    "contract_type": "economic",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "trump", "ustr", "trade representative",
+      "china", "chinese", "beijing"
+    ],
+    "keywords_event": [
+      "tariff", "tariffs", "trade war", "import duty",
+      "section 301", "trade deficit", "decoupling",
+      "executive order", "trade policy", "retaliation",
+      "customs", "import tax", "reciprocal tariff"
+    ],
+    "gdelt_themes": [
+      "EMBARGO", "SANCTIONS", "TRADE", "ECON_TRADE",
+      "TAX_POLICY", "GENERAL_GOVERNMENT"
+    ],
+    "active": true
+  },
+  {
+    "id": "fed-rate-cut-march-2026",
+    "name": "Fed cuts rates at March 2026 FOMC meeting",
+    "polymarket_slug": "fed-rate-cut-march-2026",
+    "manifold_search_term": "Fed rate cut March 2026",
+    "contract_type": "economic",
+    "resolution_date": "2026-03-20",
+    "keywords_subject": [
+      "federal reserve", "fed", "fomc", "powell", "jerome powell",
+      "federal open market committee"
+    ],
+    "keywords_event": [
+      "rate cut", "interest rate", "rate decision",
+      "basis points", "monetary policy", "easing",
+      "dovish", "hawkish", "fed funds rate",
+      "inflation", "cpi", "pce", "employment"
+    ],
+    "gdelt_themes": [
+      "ECON_INTEREST_RATE", "ECON_MONETARY_POLICY",
+      "ECON_INFLATION", "CENTRAL_BANK"
+    ],
+    "active": true
+  },
+  {
+    "id": "ai-regulation-us-2026",
+    "name": "US passes federal AI regulation by December 2026",
+    "polymarket_slug": "us-federal-ai-regulation-2026",
+    "manifold_search_term": "US federal AI regulation law 2026",
+    "contract_type": "regulatory",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "artificial intelligence", "ai regulation", "ai safety",
+      "congress", "senate", "house"
+    ],
+    "keywords_event": [
+      "ai regulation", "ai bill", "ai act", "ai safety",
+      "ai oversight", "ai governance", "deepfake",
+      "algorithmic accountability", "ai executive order",
+      "frontier model", "foundation model",
+      "openai", "anthropic", "google ai", "meta ai"
+    ],
+    "gdelt_themes": [
+      "GENERAL_GOVERNMENT", "LEGISLATION", "REGULATE",
+      "SCIENCE_TECHNOLOGY"
+    ],
+    "active": true
+  },
+  {
+    "id": "north-korea-nuclear-test-2026",
+    "name": "North Korea conducts nuclear test in 2026",
+    "polymarket_slug": "north-korea-nuclear-test-2026",
+    "manifold_search_term": "North Korea nuclear test 2026",
+    "contract_type": "military",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "north korea", "dprk", "pyongyang", "kim jong un",
+      "korean peninsula"
+    ],
+    "keywords_event": [
+      "nuclear test", "nuclear weapon", "nuclear detonation",
+      "punggye-ri", "icbm", "missile launch",
+      "ballistic missile", "hwasong", "denuclearization",
+      "six party", "un sanctions", "ctbto", "seismic event"
+    ],
+    "gdelt_themes": [
+      "WMD", "ARMEDCONFLICT", "MILITARY", "SANCTIONS",
+      "WB_585_DEFENSE_AND_SECURITY"
+    ],
+    "active": true
+  },
+  {
+    "id": "sp500-above-6000-eoy-2026",
+    "name": "S&P 500 above 6000 at end of 2026",
+    "polymarket_slug": "will-sp500-be-above-6000-end-of-2026",
+    "manifold_search_term": "S&P 500 above 6000 end 2026",
+    "contract_type": "economic",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "s&p 500", "sp500", "stock market", "wall street",
+      "nasdaq", "dow jones"
+    ],
+    "keywords_event": [
+      "all time high", "record high", "bull market",
+      "bear market", "market crash", "correction",
+      "earnings season", "tech rally", "magnificent seven",
+      "market selloff", "volatility", "vix"
+    ],
+    "gdelt_themes": [
+      "ECON_STOCKMARKET", "ECON_WORLDCURRENCIES",
+      "ECON_BANKRUPTCY"
+    ],
+    "active": true
+  },
+  {
+    "id": "bitcoin-above-150k-2026",
+    "name": "Bitcoin above $150,000 at any point in 2026",
+    "polymarket_slug": "bitcoin-above-150000-2026",
+    "manifold_search_term": "Bitcoin above 150000 2026",
+    "contract_type": "economic",
+    "resolution_date": "2026-12-31",
+    "keywords_subject": [
+      "bitcoin", "btc", "cryptocurrency", "crypto"
+    ],
+    "keywords_event": [
+      "bitcoin price", "btc price", "all time high",
+      "crypto rally", "bitcoin etf", "spot etf",
+      "halving", "hash rate", "mining",
+      "institutional adoption", "blackrock bitcoin",
+      "crypto regulation", "stablecoin"
+    ],
+    "gdelt_themes": [
+      "ECON_WORLDCURRENCIES", "ECON_STOCKMARKET",
+      "SCIENCE_TECHNOLOGY"
+    ],
+    "active": true
   }
 ]

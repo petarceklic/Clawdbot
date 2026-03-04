@@ -1,12 +1,16 @@
 """
 Possum PM — Polymarket Client
 Fetches YES contract prices from Polymarket Gamma API.
-Falls back to cached prices if API is unreachable.
+
+Price-fetching chain (3 tiers):
+  1. Gamma API (gamma-api.polymarket.com) — primary, official API
+  2. Scraper fallback (CLOB/Strapi endpoints) — alternative when Gamma is down
+  3. Cached prices (in-memory + disk) — last resort
 
 Polymarket contracts are priced $0.00 - $1.00 (YES token).
 Price of $0.28 means the market implies 28% probability.
 
-Note: ISP DNS in Australia blocks gamma-api.polymarket.com.
+Note: ISP DNS in Australia blocks *.polymarket.com domains.
 We resolve via Google DNS (8.8.8.8) as a workaround.
 """
 
@@ -54,11 +58,12 @@ def _resolve_host() -> str:
 
 
 class PolymarketClient:
-    """Fetch YES contract prices from Polymarket Gamma API with cached fallback."""
+    """Fetch YES contract prices from Polymarket Gamma API with scraper + cached fallback."""
 
     def __init__(self):
         self._session_cache: dict[str, float] = {}
         self._resolved_ip: str | None = None
+        self._scraper = None  # lazy init
 
     def get_yes_price(self, contract: dict) -> float | None:
         """
@@ -77,22 +82,42 @@ class PolymarketClient:
             logger.info("Polymarket: %s → $%.4f (session cache)", contract_id, price)
             return price
 
-        # Try Gamma API
+        # Tier 1: Gamma API (primary)
         if slug:
             price = self._fetch_from_gamma(slug)
             if price is not None:
                 self._session_cache[contract_id] = price
                 _cached_prices[contract_id] = price
+                # Persist to disk cache for resilience
+                try:
+                    from data.polymarket_scraper import persist_price
+                    persist_price(contract_id, price)
+                except Exception:
+                    pass
                 logger.info("Polymarket: %s → $%.4f (live)", contract_id, price)
                 return price
 
-        # Fall back to cached price
+        # Tier 2: Scraper fallback (CLOB/Strapi endpoints)
+        try:
+            if self._scraper is None:
+                from data.polymarket_scraper import PolymarketScraper
+                self._scraper = PolymarketScraper()
+            price = self._scraper.get_yes_price(contract)
+            if price is not None:
+                self._session_cache[contract_id] = price
+                _cached_prices[contract_id] = price
+                logger.info("Polymarket: %s → $%.4f (scraper fallback)", contract_id, price)
+                return price
+        except Exception as e:
+            logger.debug("Scraper fallback failed for %s: %s", contract_id, e)
+
+        # Tier 3: In-memory cached price (hardcoded fallback)
         price = _cached_prices.get(contract_id)
         if price is not None:
             self._session_cache[contract_id] = price
             logger.info("Polymarket: %s → $%.4f (cached fallback)", contract_id, price)
         else:
-            logger.warning("No Polymarket price for %s", contract_id)
+            logger.warning("No Polymarket price for %s (all tiers failed)", contract_id)
 
         return price
 

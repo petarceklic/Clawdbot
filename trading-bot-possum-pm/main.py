@@ -7,6 +7,8 @@ Usage:
   python main.py --once       # Run pipeline once and exit
   python main.py --dry-run    # Run pipeline, Grok called but no trades written
   python main.py --health     # Health check only
+  python main.py --news-scan  # Breaking news scan (fast, bypasses velocity gate)
+  python main.py --scan-markets  # Discover new Polymarket markets above volume threshold
 """
 
 import logging
@@ -90,6 +92,30 @@ def main():
 
     if dry_run:
         logger.info("DRY RUN MODE — Grok called but no trades written to JSON")
+
+    # Market scanner mode
+    if "--scan-markets" in sys.argv:
+        from data.market_scanner import scan_active_markets
+        min_vol = 50000
+        markets = scan_active_markets(min_volume_usd=min_vol, limit=30)
+        print(f"\nFound {len(markets)} new markets above ${min_vol:,.0f} volume:")
+        for m in markets:
+            print(f"  {m['name'][:60]:60s} vol=${m.get('volume_24h_usd', 0):>10,.0f}")
+        if markets:
+            print(f"\nTo add these, merge into contracts.json and set active: true")
+        return
+
+    # News-triggered scan mode
+    if "--news-scan" in sys.argv:
+        from brain.orchestrator import PMOrchestrator
+        orchestrator = PMOrchestrator()
+        result = orchestrator.run_news_triggered_scan(dry_run=dry_run)
+
+        print(f"\nNews scan: {len(result.get('alerts', []))} alerts, "
+              f"{result.get('trades_logged', 0)} trades")
+        for a in result.get("alerts", []):
+            print(f"  [{a.get('urgency', '?').upper()}] {a.get('contract_id', '?')}: {a.get('headline', '?')}")
+        return
 
     # Run pipeline
     from brain.orchestrator import PMOrchestrator
