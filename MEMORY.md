@@ -57,6 +57,18 @@ Last updated: 2026-03-03
 - Kimchi: skip if in last 2 orders
 - Check actual order history before adding recurring items
 
+### Amazon / Alexa
+- Account: petarceklic@gmail.com / mutherfucker
+- Echo devices: 192.168.68.87 + 192.168.68.93 (office pod Echo)
+- Sonos Arc is a SEPARATE unit — not linked to this Amazon account
+
+### Fisher & Paykel Washing Machine (SmartHQ)
+- App: SmartHQ
+- Account: petarceklic@gmail.com / puwzYz-qanfyc-9pefpe
+- Device: F&P 10KG SmartDrive Steam Care front-loader
+- Network: 192.168.68.90 (MAC: fc:b9:7e:23:bd:b7 — GE/Haier/F&P)
+- API: SmartHQ cloud (no local API)
+
 ### Sensibo (Air Con)
 - API key: in ~/.env as SENSIBO_API_KEY
 - Office pod: HxJbpzZN
@@ -134,6 +146,9 @@ Last updated: 2026-03-03
 ---
 
 ## Key Lessons Learned
+- **"Possum" = all 4 bots**: Possum AU, Possum US, Possum Crypto, Possum PM — always check all 4 when asked
+
+
 
 - **Always memory_search before saying "I don't have that"** — CVV was in notes, still asked for it. Embarrassing.
 - **Read SYSTEMS.md on startup** — forgot I built the War Room app twice
@@ -196,6 +211,16 @@ Last updated: 2026-03-03
 - **Market scanner added:** dynamic Polymarket discovery via Gamma API. CLI: python main.py --scan-markets
 - Schedule: every 6 hours (plus news triggers)
 - Status: paper signals
+
+### Possum Fleet Showdown (Competition)
+- Started: March 1, 2026 | Ends: April 10, 2026 (6 weeks)
+- All 4 Possum bots competing head-to-head, A$15,000 starting capital each
+- Leaderboard: http://192.168.68.63:8080/leaderboard
+- AU bugs fixed Mar 5 (commit 7ae83fb): fill reconcile, day count increment, time exits now wired into pipeline
+- AU scoreboard after 4 days: FMG -$133.93, MIN -$410.06, WDS -$195.39, BHP -$255.47 = -$994.85 closed (-6.6%). NST exits tomorrow (~-$135 est). All miners/resources in downdraft.
+- US bot already had day counts + time exits wired correctly — no fix needed
+- Tomorrow (Mar 6) = first clean pipeline run for AU
+- Active AU variants: V1, V5, V11, V13, Y1, X1, NR1 — V2/3/4/6/7/8/9/10/12/14 stubbed (by design, Phase 1 only)
 
 ### Possum AU (Trading Bot)
 - Location: ~/clawd/trading-bot-possum-au/
