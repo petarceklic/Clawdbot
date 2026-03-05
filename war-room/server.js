@@ -893,14 +893,15 @@ const US_VARIANT_NAMES = {
   'E3': 'Contrarian', 'F': 'PEAD', 'P2': 'Pattern', 'G': 'Vol Div', 'N1': 'News'
 };
 const AU_VARIANT_NAMES = {
-  'V1': 'Swing', 'V2': 'Mean Rev', 'V3': 'Momentum',
-  'V4': 'Sentiment', 'V5': 'Industry Mom', 'V6': 'Yield Spread',
-  'V7': 'Commodity Beta', 'V8': 'PEAD', 'V9': 'Vol Divergence',
+  'V1': 'US Lead-Lag', 'V2': 'Sector Rotation', 'V3': 'Pairs Trade',
+  'V4': 'FX Sensitivity', 'V5': 'Industry Mom', 'V6': 'Yield Curve',
+  'V7': 'Commodity Beta', 'V8': 'Pre-Earnings', 'V9': 'Index Rebal',
   'V10': 'Opening Range', 'V11': 'Day-of-Week', 'V12': 'A-VIX Mean Rev',
-  'V13': 'Franking Ex-Div', 'V14': 'Cross-Market Mom'
+  'V13': 'Franking Ex-Div', 'V14': 'Cross-Market Mom',
+  'Y1': 'YOLO', 'X1': 'Contrarian', 'NR1': 'Neutral Range'
 };
 const CRYPTO_VARIANT_NAMES = {
-  'M1': 'EMA Cross', 'M2': 'RSI Mom', 'M3': 'Breakout',
+  'M1': 'EMA Cross', 'M2': 'RSI Mom', 'M3': 'Breakout', 'M4': 'ADX Mom',
   'MR1': 'BB Revert', 'MR2': 'RSI Extreme', 'MR3': 'FGI Contra',
   'S1': 'Grok Dir', 'S2': 'Grok+Tech', 'S3': 'Grok Contra',
 };
@@ -912,7 +913,8 @@ const VARIANT_COLORS_9 = [
 const VARIANT_COLORS_14 = [
   '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
   '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#14b8a6',
-  '#f43f5e', '#84cc16', '#a855f7', '#0ea5e9'
+  '#f43f5e', '#84cc16', '#a855f7', '#0ea5e9',
+  '#e11d48', '#65a30d', '#7c3aed'
 ];
 
 /**
@@ -1077,7 +1079,7 @@ function getPossumAUData() {
 function buildVariantLeaderboard() {
   const startDate = getCompetitionStartDate();
   const variants = {};
-  for (let v = 1; v <= 14; v++) variants[`V${v}`] = { code: `V${v}`, trades: 0, totalPnl: 0, wins: 0 };
+  for (const code of Object.keys(AU_VARIANT_NAMES)) variants[code] = { code, trades: 0, totalPnl: 0, wins: 0 };
 
   // Count actual executed trades from DB (competition period only)
   const dbTrades = auQuery(
@@ -1172,7 +1174,7 @@ app.get('/possum-au', async (req, res) => {
   const auTradeCount = auTradeCountRow.length ? (Number(auTradeCountRow[0].cnt) || 0) : 0;
 
   // Regime badge color
-  const regimeColors = { bull: '#10b981', bear: '#ef4444', range_bound: '#f59e0b' };
+  const regimeColors = { bull: '#10b981', bear: '#ef4444', range_bound: '#f59e0b', neutral: '#f59e0b', crisis: '#dc2626' };
   const regimeColor = regimeColors[regimeTrend] || '#6b7280';
 
   // Leaderboard rows
