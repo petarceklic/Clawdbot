@@ -1076,6 +1076,71 @@ function getPossumAUData() {
   return allDays;
 }
 
+/**
+ * Build daily cumulative P&L per variant from AU positions table (DB-based).
+ * Mirrors getCryptoVariantHistory() approach.
+ * Closed positions: attributed to entry date (no close_timestamp in schema).
+ * Open positions: attributed to today.
+ */
+function getAUVariantHistory(startDate) {
+  const result = { dates: [], series: {} };
+  try {
+    // Closed positions grouped by entry date + variant
+    const closed = auQuery(
+      `SELECT DATE(entry_timestamp_utc) as d, variant, SUM(unrealised_pnl_aud) as pnl
+       FROM positions WHERE status='closed' AND entry_timestamp_utc >= '${startDate}'
+       GROUP BY d, variant ORDER BY d`
+    );
+
+    // Open positions unrealised P&L by variant (attribute to today)
+    const openRows = auQuery(
+      `SELECT variant, COALESCE(SUM(unrealised_pnl_aud), 0) as pnl
+       FROM positions WHERE status='open' AND entry_timestamp_utc >= '${startDate}'
+       GROUP BY variant`
+    );
+
+    // Collect all dates
+    const dateSet = new Set();
+    for (const row of closed) if (row.d) dateSet.add(row.d);
+    const today = new Date().toISOString().slice(0, 10);
+    if (openRows.length > 0) dateSet.add(today);
+    const dates = [...dateSet].sort();
+
+    if (dates.length === 0) return result;
+
+    // Build daily P&L map
+    const dailyMap = {};
+    for (const row of closed) {
+      if (!dailyMap[row.d]) dailyMap[row.d] = {};
+      dailyMap[row.d][row.variant] = (dailyMap[row.d][row.variant] || 0) + (row.pnl || 0);
+    }
+    for (const row of openRows) {
+      if (!dailyMap[today]) dailyMap[today] = {};
+      dailyMap[today][row.variant] = (dailyMap[today][row.variant] || 0) + (row.pnl || 0);
+    }
+
+    // Build cumulative series
+    const cumulative = {};
+    for (const date of dates) {
+      result.dates.push(date.slice(5));
+      const day = dailyMap[date] || {};
+      for (const v of Object.keys(day)) {
+        cumulative[v] = (cumulative[v] || 0) + day[v];
+      }
+      for (const v of Object.keys(cumulative)) {
+        if (!result.series[v]) result.series[v] = new Array(result.dates.length - 1).fill(0);
+        result.series[v].push(Math.round(cumulative[v] * 100) / 100);
+      }
+      for (const v of Object.keys(result.series)) {
+        if (result.series[v].length < result.dates.length) {
+          result.series[v].push(result.series[v][result.series[v].length - 1] || 0);
+        }
+      }
+    }
+  } catch {}
+  return result;
+}
+
 function buildVariantLeaderboard() {
   const startDate = getCompetitionStartDate();
   const variants = {};
@@ -1144,7 +1209,7 @@ app.get('/possum-au', async (req, res) => {
 
   // Variant performance chart data
   const startDate = getCompetitionStartDate();
-  const auVariantHistory = compLive ? getVariantHistory(POSSUM_RESULTS_DIR, 'possum_au', startDate) : { dates: [], series: {} };
+  const auVariantHistory = compLive ? getAUVariantHistory(startDate) : { dates: [], series: {} };
   const auChartDatasets = buildVariantChartDatasets(auVariantHistory, AU_VARIANT_NAMES, VARIANT_COLORS_14);
   const hasAuChart = auVariantHistory.dates.length > 0;
 
@@ -1160,14 +1225,21 @@ app.get('/possum-au', async (req, res) => {
   const auOpenPositions = auQuery(
     `SELECT symbol, entry_price_aud, current_price_aud, quantity, unrealised_pnl_aud, variant, entry_timestamp_utc FROM positions WHERE status='open' AND entry_timestamp_utc >= '${startDate}' ORDER BY symbol`
   );
-  const auPositionPnl = auOpenPositions.reduce((sum, p) => sum + (Number(p.unrealised_pnl_aud) || 0), 0);
+  const auOpenPnl = auOpenPositions.reduce((sum, p) => sum + (Number(p.unrealised_pnl_aud) || 0), 0);
+
+  // Total P&L = open unrealised + closed realised (competition period)
+  const auClosedPnlRow = auQuery(
+    `SELECT COALESCE(SUM(unrealised_pnl_aud), 0) as pnl FROM positions WHERE status='closed' AND entry_timestamp_utc >= '${startDate}'`
+  );
+  const auClosedPnl = auClosedPnlRow.length ? (Number(auClosedPnlRow[0].pnl) || 0) : 0;
+  const auTotalPnl = auOpenPnl + auClosedPnl;
 
   const regime = today?.regime_state || {};
   const regimeTrend = regime.trend || '—';
   const avix = regime.a_vix != null ? Number(regime.a_vix).toFixed(2) : '—';
   const adx = regime.adx != null ? Number(regime.adx).toFixed(1) : '—';
-  const todayPnl = auPositionPnl;
-  const todayRet = auPositionPnl ? (auPositionPnl / 15000 * 100) : 0;
+  const todayPnl = auTotalPnl;
+  const todayRet = auTotalPnl ? (auTotalPnl / 15000 * 100) : 0;
 
   // Actual trade count from DB (competition period only)
   const auTradeCountRow = auQuery(`SELECT COUNT(*) as cnt FROM trades WHERE timestamp_utc >= '${startDate}'`);
