@@ -116,12 +116,13 @@ Last updated: 2026-03-03
 - Monitoring script being built: ~/clawd/scripts/site-monitor.py (sub-agent running 2026-02-27)
 
 ### War Room Dashboard
-- URL: http://192.168.68.63:3002 (Mac mini LAN)
+- URL: http://192.168.68.52:3002 (Mac mini LAN) — **IP is DHCP, may change. Always check current IP before sharing.**
 - Location: ~/clawd/war-room/server.js
 - Ideas data: ~/clawd/ideas.json
 - Pages: / (main), /ideas, /possum-au, /possum-us
-- 🏆 Leaderboard nav link → http://192.168.68.63:8080/leaderboard (US vs AU head-to-head)
+- 🏆 Leaderboard nav link → http://192.168.68.52:8080/leaderboard (US vs AU head-to-head)
 - Auto-starts via launchd
+- **DO NOT change network/IP settings on Mac Mini** — use router DHCP reservation if static IP needed
 - Add ideas to ideas.json directly whenever Petar mentions one
 
 ### Meeting Alert (Ellen)
@@ -214,7 +215,7 @@ Last updated: 2026-03-03
 
 ### Possum Fleet Showdown (Competition)
 - Started: March 1, 2026 | Ends: April 10, 2026 (6 weeks)
-- All 4 Possum bots competing head-to-head, A$15,000 starting capital each
+- All 4 Possum bots competing head-to-head, **$15,000 per variant** (not per bot)
 - Leaderboard: http://192.168.68.63:8080/leaderboard
 - AU bugs fixed Mar 5 (commit 7ae83fb): fill reconcile, day count increment, time exits now wired into pipeline
 - AU scoreboard after 4 days: FMG -$133.93, MIN -$410.06, WDS -$195.39, BHP -$255.47 = -$994.85 closed (-6.6%). NST exits tomorrow (~-$135 est). All miners/resources in downdraft.

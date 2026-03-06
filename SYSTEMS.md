@@ -143,7 +143,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 - **LaunchAgent (crossfeed):** com.possum.au.crossfeed — 6:00 AM AWST daily
 - **Location:** ~/clawd/trading-bot-possum-au/
 - **Market:** ASX equities (21 stocks: ANZ, BHP, CBA, CSL, XRO, WES, WOW, etc.)
-- **What it does:** Overnight analysis cycle before ASX open. 14 strategy variants (V1–V14). Reads cross-feed from Possum US. Paper trading on IBKR (port 7497).
+- **What it does:** Overnight analysis cycle before ASX open. 14 strategy variants (V1–V14). Reads cross-feed from Possum US. Paper trading on IBKR (port 4002 = IB Gateway paper, headless via IBC).
 - **Status command:** `python3 ~/clawd/trading-bot-possum-au/main.py --status`
 - **Health command:** `python3 ~/clawd/trading-bot-possum-au/main.py --health`
 - **Logs:** ~/clawd/trading-bot-possum-au/logs/
