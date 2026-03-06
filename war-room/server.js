@@ -1563,7 +1563,7 @@ app.get('/possum-au', async (req, res) => {
 
     <!-- Open Positions -->
     <section class="section">
-      <h2 class="section-title">📊 Open Positions${auOpenPositions.length ? ` (${auOpenPositions.length})` : ''} — ${fmtAud(auPositionPnl)} unrealised</h2>
+      <h2 class="section-title">📊 Open Positions${auOpenPositions.length ? ` (${auOpenPositions.length})` : ''} — ${fmtAud(auOpenPnl)} unrealised</h2>
       <div class="table-wrap">
         <table>
           <thead>
