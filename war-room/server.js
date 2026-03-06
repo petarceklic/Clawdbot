@@ -890,7 +890,8 @@ const US_RESULTS_DIR = path.join(__dirname, '../trading-bot-possum/results');
 
 const US_VARIANT_NAMES = {
   'A': 'Swing', 'C': 'Mean Rev', 'D': 'Momentum', 'E2': 'Sentiment',
-  'E3': 'Contrarian', 'F': 'PEAD', 'P2': 'Pattern', 'G': 'Vol Div', 'N1': 'News'
+  'E3': 'Contrarian', 'F': 'PEAD', 'P2': 'Pattern', 'G': 'Vol Div', 'N1': 'News',
+  'Y1': 'YOLO', 'X1': 'Contrarian'
 };
 const AU_VARIANT_NAMES = {
   'V1': 'US Lead-Lag', 'V2': 'Sector Rotation', 'V3': 'Pairs Trade',
@@ -1694,7 +1695,7 @@ app.get('/possum-us', async (req, res) => {
   // Variant performance chart data
   const startDate = getCompetitionStartDate();
   const usVariantHistory = compLive ? getVariantHistory(US_RESULTS_DIR, 'possum_us', startDate) : { dates: [], series: {} };
-  const usChartDatasets = buildVariantChartDatasets(usVariantHistory, US_VARIANT_NAMES, VARIANT_COLORS_9);
+  const usChartDatasets = buildVariantChartDatasets(usVariantHistory, US_VARIANT_NAMES, VARIANT_COLORS_14);
   const hasUsChart = usVariantHistory.dates.length > 0;
 
   const pclr = (n) => n > 0 ? '#10b981' : n < 0 ? '#ef4444' : '#64647a';
@@ -2100,7 +2101,7 @@ function fmtAud2(n) {
 }
 function pnlColor(n) { return Number(n) > 0 ? '#10b981' : Number(n) < 0 ? '#ef4444' : '#64647a'; }
 
-const CRYPTO_VARIANTS = ['M1','M2','M3','MR1','MR2','MR3','S1','S2','S3'];
+const CRYPTO_VARIANTS = ['M1','M2','M3','M4','MR1','MR2','MR3','S1','S2','S3'];
 
 function buildCryptoLeaderboard(signals) {
   const map = {};
@@ -2122,7 +2123,7 @@ app.get('/possum-crypto', async (req, res) => {
   // Variant performance chart data
   const startDate = getCompetitionStartDate();
   const cryptoVariantHistory = compLive ? getCryptoVariantHistory(startDate) : { dates: [], series: {} };
-  const cryptoChartDatasets = buildVariantChartDatasets(cryptoVariantHistory, CRYPTO_VARIANT_NAMES, VARIANT_COLORS_9);
+  const cryptoChartDatasets = buildVariantChartDatasets(cryptoVariantHistory, CRYPTO_VARIANT_NAMES, VARIANT_COLORS_14);
   const hasCryptoChart = cryptoVariantHistory.dates.length > 0;
 
   // Fetch data
