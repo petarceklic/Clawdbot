@@ -2667,6 +2667,77 @@ app.get('/possum-pm', async (req, res) => {
     return { code, name, total: activeTrades, open: openCount, closed: closedCount, pnl };
   });
 
+  // ── GDELT feed data ──
+  const gdeltLastFile = dbExists ? pmQuery("SELECT filename, processed_at, articles_found FROM gdelt_processed_files ORDER BY filename DESC LIMIT 1") : [];
+  const gdeltTotalArticles = dbExists ? (pmQuery("SELECT COUNT(*) as n FROM gdelt_articles")[0]?.n || 0) : 0;
+
+  const gdeltPerContract = {};
+  if (dbExists) {
+    for (const c of contracts) {
+      const articles24h = pmQuery(`SELECT COUNT(*) as n FROM gdelt_articles WHERE contract_id='${c.id}' AND gkg_timestamp >= strftime('%Y%m%d%H%M%S', datetime('now','-1 day'))`);
+      const dailyVolume = pmQuery(`SELECT substr(gkg_timestamp,1,8) as day, COUNT(*) as n FROM gdelt_articles WHERE contract_id='${c.id}' GROUP BY day ORDER BY day DESC LIMIT 5`);
+      const headlines = pmQuery(`SELECT headline, source_name, source_tier, gkg_timestamp FROM gdelt_articles WHERE contract_id='${c.id}' AND headline IS NOT NULL AND headline != '' ORDER BY source_tier ASC, gkg_timestamp DESC LIMIT 3`);
+      const velocity = latestDecisions[c.id]?.velocity_ratio ?? null;
+      gdeltPerContract[c.id] = { articles24h: articles24h[0]?.n || 0, dailyVolume: dailyVolume.reverse(), headlines, velocity };
+    }
+  }
+
+  // GDELT feed status
+  let gdeltIsLive = false;
+  let gdeltLastUpdate = '—';
+  if (gdeltLastFile.length) {
+    const fn = gdeltLastFile[0].filename;
+    const y = fn.slice(0,4), mo = fn.slice(4,6), d = fn.slice(6,8), h = fn.slice(8,10), mi = fn.slice(10,12);
+    const fileDate = new Date(`${y}-${mo}-${d}T${h}:${mi}:00Z`);
+    const ageMin = (Date.now() - fileDate.getTime()) / 60000;
+    gdeltIsLive = ageMin < 60;
+    gdeltLastUpdate = `${d}/${mo}/${y} ${h}:${mi} UTC`;
+  }
+
+  // Build GDELT cards HTML
+  const gdeltCardsHtml = contracts.map(c => {
+    const g = gdeltPerContract[c.id];
+    if (!g) return '';
+    const velStr = g.velocity != null ? g.velocity.toFixed(1) + 'x' : '—';
+    const velColor = g.velocity >= 1.5 ? '#10b981' : '#64647a';
+    const name = c.name.replace(/^(US |Will the US )/, '').slice(0, 35);
+
+    const maxVol = Math.max(...g.dailyVolume.map(d => d.n), 1);
+    const barsHtml = g.dailyVolume.map(d => {
+      const px = Math.max(Math.round((d.n / maxVol) * 24), 2);
+      const dayLabel = d.day.slice(6, 8) + '/' + d.day.slice(4, 6);
+      return '<div style="flex:1;text-align:center"><div style="height:' + px + 'px;background:#14b8a6;border-radius:2px 2px 0 0;min-width:8px"></div><div style="font-size:0.45rem;color:var(--muted)">' + dayLabel + '</div></div>';
+    }).join('');
+
+    const headlinesHtml = g.headlines.map(h => {
+      const tierColor = h.source_tier === 1 ? '#10b981' : h.source_tier === 2 ? '#3b82f6' : 'var(--muted)';
+      const headline = (h.headline || '').slice(0, 90) + ((h.headline || '').length > 90 ? '…' : '');
+      const src = h.source_name || '';
+      return '<li style="font-size:0.62rem;padding:3px 0;border-bottom:1px solid var(--border);color:var(--text);line-height:1.3">' + headline + ' <span style="color:' + tierColor + ';font-size:0.55rem">' + src + '</span></li>';
+    }).join('');
+
+    return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<span style="font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">' + name + '</span>' +
+        '<span style="font-size:0.65rem;font-weight:600;color:' + velColor + '">⚡ ' + velStr + '</span>' +
+      '</div>' +
+      '<div style="font-size:1rem;font-weight:800">' + g.articles24h.toLocaleString() + ' <span style="font-size:0.6rem;color:var(--muted)">articles / 24h</span></div>' +
+      '<div style="display:flex;align-items:flex-end;gap:3px;height:24px;margin:6px 0">' + barsHtml + '</div>' +
+      '<ul style="list-style:none;padding:0;margin:0">' + headlinesHtml + '</ul>' +
+    '</div>';
+  }).join('');
+
+  const gdeltSectionHtml = `
+  <div class="section">
+    <div class="section-title">📡 GDELT News Feed</div>
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);margin-bottom:14px;font-size:0.7rem">
+      <span style="color:${gdeltIsLive ? '#10b981' : '#f59e0b'};font-weight:700">● ${gdeltIsLive ? 'LIVE' : 'STALE'}</span>
+      <span style="color:var(--muted)">Last update: ${gdeltLastUpdate}</span>
+      <span style="color:var(--muted)">${Number(gdeltTotalArticles).toLocaleString()} articles ingested</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:24px">${gdeltCardsHtml}</div>
+  </div>`;
+
   // Build contract card rows
   function stageBar(n) {
     const total = 6;
@@ -2991,6 +3062,9 @@ app.get('/possum-pm', async (req, res) => {
       ? '<div class="empty-msg">No contracts loaded.</div>'
       : `<div class="contract-grid">${contractCards}</div>`}
   </div>
+
+  <!-- GDELT News Feed -->
+  ${gdeltSectionHtml}
 
   <!-- Pipeline Decisions Table -->
   <div class="section">
