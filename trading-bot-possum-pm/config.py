@@ -31,7 +31,7 @@ class LLMSettings(BaseSettings):
 
 class PMSettings(BaseSettings):
     """Prediction market pipeline thresholds."""
-    velocity_threshold: float = 3.0       # Article velocity ratio to trigger alert
+    velocity_threshold: float = 1.5       # Article velocity ratio to trigger alert (lowered from 3.0 for competition)
     manifold_gap_threshold: float = 15.0  # |manifold - polymarket| in percentage points
     max_contracts: int = 20               # Max active contracts to scan per run
 

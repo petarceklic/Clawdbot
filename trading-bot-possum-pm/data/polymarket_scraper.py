@@ -72,8 +72,15 @@ def _https_get(hostname: str, path: str, timeout: int = 8) -> dict | list | None
         return None
 
     try:
+        # Connect raw TCP socket to the resolved IP, then wrap with TLS.
+        # server_hostname= tells the TLS layer to send the real hostname
+        # in the SNI extension (required when connecting via IP address).
+        raw = socket.create_connection((ip, 443), timeout=timeout)
         ctx = ssl.create_default_context()
-        conn = HTTPSConnection(ip, 443, timeout=timeout, context=ctx)
+        ssock = ctx.wrap_socket(raw, server_hostname=hostname)
+
+        conn = HTTPSConnection(hostname, 443, timeout=timeout, context=ctx)
+        conn.sock = ssock
         conn.request("GET", path, headers={
             "Host": hostname,
             "Accept": "application/json",
@@ -81,11 +88,11 @@ def _https_get(hostname: str, path: str, timeout: int = 8) -> dict | list | None
         })
         resp = conn.getresponse()
         if resp.status != 200:
-            logger.debug("%s%s returned %d", hostname, path, resp.status)
+            logger.warning("%s%s returned %d", hostname, path, resp.status)
             return None
         return json.loads(resp.read().decode())
     except Exception as e:
-        logger.debug("%s request failed: %s", hostname, e)
+        logger.warning("%s request failed: %s", hostname, e)
         return None
 
 

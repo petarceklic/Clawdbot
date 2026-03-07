@@ -25,11 +25,14 @@ logger = logging.getLogger("possum.pm.polymarket")
 GAMMA_HOST = "gamma-api.polymarket.com"
 
 # Cached prices — updated when API is reachable, used as fallback when not.
-# Last updated: 2026-03-02 from live Gamma API.
+# Last updated: 2026-03-07 from live Gamma API.
 _cached_prices: dict[str, float] = {
-    "iran-strike-2026": 1.00,           # Resolved YES ~Feb 28
-    "ukraine-ceasefire-2026": 0.375,    # ~37.5% (ceasefire by end 2026)
-    "greenland-acquisition-2026": 0.155, # ~15.5% (acquisition in 2026)
+    "iran-strike-2026": 1.00,              # Resolved YES ~Feb 28
+    "ukraine-ceasefire-2026": 0.385,       # ~38.5% (ceasefire by end 2026)
+    "greenland-acquisition-2026": 0.165,   # ~16.5% (acquisition in 2026)
+    "china-taiwan-blockade-2026": 0.109,   # ~10.9% (invasion by end 2026)
+    "us-recession-2026": 0.335,            # ~33.5% (recession by end 2026)
+    "bitcoin-above-150k-2026": 0.125,      # ~12.5% (BTC $150k by end 2026)
 }
 
 
@@ -134,20 +137,26 @@ class PolymarketClient:
             return None
 
         try:
+            # Connect raw TCP socket to the resolved IP, then wrap with TLS.
+            # server_hostname= tells the TLS layer to send the real hostname
+            # in the SNI extension (required when connecting via IP address).
+            raw = socket.create_connection((ip, 443), timeout=5)
             ctx = ssl.create_default_context()
-            conn = HTTPSConnection(ip, 443, timeout=5, context=ctx)
-            conn.set_tunnel(GAMMA_HOST) if ip != GAMMA_HOST else None
-            # SNI: set the correct hostname for TLS
+            ssock = ctx.wrap_socket(raw, server_hostname=GAMMA_HOST)
+
+            conn = HTTPSConnection(GAMMA_HOST, 443, timeout=5, context=ctx)
+            conn.sock = ssock
             conn.request("GET", path, headers={
                 "Host": GAMMA_HOST,
                 "Accept": "application/json",
             })
             resp = conn.getresponse()
             if resp.status != 200:
+                logger.warning("Gamma API %s returned %d", path, resp.status)
                 return None
             return json.loads(resp.read().decode())
         except Exception as e:
-            logger.debug("Gamma API request failed: %s", e)
+            logger.warning("Gamma API request failed: %s", e)
             return None
 
     def _fetch_from_gamma(self, slug: str) -> float | None:
