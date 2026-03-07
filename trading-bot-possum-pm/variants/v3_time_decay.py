@@ -2,13 +2,14 @@
 Possum PM — V3 Time Decay Variant
 Bets on the favourite hardening as resolution date approaches.
 
-Logic: When a contract is within 30 days of resolution and the market
-shows a clear favourite (price > 0.65 or < 0.35), bet on the favourite
-getting stronger. Pure time-based pressure — no Grok needed.
+Logic: When a contract has a clear favourite (price > 0.65 or < 0.35),
+bet on the favourite getting stronger. Confidence scales with proximity
+to resolution — closer = higher confidence.
 
 Why: Prediction markets exhibit "favourite-longshot bias" near resolution.
 As uncertainty decreases, the favourite's price converges toward 1.0.
-The closer to resolution, the stronger the effect.
+The closer to resolution, the stronger the effect. Even far-out contracts
+show this bias when the favourite is strong enough.
 """
 
 import logging
@@ -19,7 +20,7 @@ from variants.base_variant import PMBaseVariant, PMTradeSignal
 logger = logging.getLogger("possum.pm.variant_v3")
 
 # Thresholds
-MAX_DAYS_TO_RESOLUTION = 30
+MAX_DAYS_TO_RESOLUTION = 300     # raised from 30 — confidence scales with proximity
 FAVOURITE_YES_THRESHOLD = 0.65   # YES price above this → bet YES
 FAVOURITE_NO_THRESHOLD = 0.35    # YES price below this → bet NO
 MIN_CONFIDENCE = 0.55

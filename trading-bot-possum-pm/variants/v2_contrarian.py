@@ -16,9 +16,9 @@ from variants.base_variant import PMBaseVariant, PMTradeSignal
 
 logger = logging.getLogger("possum.pm.variant_v2")
 
-# Only invert moderate confidence — don't fight strong signals
+# Only invert moderate confidence — don't fight extreme signals
 CONFIDENCE_MIN = 0.55
-CONFIDENCE_MAX = 0.75
+CONFIDENCE_MAX = 0.88  # raised from 0.75 — Grok typically returns 0.80-0.85
 
 
 class VariantV2(PMBaseVariant):

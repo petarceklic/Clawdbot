@@ -41,8 +41,37 @@ class VariantV5(PMBaseVariant):
             return None
 
         grok_prob = grok_response.get("estimated_probability")
+
+        # Derive estimated_probability if Grok omitted it
         if grok_prob is None:
-            return None
+            mispricing_pp = grok_response.get("mispricing_magnitude_pp")
+            mispricing_dir = grok_response.get("polymarket_mispricing")
+            if mispricing_pp is not None and mispricing_dir and polymarket_price is not None:
+                # Reconstruct: if PM is "underpriced" by Xpp, true prob = pm_price + X/100
+                if mispricing_dir == "underpriced":
+                    grok_prob = min(polymarket_price + abs(mispricing_pp) / 100.0, 0.99)
+                elif mispricing_dir == "overpriced":
+                    grok_prob = max(polymarket_price - abs(mispricing_pp) / 100.0, 0.01)
+                else:
+                    grok_prob = polymarket_price  # "fair" → no mispricing
+
+            # Last resort: infer from Grok's direction + confidence
+            if grok_prob is None:
+                direction = grok_response.get("direction")
+                confidence = grok_response.get("confidence", 0)
+                if direction == "yes" and confidence > 0:
+                    # Grok thinks YES is more likely than PM price implies
+                    grok_prob = polymarket_price + (confidence - 0.5) * 0.3
+                elif direction == "no" and confidence > 0:
+                    grok_prob = polymarket_price - (confidence - 0.5) * 0.3
+                else:
+                    return None
+                grok_prob = max(0.01, min(0.99, grok_prob))
+
+            logger.debug(
+                "[V5] %s — derived estimated_probability=%.3f from Grok response",
+                contract["id"], grok_prob,
+            )
 
         # Step 1: Check Grok and Manifold agree (within tolerance)
         grok_manifold_gap = abs(grok_prob - manifold_prob) * 100
