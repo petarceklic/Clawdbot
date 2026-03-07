@@ -1,6 +1,6 @@
 # MEMORY.md — Mia's Long-Term Memory
 
-Last updated: 2026-03-03
+Last updated: 2026-03-07
 
 ---
 
@@ -212,16 +212,24 @@ Last updated: 2026-03-03
 - **Market scanner added:** dynamic Polymarket discovery via Gamma API. CLI: python main.py --scan-markets
 - Schedule: every 6 hours (plus news triggers)
 - Status: paper signals
+- **Major fixes 2026-03-07 (Claude Code session):**
+  - SNI bug fixed (Python 3.14 SSL change broke Polymarket API) — 5/9 contracts now live
+  - Velocity threshold lowered 3.0x → 1.5x
+  - V2/V3/V5 variants activated (were silently idle since launch)
+  - V2: confidence ceiling raised (Grok returns 0.80-0.85, ceiling was 0.75)
+  - V3: resolution window raised to 300 days (was 30 — all contracts are 298+ days out)
+  - V5: fixed broken estimated_probability field (Grok never returned it)
+  - Anti-hedge guard added: first variant to fire on a contract sets direction; opposing blocked
+  - GDELT panel restored on war-room PM page
+- **Greenland legacy hedge:** V1 YES + V1 NO both open (predates anti-hedge guard). ~Cancel out on resolution. Effectively 3/5 position slots available for rest of competition.
 
 ### Possum Fleet Showdown (Competition)
 - Started: March 1, 2026 | Ends: April 10, 2026 (6 weeks)
 - All 4 Possum bots competing head-to-head, **$15,000 per variant** (not per bot)
 - Leaderboard: http://192.168.68.63:8080/leaderboard
-- AU bugs fixed Mar 5 (commit 7ae83fb): fill reconcile, day count increment, time exits now wired into pipeline
-- AU scoreboard after 4 days: FMG -$133.93, MIN -$410.06, WDS -$195.39, BHP -$255.47 = -$994.85 closed (-6.6%). NST exits tomorrow (~-$135 est). All miners/resources in downdraft.
-- US bot already had day counts + time exits wired correctly — no fix needed
-- Tomorrow (Mar 6) = first clean pipeline run for AU
-- Active AU variants: V1, V5, V11, V13, Y1, X1, NR1 — V2/3/4/6/7/8/9/10/12/14 stubbed (by design, Phase 1 only)
+- Active AU variants: V1, V5, V11, V13, Y1, X1, NR1
+- **Week 1 standings (Mar 7):** Crypto leading (~+$710 AUD), US strong (~+$955 USD), AU struggling (-$1,031 closed), PM now active after fixes
+- **2026-03-07 mass fix session (Claude Code):** PM SNI bug, 4 variants activated, anti-hedge guard; US F/P2 PEAD variants unblocked. All bots now clean.
 
 ### Possum AU (Trading Bot)
 - Location: ~/clawd/trading-bot-possum-au/
