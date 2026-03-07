@@ -44,8 +44,21 @@ def log_paper_trade(
     )
     if existing:
         logger.info(
-            "Skipping duplicate: already have open %s position for %s",
-            direction, contract["id"],
+            "Skipping duplicate: already have open %s position for %s [%s]",
+            direction, contract["id"], variant,
+        )
+        return False
+
+    # Anti-hedge: block opposing direction on same contract if any variant already has a position
+    opposite = "no" if direction == "yes" else "yes"
+    opposing = db.fetch_one(
+        "SELECT id, variant FROM pm_trades WHERE contract_id = ? AND direction = ? AND status = 'open'",
+        (contract["id"], opposite),
+    )
+    if opposing:
+        logger.info(
+            "Blocking hedge: %s already has open %s position for %s — won't open opposing %s [%s]",
+            opposing["variant"], opposite, contract["id"], direction, variant,
         )
         return False
 
