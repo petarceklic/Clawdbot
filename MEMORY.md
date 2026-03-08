@@ -58,7 +58,7 @@ Last updated: 2026-03-07
 - Check actual order history before adding recurring items
 
 ### Amazon / Alexa
-- Account: petarceklic@gmail.com / mutherfucker
+- Account: petarceklic@gmail.com / M73pqERrZGXt6G7
 - Echo devices: 192.168.68.87 + 192.168.68.93 (office pod Echo)
 - Sonos Arc is a SEPARATE unit — not linked to this Amazon account
 
@@ -97,7 +97,7 @@ Last updated: 2026-03-07
 - Mia can trigger rooms/lights manually, create bridge-level schedules
 
 ### AirTouch 5 AC
-- AirTouch 5 @ 192.168.68.88 (console ID: AT5C202405000322)
+- AirTouch 5 console ID: AT5C202405000322 (IP is DHCP — script uses UDP discovery, no hardcoded IP)
 - Zones: Family Area, Master Bed, Gaystation, Ozren, Filip
 - Cron: auto-off at 5:00 AM daily
 

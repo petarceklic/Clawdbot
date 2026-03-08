@@ -169,7 +169,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 - **Cron ID:** 49af1267-8819-4f0b-8aff-f37545fd3715
 - **Schedule:** 5:00 AM daily (Australia/Perth)
 - **Script:** ~/clawd/scripts/airtouch-off.py
-- **Device:** AirTouch 5 @ 192.168.68.88 (console ID: AT5C202405000322)
+- **Device:** AirTouch 5 @ 192.168.68.59 (console ID: AT5C202405000322) — IP updated 2026-03-08 (was .88, drifted via DHCP; set static reservation for MAC d0:c9:07:fc:dd:84)
 - **Zones:** Family Area, Master Bed, Gaystation, Ozren, Filip
 - **What it does:** Turns off the MHI AC unit silently every morning. If already off, does nothing. If script fails, alerts Petar via Telegram.
 - **Status:** ✅ Active
@@ -187,7 +187,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 
 ## 14. Backup Sessions to GitHub — Nightly
 - **Cron ID:** 760127cd-ca84-42e8-9cce-62475167c4f6
-- **Schedule:** 3:30 AM daily (Australia/Perth) — runs after sanitize (#13)
+- **Schedule:** 2:30 AM daily (Australia/Perth) — runs after sanitize (#13)
 - **Script:** ~/clawd/scripts/backup-sessions.sh
 - **What it does:** Backs up last 7 days of sessions + memory files to GitHub (petarceklic/Clawdbot). 7-day retention to avoid repo bloat. Silent if clean; alerts Petar on error.
 - **Status:** ✅ Active (added 2026-03-03)
