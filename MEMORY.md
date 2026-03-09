@@ -94,7 +94,16 @@ Last updated: 2026-03-07
 ### Philips Hue
 - Hue Bridge "2A5980" at 192.168.68.50
 - Existing morning routines (Hue app/cloud-controlled): Kitchen & Lounge Morning (6:20-8:00 AM), Morning Coach (6:00-8:00 AM), Sunroom Mornings (sunrise-8:00 AM)
-- Mia can trigger rooms/lights manually, create bridge-level schedules
+- Mia can trigger rooms/lights manually on request ONLY
+- **DO NOT automate lounge lights** — morning routines cause blue stuck issue, root cause is Hue cloud routines we can't control. Only adjust lights when Petar explicitly asks.
+
+### Mitsubishi WF-RAC (Bedroom/Lounge AC)
+- IP: 192.168.68.70, Port: 51443 (plain HTTP not HTTPS)
+- MAC/airconId: e8165617aaf3
+- mDNS service: `_beaver._tcp` → `e8165617aaf3.local:51443`
+- Controller: `~/clawd/scripts/wf-rac.py status|on|off|temp|mode|fan`
+- **Key quirk:** Port 51443 but plain HTTP (not TLS). Python ssl will fail, use http.client directly.
+- Firmware: WF-RAC, mcu:131, wifi:010
 
 ### AirTouch 5 AC
 - AirTouch 5 console ID: AT5C202405000322 (IP is DHCP — script uses UDP discovery, no hardcoded IP)
@@ -148,6 +157,7 @@ Last updated: 2026-03-07
 
 ## Key Lessons Learned
 - **"Possum" = all 4 bots**: Possum AU, Possum US, Possum Crypto, Possum PM — always check all 4 when asked
+- **Possum PnL = per variant, $15k each**: NEVER report portfolio-level equity totals. Always use the leaderboard (http://192.168.68.52:3002/leaderboard) which breaks down per variant. The DB equity figures ($99k etc) are meaningless for competition tracking.
 
 
 

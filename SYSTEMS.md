@@ -27,7 +27,7 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 ## 3. OpenClaw Update Check — Daily
 - **Cron ID:** 0d45117f-5da6-4208-8362-2a97631de87e
 - **Schedule:** 3:00 AM daily
-- **What it does:** Checks current vs latest `openclaw` npm version. If security update found → updates immediately any day. If only bug fixes/features → only updates on Mondays. Silent if already up to date.
+- **What it does:** Checks current vs latest `openclaw` npm version. If behind → installs update and notifies Petar via Telegram with old + new version numbers. Silent if already up to date.
 - **Status:** ✅ Active (updated from clawdbot → openclaw 2026-03-03)
 
 ---
@@ -210,7 +210,23 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 
 ---
 
+## 17. Mac Mini Health Checks
+- **Cron ID (8 AM):** 4826a676-3e82-4282-a2a6-4733f8a2f415
+- **Cron ID (2 PM):** 31b7f524-2277-4ed8-beec-3d44b21e19a2
+- **Schedule:** 8:00 AM and 2:00 PM daily (Australia/Perth)
+- **What it does:** Checks top CPU processes on Mac Mini. If anything unexpected is eating >15% CPU (e.g. avconferenced, VTEncoderXPCService), kills it and notifies Petar via Telegram. Silent if clean.
+- **Normal processes:** openclaw-gateway, Claude.app, IB Gateway, Possum bots, WindowServer, kernel_task
+- **Status:** ✅ Active
+
+---
+
 ## Notes
 - Always write new automations here before AND after setting them up
 - If a cron ID is missing from live cron list, recreate it using the spec above
 - Woolworths browser session persists for weeks once authenticated (clawd browser profile)
+
+## WF-RAC Evening Check
+- Cron ID: 9c7479cb-618a-4739-9c21-eb2b633cd948
+- Schedule: 8 PM daily (Perth)
+- Action: Check if bedroom AC is on; if yes, message Petar asking if he wants it off
+- Script: ~/clawd/scripts/wf-rac-evening-check.sh
