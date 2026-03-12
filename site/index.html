@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disruptis - Global Trade Disruption Monitor</title>
+  <meta name="description" content="Trade disruption intelligence, updated daily. Scored, classified, and delivered as structured datasets.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://disruptis.io/">
+
+  <!-- Open Graph -->
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://disruptis.io/">
+  <meta property="og:title" content="Disruptis — Global Trade Disruption Monitor">
+  <meta property="og:description" content="Trade disruption intelligence, updated daily. Scored, classified, and delivered as structured datasets.">
+  <meta property="og:image" content="https://disruptis-production.up.railway.app/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Disruptis">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Disruptis — Global Trade Disruption Monitor">
+  <meta name="twitter:description" content="Trade disruption intelligence, updated daily. Scored, classified, and delivered as structured datasets.">
+  <meta name="twitter:image" content="https://disruptis-production.up.railway.app/assets/og-image.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- TICKER BAR -->
+  <div class="ticker" id="ticker">
+    <div class="ticker-track">
+      <div class="ticker-content" id="tickerContent"></div>
+      <div class="ticker-content" id="tickerContentDupe" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="Disruptis Home">
+        <svg class="nav-logo-icon" viewBox="0 0 46 45" width="26" height="25" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M29.9954 25.9848C27.0634 28.9612 24.1515 31.9573 21.1925 34.9081C18.2217 37.8723 15.2559 40.8476 12.164 43.6889C11.4179 44.3755 10.2037 44.8323 9.16624 44.9103C6.80521 45.088 4.41686 44.9084 2.04405 44.9852C0.528276 45.0342 -0.00550762 44.4123 0.0332414 42.9894C0.0955438 40.8105 -0.123651 38.6112 0.112262 36.4557C0.245224 35.241 0.757345 33.8204 1.60109 32.9653C6.89755 27.5999 12.3357 22.37 17.7214 17.0897C18.2571 16.563 18.7555 15.9982 19.7459 14.9464C17.1273 14.9464 15.1499 14.9449 13.1726 14.9468C9.50132 14.9498 5.82816 14.9052 2.15878 14.9824C0.55183 15.0162 -0.0176323 14.3938 0.0279548 12.8674C0.103933 10.2673 -0.017666 7.66124 0.0788267 5.06262C0.206471 1.55884 1.78302 0.0542932 5.32628 0.0468707C18.0686 0.0212631 30.8106 0.0676624 43.5526 0.000117703C45.4642 -0.00990266 46.0097 0.618421 45.9999 2.44101C45.9341 14.8889 45.9763 27.3372 45.9577 39.7851C45.9509 43.4254 44.4302 44.908 40.7201 44.9563C38.13 44.9897 35.5331 44.8865 32.946 44.9945C31.2468 45.065 30.6792 44.4605 30.7046 42.8108C30.7837 37.7487 30.7331 32.6843 30.7248 27.6203C30.7233 27.2102 30.6556 26.8001 30.6203 26.3901L29.9954 25.9848Z" fill="#15EE76"/>
+        </svg>
+        <span class="nav-logo-text">DISRUPTIS</span>
+      </a>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#platform" class="nav-link">Platform</a>
+        <a href="#data" class="nav-link">Data</a>
+        <a href="methodology.html" class="nav-link">Methodology</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="https://www.thedatafusion.com/contact" class="nav-link" target="_blank" rel="noopener noreferrer">Support</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-primary btn-sm" onclick="openModal()">Request Access</button>
+      </div>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="nav-mobile" id="navMobile">
+      <a href="#platform" class="nav-link">Platform</a>
+      <a href="#data" class="nav-link">Data</a>
+      <a href="methodology.html" class="nav-link">Methodology</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="https://www.thedatafusion.com/contact" class="nav-link" target="_blank" rel="noopener noreferrer">Support</a>
+      <div class="nav-mobile-actions">
+        <button class="btn btn-primary" onclick="openModal()">Request Access</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="hero">
+    <canvas id="networkCanvas" class="hero-network"></canvas>
+    <div class="hero-inner">
+      <div class="hero-badge anim-fade-up">
+        <span class="pulse-dot" style="animation: none;"></span>
+        <span>DAILY UPDATES FROM <span id="sourceCount">2,412</span>+ SOURCES</span>
+      </div>
+
+      <h1 class="hero-title anim-fade-up anim-delay-1">
+        <span class="hero-title-line1">Global Trade</span>
+        <span class="hero-title-line2">Disruption Intelligence</span>
+      </h1>
+
+      <p class="hero-subtitle anim-fade-up anim-delay-2">
+        Trade disruption intelligence, updated daily. Scored, classified, and delivered as structured datasets.
+      </p>
+
+      <div class="hero-ctas anim-fade-up anim-delay-3">
+        <button class="btn btn-primary btn-lg" onclick="openModal()">Request Data Access</button>
+        <a href="#platform" class="btn btn-ghost btn-lg">Explore the Data</a>
+      </div>
+
+      <div class="hero-stats anim-fade-up anim-delay-4">
+        <div class="hero-stat">
+          <span class="hero-stat-value" style="color: var(--green)" id="disruptionCount">—</span>
+          <span class="hero-stat-label">Active Disruptions</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" style="color: var(--green)">2.4k</span>
+          <span class="hero-stat-label">Sources Monitored</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" style="color: var(--green)">24hr</span>
+          <span class="hero-stat-label">Update Cycle</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" style="color: var(--green)">99.7%</span>
+          <span class="hero-stat-label">Uptime SLA</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP SECTION -->
+  <section class="map-section" id="platform">
+    <div class="map-container">
+      <!-- Map Toolbar -->
+      <div class="map-toolbar">
+        <div class="map-toolbar-left">
+          <span class="map-toolbar-title">GLOBAL DISRUPTION MAP — SELECTED EVENTS</span>
+          <span class="map-live-badge">
+            <span class="map-live-dot" style="animation: none;"></span>
+            UPDATED DAILY
+          </span>
+        </div>
+        <div class="map-toolbar-right">
+          <div class="map-filters" id="mapFilters">
+            <button class="map-filter active" data-filter="all">All</button>
+            <button class="map-filter" data-filter="supply_cutoff">Supply Cutoff</button>
+            <button class="map-filter" data-filter="strike">Strike</button>
+            <button class="map-filter" data-filter="policy">Policy</button>
+            <button class="map-filter" data-filter="protest">Protest</button>
+            <button class="map-filter" data-filter="infrastructure">Infrastructure</button>
+            <button class="map-filter" data-filter="natural_event">Natural Event</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Canvas -->
+      <div class="map-canvas-wrapper">
+        <div id="map" class="map-canvas"></div>
+
+        <!-- Side Panel -->
+        <div class="map-panel" id="mapPanel">
+          <div class="map-panel-section">
+            <span class="map-panel-label">TRADE RISK INDEX</span>
+            <div class="risk-index">
+              <div class="risk-index-top">
+                <span class="risk-index-arrow risk-index-arrow--up">&#9650;</span>
+                <span class="risk-index-score" id="riskScore">—</span>
+                <div class="risk-index-chip risk-index-chip--elevated">
+                  <span class="risk-index-chip-dot"></span>
+                  <span id="riskLabel">Loading</span>
+                </div>
+              </div>
+              <div class="risk-index-sparkline-row">
+                <canvas id="riskSparkline" width="60" height="28"></canvas>
+                <span class="risk-index-change" id="riskChange">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="map-panel-divider"></div>
+          <div class="map-panel-section">
+            <span class="map-panel-label">RECENT DISRUPTIONS</span>
+            <div class="disruption-list" id="disruptionList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="features-section" id="features">
+    <div class="section-container">
+      <span class="section-label anim-fade-up">CAPABILITIES</span>
+      <h2 class="section-title anim-fade-up anim-delay-1">Intelligence, not just data</h2>
+      <p class="section-subtitle anim-fade-up anim-delay-2">
+        Our dataset goes beyond aggregation. Every disruption event is classified, scored, and enriched with structured metadata ready for integration.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card anim-fade-up">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3 class="feature-title">Continuous Detection</h3>
+          <p class="feature-desc">NLP processing of 2,400+ global news sources, wire services, and government feeds. New disruptions captured daily and delivered in structured delta files.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-1">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3 class="feature-title">Severity Scoring</h3>
+          <p class="feature-desc">Proprietary bidirectional -4 to +4 scale capturing both disruptions and restorations with multi-factor weighting.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-2">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3 class="feature-title">Geographic Tagging</h3>
+          <p class="feature-desc">Every event tagged with precise coordinates, affected trade corridors, ports, and border crossings. Map-ready from day one.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-3">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <h3 class="feature-title">Integration Ready</h3>
+          <p class="feature-desc">Delivered as versioned Parquet files to your secure cloud bucket. Filter by region, severity, category, and date range. API access available on request.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-4">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="feature-title">Predictive Signals</h3>
+          <p class="feature-desc">Early warning indicators based on news velocity, sentiment shift, and historical pattern matching. Know before the disruption escalates.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-5">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3 class="feature-title">Structured Categories</h3>
+          <p class="feature-desc">Events classified across 18 disruption types: sanctions, tariffs, port closures, conflicts, climate events, regulatory changes, and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA PREVIEW SECTION -->
+  <section class="data-section" id="data">
+    <div class="section-container">
+      <span class="section-label anim-fade-up">DATA PREVIEW</span>
+      <h2 class="section-title anim-fade-up anim-delay-1">See what you're licensing</h2>
+      <p class="section-subtitle anim-fade-up anim-delay-2">
+        Every disruption event is structured, enriched, and delivered as versioned Parquet files. Here's what the data looks like.
+      </p>
+
+      <div class="data-grid">
+        <!-- JSON Sample -->
+        <div class="data-card anim-fade-up anim-delay-3">
+          <div class="data-card-header">
+            <span class="data-card-title">EXAMPLE RECORD</span>
+            <span class="data-card-badge">PARQUET</span>
+          </div>
+          <div class="data-card-body">
+<pre class="code-block"><code>{
+  <span class="code-key">"eventid"</span>: <span class="code-number">1</span>,
+  <span class="code-key">"date"</span>: <span class="code-string">"20260101"</span>,
+  <span class="code-key">"final_headline"</span>: <span class="code-string">"China imposes 55% import
+    tariffs on Australian beef,
+    impacting trade."</span>,
+  <span class="code-key">"severity_score"</span>: <span class="code-number">-2.0</span>,
+  <span class="code-key">"event_sentiment"</span>: <span class="code-string">"negative"</span>,
+  <span class="code-key">"event_type"</span>: <span class="code-string">"policy"</span>,
+  <span class="code-key">"country"</span>: <span class="code-string">"China"</span>,
+  <span class="code-key">"region"</span>: <span class="code-string">"East Asia"</span>,
+  <span class="code-key">"commodity_tag"</span>: <span class="code-string">"Livestock & Meat"</span>,
+  <span class="code-key">"trade_routes"</span>: <span class="code-string">"China-US Pacific route |
+    Australia-Asia iron ore/LNG"</span>,
+  <span class="code-key">"temporal_status"</span>: <span class="code-string">"HAPPENED"</span>,
+  <span class="code-key">"first_seen_at"</span>: <span class="code-string">"2026-01-01 08:45:00"</span>,
+  <span class="code-key">"days_length"</span>: <span class="code-number">1</span>
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Schema Overview -->
+        <div class="data-card anim-fade-up anim-delay-4">
+          <div class="data-card-header">
+            <span class="data-card-title">SCHEMA OVERVIEW</span>
+            <span class="data-card-badge">23 FIELDS</span>
+          </div>
+          <div class="data-card-body">
+            <table class="schema-table">
+              <tbody>
+                <tr><td class="schema-field">severity_score</td><td class="schema-desc">-4.0 to +4.0 bidirectional scale</td></tr>
+                <tr><td class="schema-field">event_type</td><td class="schema-desc">strike, supply_cutoff, policy, import, export, infrastructure, natural_event, protest...</td></tr>
+                <tr><td class="schema-field">commodity_tag</td><td class="schema-desc">30+ categories: Crude Oil, Semiconductors, LNG, Maritime & Shipping, Agriculture...</td></tr>
+                <tr><td class="schema-field">trade_routes</td><td class="schema-desc">Affected corridors: Trans-Pacific, Strait of Hormuz, Black Sea...</td></tr>
+                <tr><td class="schema-field">hs_chapter</td><td class="schema-desc">Harmonized System code for commodity classification</td></tr>
+                <tr><td class="schema-field">temporal_status</td><td class="schema-desc">HAPPENED, HAPPENING, PRECURSOR</td></tr>
+                <tr><td class="schema-field">final_headline</td><td class="schema-desc">AI-generated event headline</td></tr>
+                <tr><td class="schema-field">explanation</td><td class="schema-desc">AI-generated impact analysis</td></tr>
+                <tr><td class="schema-field">country / city_town</td><td class="schema-desc">Source country and city-level location</td></tr>
+                <tr><td class="schema-field">region</td><td class="schema-desc">Africa, East Asia, Europe, Middle East, North America...</td></tr>
+                <tr><td class="schema-field">port / waterway</td><td class="schema-desc">Chabahar Port, St Lawrence River...</td></tr>
+                <tr><td class="schema-field">first_seen_at</td><td class="schema-desc">Timestamp of first detection</td></tr>
+                <tr><td class="schema-field">hours_since_first_seen</td><td class="schema-desc">Time elapsed since initial detection</td></tr>
+                <tr><td class="schema-field">first_date / last_date</td><td class="schema-desc">Event date range (YYYYMMDD)</td></tr>
+                <tr><td class="schema-field">days_length</td><td class="schema-desc">Duration of disruption event</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Delivery Structure -->
+        <div class="data-card anim-fade-up anim-delay-5" style="grid-column: 1 / -1;">
+          <div class="data-card-header">
+            <span class="data-card-title">DELIVERY STRUCTURE</span>
+            <span class="data-card-badge">S3</span>
+          </div>
+          <div class="data-card-body">
+<pre class="code-block"><code><span class="code-key">your-bucket/</span>
+  <span class="code-string">README.md</span>
+  <span class="code-string">data_dictionary.csv</span>
+  <span class="code-string">snapshots/</span>            Full dataset (Parquet), versioned weekly
+    2026-02-14_v1.parquet
+  <span class="code-string">daily/</span>                Delta files, one per day
+    2026-02-14_v1.parquet   <span class="code-key">event_id</span> + <span class="code-key">updated_at_utc</span> + <span class="code-key">operation</span>
+  <span class="code-string">latest/</span>               Pointer files for automation
+    snapshot.txt
+    daily.txt</code></pre>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 14px; line-height: 1.6;">
+              Start from the latest snapshot. Apply daily deltas by <code style="font-family: var(--font-mono); color: var(--green); font-size: 11px;">event_id</code>. Data dictionary and README included in every delivery.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES SECTION -->
+  <section class="usecases-section" id="usecases">
+    <div class="section-container">
+      <span class="section-label anim-fade-up">USE CASES</span>
+      <h2 class="section-title anim-fade-up anim-delay-1">Built for decision-makers</h2>
+      <p class="section-subtitle anim-fade-up anim-delay-2">
+        From trading desks to boardrooms — actionable disruption intelligence for the teams that need it most.
+      </p>
+
+      <div class="usecases-grid">
+        <div class="usecase-card anim-fade-up">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="usecase-title">Commodity Trading</h3>
+          <p class="usecase-desc">Signal detection for trading desks. Identify supply shocks, export bans, and route disruptions before they hit the market.</p>
+        </div>
+        <div class="usecase-card anim-fade-up anim-delay-1">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="usecase-title">Supply Chain Risk</h3>
+          <p class="usecase-desc">Early warning for procurement teams. Monitor supplier regions, track port closures, and assess cascading disruption risk.</p>
+        </div>
+        <div class="usecase-card anim-fade-up anim-delay-2">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M12 4v16"/></svg>
+          </div>
+          <h3 class="usecase-title">Insurance & Underwriting</h3>
+          <p class="usecase-desc">Exposure assessment for cargo and trade credit underwriters. Quantify risk by route, region, and commodity with daily-updated datasets.</p>
+        </div>
+        <div class="usecase-card anim-fade-up anim-delay-3">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <h3 class="usecase-title">Policy & Research</h3>
+          <p class="usecase-desc">Structured datasets for analysts and academics. Study trade policy impacts, sanction effects, and geopolitical disruption patterns.</p>
+        </div>
+        <div class="usecase-card anim-fade-up anim-delay-4">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3 class="usecase-title">Logistics Planning</h3>
+          <p class="usecase-desc">Route disruption alerts for freight operators. Reroute shipments proactively with daily corridor status and severity data.</p>
+        </div>
+        <div class="usecase-card anim-fade-up anim-delay-5">
+          <div class="usecase-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <h3 class="usecase-title">Market Intelligence</h3>
+          <p class="usecase-desc">Macro trend detection for strategy teams. Track disruption patterns across sectors and regions to inform investment and positioning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section" id="pricing">
+    <canvas id="networkCanvasFooter" class="footer-network"></canvas>
+    <div class="section-container">
+      <div class="cta-card">
+        <div class="cta-glow"></div>
+        <h2 class="cta-title">Ready to integrate trade intelligence?</h2>
+        <p class="cta-subtitle">Trade disruption intelligence your team can act on.</p>
+        <div class="cta-buttons">
+          <button class="btn btn-primary btn-lg" onclick="openModal()">Request Data Access</button>
+          <a href="#platform" class="btn btn-ghost btn-lg">Explore the Data</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-brand">Disruptis</span>
+        <span class="footer-sep">&middot;</span>
+        <span class="footer-copy">&copy; <script>document.write(new Date().getFullYear())</script> All rights reserved</span>
+      </div>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- REQUEST ACCESS MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+      <h3 class="modal-title">Request Data Access</h3>
+      <p class="modal-subtitle">Tell us a bit about your needs and we'll be in touch.</p>
+      <form class="modal-form" id="requestForm" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="formName">Full Name</label>
+          <input type="text" id="formName" name="name" required placeholder="Jane Smith">
+        </div>
+        <div class="form-group">
+          <label for="formEmail">Work Email</label>
+          <input type="email" id="formEmail" name="email" required placeholder="jane@company.com">
+        </div>
+        <div class="form-group">
+          <label for="formCompany">Company</label>
+          <input type="text" id="formCompany" name="company" required placeholder="Acme Corp">
+        </div>
+        <div class="form-group">
+          <label for="formUseCase">Use Case</label>
+          <select id="formUseCase" name="use_case" required>
+            <option value="" disabled selected>Select a use case</option>
+            <option value="risk-monitoring">Supply Chain Risk Monitoring</option>
+            <option value="trading">Commodity Trading Signals</option>
+            <option value="research">Academic / Policy Research</option>
+            <option value="insurance">Insurance / Underwriting</option>
+            <option value="logistics">Logistics Planning</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-full">Submit Request</button>
+      </form>
+      <div class="modal-success" id="modalSuccess" style="display:none;">
+        <div class="modal-success-icon">&#10003;</div>
+        <h3 class="modal-title">Request Received</h3>
+        <p class="modal-subtitle">Thanks for your interest. We'll be in touch soon.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
