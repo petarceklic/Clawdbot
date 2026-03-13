@@ -79,6 +79,11 @@ Last updated: 2026-03-07
 - Password: stored in ~/.env as CLAWD_LOGIN_PASSWORD
 - Useful for: unlocking screen via AppleScript, Screen Sharing, manual troubleshooting
 
+### GDELT Nightcrawler
+- Runs nightly 10pm–5am AWST, downloads GDELT data to /Volumes/5TB Drive/
+- High CPU during this window is **expected and intentional** — DO NOT kill it or alert on it
+- Process name TBD (confirm when first seen in health checks)
+
 ### IB Gateway Watchdog
 - Script: ~/clawd/scripts/ib-gateway-watchdog.sh
 - App: ~/Applications/IB Gateway 10.44/IB Gateway 10.44.app (NOT /Applications/)
@@ -97,7 +102,11 @@ Last updated: 2026-03-07
 - Mia can trigger rooms/lights manually on request ONLY
 - **DO NOT automate lounge lights** — morning routines cause blue stuck issue, root cause is Hue cloud routines we can't control. Only adjust lights when Petar explicitly asks.
 
-### Mitsubishi WF-RAC (Bedroom/Lounge AC)
+### AC Setup
+- **Whole house:** AirTouch 5 (zones: Family Area, Master Bed, Gaystation, Ozren, Filip)
+- **Ellen's office:** Mitsubishi WF-RAC only
+
+### Mitsubishi WF-RAC (Ellen's Office AC)
 - IP: 192.168.68.70, Port: 51443 (plain HTTP not HTTPS)
 - MAC/airconId: e8165617aaf3
 - mDNS service: `_beaver._tcp` → `e8165617aaf3.local:51443`
@@ -125,7 +134,7 @@ Last updated: 2026-03-07
 - Monitoring script being built: ~/clawd/scripts/site-monitor.py (sub-agent running 2026-02-27)
 
 ### War Room Dashboard
-- URL: http://192.168.68.52:3002 (Mac mini LAN) — **IP is DHCP, may change. Always check current IP before sharing.**
+- URL: http://192.168.68.62:3002 (Mac mini LAN) — **IP is DHCP, may change. Always check current IP before sharing.**
 - Location: ~/clawd/war-room/server.js
 - Ideas data: ~/clawd/ideas.json
 - Pages: / (main), /ideas, /possum-au, /possum-us
@@ -197,7 +206,7 @@ Last updated: 2026-03-07
 - Planned: multi-location trip support, trip naming, pack template integration
 
 ### Possum US (Trading Bot)
-- Location: ~/clawd/trading-bot-possum/
+- Location: ~/clawd/trading-bot-possum/ ⚠️ NOTE: this is the correct path — do NOT skip or say "not found"
 - Paper trading on IBKR (port 4002 = Gateway paper), $15k per variant
 - Dashboard: http://192.168.68.63:8080/ (leaderboard at /leaderboard)
 - War Room page: http://192.168.68.63:3002/possum-us

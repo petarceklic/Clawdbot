@@ -42,8 +42,8 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 ---
 
 ## 5. Sunday Night Grocery Automation
-- **Cron ID (Phase 1 — 7pm generate):** e607323c-e359-4ae4-a631-643107347071
-- **Cron ID (Phase 2 — 9pm deadline):** c5fa1fbe-153f-4e5f-8996-3e63bfe698c5
+- **Cron ID (Phase 1 — 7pm generate):** b282e685-e0b2-40ab-b40b-3e3e42987de3
+- **Cron ID (Phase 2 — 9pm deadline):** 4fcb9960-49af-40a2-acfe-b5b534f75228
 - **Schedule:** Phase 1: Sunday 7:00 PM | Phase 2: Sunday 9:00 PM (Australia/Perth)
 - **Script:** ~/clawd/scripts/grocery-automation.js
 - **State file:** ~/clawd/scripts/.grocery-state.json
@@ -228,5 +228,20 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 ## WF-RAC Evening Check
 - Cron ID: 9c7479cb-618a-4739-9c21-eb2b633cd948
 - Schedule: 8 PM daily (Perth)
-- Action: Check if bedroom AC is on; if yes, message Petar asking if he wants it off
+- Action: Check if Ellen's office AC (WF-RAC) is on; if yes, notify Petar with temp
 - Script: ~/clawd/scripts/wf-rac-evening-check.sh
+- Note: ONLY check Ellen's office AC (WF-RAC). Do not check AirTouch or any other unit.
+
+---
+
+## 18. GDELT NightCrawler
+- **Location:** ~/clawd/GDELT NightCrawler/
+- **Data:** /Volumes/5TB Drive/gdelt_cache/
+- **API server:** http://localhost:8000 (uvicorn, port 8000)
+- **Dashboard:** http://192.168.68.62:8000 (LAN — check current IP)
+- **LaunchAgent (API):** com.petar.gdelt.api — starts API server, KeepAlive
+- **LaunchAgent (cache):** com.petar.gdelt.cache — nightly download cron, 10pm AWST
+- **Schedule:** Downloads GDELT data nightly 10pm–5am AWST
+- **What it does:** Downloads and caches GDELT event data (news/events worldwide) for local search and analysis. Parquet format, searchable by theme, org, person, location, quotation.
+- **CPU note:** High CPU during 10pm–5am window is expected — do NOT alert or kill
+- **Status:** ✅ Active (1 day cached as of 2026-03-13)
