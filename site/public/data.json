@@ -1,0 +1,689 @@
+{
+  "events": [
+    {
+      "id": 400,
+      "summary": "Deadly attacks disrupt trade in key corridor between Senegal and Mali.",
+      "country": "Senegal",
+      "region": "West Africa",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "Conflict & Security",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 16.3,
+      "lng": -15.8,
+      "date": "20260207"
+    },
+    {
+      "id": 399,
+      "summary": "Collapsed bridges disrupt trade in Kasungu's northwest border areas.",
+      "country": "Malawi",
+      "region": "Southern Africa",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "General Trade Disruption",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": -13.5,
+      "lng": 34,
+      "date": "20260207"
+    },
+    {
+      "id": 397,
+      "summary": "All major Australian iron ore ports are closed as a cyclone approaches.",
+      "country": "Australia",
+      "region": "Oceania",
+      "severity": -4,
+      "type": "natural_event",
+      "commodity": "Iron Ore",
+      "routes": "Australia-Asia iron ore/LNG route | Indo-Pacific corridor",
+      "port": "major Australian iron ore ports",
+      "waterway": "",
+      "lat": -26,
+      "lng": 132.2,
+      "date": "20260207"
+    },
+    {
+      "id": 329,
+      "summary": "Indefinite strike disrupts operations at Chattogram Port.",
+      "country": "Bangladesh",
+      "region": "South Asia",
+      "severity": -4,
+      "type": "strike",
+      "commodity": "Port Operations",
+      "routes": "Bay of Bengal / Bangladesh garment exports",
+      "port": "Chattogram Port",
+      "waterway": "",
+      "lat": 21.6,
+      "lng": 91.3,
+      "date": "20260208"
+    },
+    {
+      "id": 413,
+      "summary": "FCC bans the import of foreign drones and critical components, restricting trade.",
+      "country": "United States",
+      "region": "North America",
+      "severity": -4,
+      "type": "policy",
+      "commodity": "Port Operations",
+      "routes": "Trans-Pacific | Trans-Atlantic",
+      "port": "",
+      "waterway": "",
+      "lat": 36.4,
+      "lng": -96.5,
+      "date": "20260209"
+    },
+    {
+      "id": 426,
+      "summary": "The Pakistan-Afghanistan border is closed, disrupting trade due to Taliban actions.",
+      "country": "Pakistan",
+      "region": "South Asia",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "General Trade Disruption",
+      "routes": "Arabian Sea / Pakistan-Middle East corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 30.3,
+      "lng": 66.2,
+      "date": "20260210"
+    },
+    {
+      "id": 420,
+      "summary": "Cuba faces jet fuel shortages due to the blockade on Venezuelan oil exports.",
+      "country": "Cuba",
+      "region": "Caribbean",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "Refined Petroleum Products",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 24.3,
+      "lng": -82.7,
+      "date": "20260210"
+    },
+    {
+      "id": 442,
+      "summary": "Tractors block access in Spain's capital to protest EU trade deal with South America.",
+      "country": "Spain",
+      "region": "Europe",
+      "severity": -4,
+      "type": "protest",
+      "commodity": "General Trade Disruption",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 37.4,
+      "lng": -2.6,
+      "date": "20260211"
+    },
+    {
+      "id": 393,
+      "summary": "U.S. beef exports to China remain blocked, impacting trade despite strong global demand.",
+      "country": "China",
+      "region": "East Asia",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "Livestock & Meat",
+      "routes": "China-Global containerized trade | China-US Pacific route",
+      "port": "",
+      "waterway": "",
+      "lat": 32.2,
+      "lng": 103.4,
+      "date": "20260211"
+    },
+    {
+      "id": 445,
+      "summary": "France halts imports of food products containing banned pesticides.",
+      "country": "France",
+      "region": "Europe",
+      "severity": -4,
+      "type": "supply_cutoff",
+      "commodity": "Agriculture Food Supply",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 44,
+      "lng": 4.9,
+      "date": "20260211"
+    },
+    {
+      "id": 393,
+      "summary": "U.S. imposes export restrictions affecting international trade.",
+      "country": "United States",
+      "region": "North America",
+      "severity": -3,
+      "type": "policy",
+      "commodity": "Rare Earths",
+      "routes": "Trans-Pacific | Trans-Atlantic",
+      "port": "",
+      "waterway": "",
+      "lat": 35.2,
+      "lng": -98.6,
+      "date": "20260208"
+    },
+    {
+      "id": 373,
+      "summary": "Australia imposes tariffs on Chinese steel exports, impacting trade flows.",
+      "country": "Australia",
+      "region": "Oceania",
+      "severity": -3,
+      "type": "supply_cutoff",
+      "commodity": "Iron Ore",
+      "routes": "China-Global containerized trade | China-US Pacific route | Australia-Asia iron ore/LNG route",
+      "port": "",
+      "waterway": "",
+      "lat": -24,
+      "lng": 133.8,
+      "date": "20260208"
+    },
+    {
+      "id": 310,
+      "summary": "Mexico suspends oil supply to Cuba due to tariff risks.",
+      "country": "Mexico",
+      "region": "North America",
+      "severity": -3,
+      "type": "supply_cutoff",
+      "commodity": "Finance & Trade Policy",
+      "routes": "US-Mexico cross-border / USMCA corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 25.3,
+      "lng": -101.7,
+      "date": "20260209"
+    },
+    {
+      "id": 418,
+      "summary": "A container ship carrying 290 containers has sunk off the coast of Phuket.",
+      "country": "Thailand",
+      "region": "Southeast Asia",
+      "severity": -3,
+      "type": "other",
+      "commodity": "Containerized General Cargo",
+      "routes": "Gulf of Thailand / Thai manufacturing exports",
+      "port": "",
+      "waterway": "",
+      "lat": 5.8,
+      "lng": 100.3,
+      "date": "20260209"
+    },
+    {
+      "id": 417,
+      "summary": "Turkiye halts chicken exports following price increases ahead of Ramadan.",
+      "country": "Turkey",
+      "region": "Europe",
+      "severity": -3,
+      "type": "supply_cutoff",
+      "commodity": "Livestock & Meat",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 39.6,
+      "lng": 34.6,
+      "date": "20260209"
+    },
+    {
+      "id": 414,
+      "summary": "Traders in Iraq protest against newly imposed customs tariffs.",
+      "country": "Iraq",
+      "region": "Middle East",
+      "severity": -3,
+      "type": "protest",
+      "commodity": "Port Operations",
+      "routes": "Persian Gulf oil exports",
+      "port": "",
+      "waterway": "",
+      "lat": 33,
+      "lng": 44,
+      "date": "20260209"
+    },
+    {
+      "id": 97,
+      "summary": "EU prepares sanctions against ports and 42 tankers, impacting international trade.",
+      "country": "European Union",
+      "region": "Europe",
+      "severity": -3,
+      "type": "protest",
+      "commodity": "Natural Gas",
+      "routes": "Persian Gulf exports via Strait of Hormuz | Russia-EU energy corridor | Northern Sea Route",
+      "port": "",
+      "waterway": "",
+      "lat": 47.5,
+      "lng": 7.4,
+      "date": "20260209"
+    },
+    {
+      "id": 427,
+      "summary": "Sanctions imposed to combat illicit trading of Iranian oil may disrupt international trade.",
+      "country": "Iran",
+      "region": "Middle East",
+      "severity": -3,
+      "type": "policy",
+      "commodity": "Road & Rail Freight",
+      "routes": "Persian Gulf exports via Strait of Hormuz",
+      "port": "",
+      "waterway": "",
+      "lat": 29.3,
+      "lng": 53.7,
+      "date": "20260210"
+    },
+    {
+      "id": 97,
+      "summary": "EU moves closer to implementing a full ban on Russian oil shipping services.",
+      "country": "European Union",
+      "region": "Europe",
+      "severity": -3,
+      "type": "protest",
+      "commodity": "Natural Gas",
+      "routes": "Persian Gulf exports via Strait of Hormuz | Indonesian archipelago / palm oil & nickel exports | Russia-EU energy corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 47.5,
+      "lng": 7.4,
+      "date": "20260210"
+    },
+    {
+      "id": 400,
+      "summary": "Deadly attacks disrupt trade on key corridor between Senegal and Mali.",
+      "country": "Senegal",
+      "region": "West Africa",
+      "severity": -3,
+      "type": "supply_cutoff",
+      "commodity": "Conflict & Security",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 16.3,
+      "lng": -15.8,
+      "date": "20260211"
+    },
+    {
+      "id": 407,
+      "summary": "Port workers at Chittagong announce a fresh strike, impacting operations.",
+      "country": "Bangladesh",
+      "region": "East Asia",
+      "severity": -2,
+      "type": "strike",
+      "commodity": "Port Operations",
+      "routes": "Bay of Bengal / Bangladesh garment exports",
+      "port": "Chittagong Port",
+      "waterway": "",
+      "lat": 25.3,
+      "lng": 91.5,
+      "date": "20260207"
+    },
+    {
+      "id": 278,
+      "summary": "India to halt Russian oil imports as U.S. removes additional tariffs on India.",
+      "country": "India",
+      "region": "East Asia",
+      "severity": -2,
+      "type": "supply_cutoff",
+      "commodity": "Crude Oil",
+      "routes": "India-EU/US trade corridor | Indian Ocean routes | Russia-EU energy corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 18.3,
+      "lng": 77.2,
+      "date": "20260207"
+    },
+    {
+      "id": 403,
+      "summary": "China border disruption causes 14.5% drop in EV imports in the first half.",
+      "country": "China",
+      "region": "East Asia",
+      "severity": -2,
+      "type": "supply_cutoff",
+      "commodity": "Port Operations",
+      "routes": "China-Global containerized trade | China-US Pacific route",
+      "port": "",
+      "waterway": "",
+      "lat": 36.4,
+      "lng": 105.7,
+      "date": "20260207"
+    },
+    {
+      "id": 401,
+      "summary": "Dockworkers in Italy disrupt ports due to protests over alleged arms shipments.",
+      "country": "Italy",
+      "region": "Europe",
+      "severity": -2,
+      "type": "protest",
+      "commodity": "Port Operations",
+      "routes": "",
+      "port": "",
+      "waterway": "",
+      "lat": 40.5,
+      "lng": 11.2,
+      "date": "20260207"
+    },
+    {
+      "id": 242,
+      "summary": "Cuba prepares to safeguard essential services amid U.S. oil supply cut.",
+      "country": "Cuba",
+      "region": "Caribbean",
+      "severity": -2,
+      "type": "supply_cutoff",
+      "commodity": "General Trade Disruption",
+      "routes": "Vietnam-US/EU manufacturing corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 24.3,
+      "lng": -80.6,
+      "date": "20260207"
+    },
+    {
+      "id": 408,
+      "summary": "Trump imposes secondary tariffs on 25 countries importing from Iran.",
+      "country": "Iran",
+      "region": "Middle East",
+      "severity": -2,
+      "type": "policy",
+      "commodity": "Finance & Trade Policy",
+      "routes": "Persian Gulf exports via Strait of Hormuz",
+      "port": "",
+      "waterway": "",
+      "lat": 29.2,
+      "lng": 51,
+      "date": "20260208"
+    },
+    {
+      "id": 406,
+      "summary": "Indian Coast Guard disrupts international oil cargo smuggling in mid-sea operation.",
+      "country": "India",
+      "region": "East Asia",
+      "severity": -1,
+      "type": "supply_cutoff",
+      "commodity": "General Trade Disruption",
+      "routes": "India-EU/US trade corridor | Indian Ocean routes",
+      "port": "",
+      "waterway": "",
+      "lat": 19.9,
+      "lng": 76.2,
+      "date": "20260207"
+    },
+    {
+      "id": 430,
+      "summary": "Containers fell from a Hapag Lloyd ship onto an LNG bunker vessel during bunkering in Rotterdam.",
+      "country": "Netherlands",
+      "region": "Europe",
+      "severity": -1,
+      "type": "infrastructure",
+      "commodity": "Containerized General Cargo",
+      "routes": "North Sea / Rotterdam gateway to EU",
+      "port": "Rotterdam",
+      "waterway": "",
+      "lat": 52.5,
+      "lng": 5.5,
+      "date": "20260210"
+    },
+    {
+      "id": 436,
+      "summary": "Government takes action against shipping line officials following Basilan tragedy.",
+      "country": "Philippines",
+      "region": "Southeast Asia",
+      "severity": -1,
+      "type": "supply_cutoff",
+      "commodity": "General Trade Disruption",
+      "routes": "South China Sea corridor",
+      "port": "",
+      "waterway": "",
+      "lat": 12.9,
+      "lng": 121.4,
+      "date": "20260211"
+    },
+    {
+      "id": 451,
+      "summary": "Ck Hutchison threatens legal action against Maersk's takeover of Panama ports.",
+      "country": "Panama",
+      "region": "Central America",
+      "severity": -1,
+      "type": "infrastructure",
+      "commodity": "Port Operations",
+      "routes": "Americas-Asia via Panama Canal | Atlantic-Pacific transit",
+      "port": "Panama ports",
+      "waterway": "",
+      "lat": 7.1,
+      "lng": -78.9,
+      "date": "20260212"
+    }
+  ],
+  "ticker": [
+    {
+      "text": "Deadly attacks disrupt trade in key corridor between Senegal and Mali",
+      "dot": "red",
+      "tag": "Security"
+    },
+    {
+      "text": "Collapsed bridges disrupt trade in Kasungu's northwest border areas",
+      "dot": "red",
+      "tag": "Trade"
+    },
+    {
+      "text": "All major Australian iron ore ports are closed as a cyclone approaches",
+      "dot": "red",
+      "tag": "Iron Ore"
+    },
+    {
+      "text": "Indefinite strike disrupts operations at Chattogram Port",
+      "dot": "red",
+      "tag": "Ports"
+    },
+    {
+      "text": "FCC bans the import of foreign drones and critical components, restricting trade",
+      "dot": "red",
+      "tag": "Ports"
+    },
+    {
+      "text": "The Pakistan-Afghanistan border is closed, disrupting trade due to Taliban actions",
+      "dot": "red",
+      "tag": "Trade"
+    },
+    {
+      "text": "Cuba faces jet fuel shortages due to the blockade on Venezuelan oil exports",
+      "dot": "red",
+      "tag": "Oil"
+    },
+    {
+      "text": "Tractors block access in Spain's capital to protest EU trade deal with South America",
+      "dot": "red",
+      "tag": "Trade"
+    },
+    {
+      "text": "U.S. beef exports to China remain blocked, impacting trade despite strong global demand",
+      "dot": "red",
+      "tag": "Meat"
+    },
+    {
+      "text": "France halts imports of food products containing banned pesticides",
+      "dot": "red",
+      "tag": "Agriculture"
+    },
+    {
+      "text": "U.S. imposes export restrictions affecting international trade",
+      "dot": "red",
+      "tag": "Rare Earths"
+    },
+    {
+      "text": "Australia imposes tariffs on Chinese steel exports, impacting trade flows",
+      "dot": "red",
+      "tag": "Iron Ore"
+    },
+    {
+      "text": "Mexico suspends oil supply to Cuba due to tariff risks",
+      "dot": "red",
+      "tag": "Policy"
+    },
+    {
+      "text": "A container ship carrying 290 containers has sunk off the coast of Phuket",
+      "dot": "red",
+      "tag": "Shipping"
+    }
+  ],
+  "tradeRoutes": [
+    {
+      "name": "Trans-Atlantic",
+      "coords": [
+        [
+          -74,
+          40
+        ],
+        [
+          -10,
+          45
+        ],
+        [
+          0,
+          50
+        ]
+      ]
+    },
+    {
+      "name": "Trans-Pacific",
+      "coords": [
+        [
+          -122,
+          37
+        ],
+        [
+          -160,
+          30
+        ],
+        [
+          175,
+          35
+        ],
+        [
+          140,
+          35
+        ]
+      ]
+    },
+    {
+      "name": "Suez Corridor",
+      "coords": [
+        [
+          32,
+          31
+        ],
+        [
+          35,
+          28
+        ],
+        [
+          43,
+          14
+        ],
+        [
+          50,
+          12
+        ]
+      ]
+    },
+    {
+      "name": "Strait of Hormuz",
+      "coords": [
+        [
+          53,
+          25
+        ],
+        [
+          57,
+          24
+        ],
+        [
+          60,
+          22
+        ]
+      ]
+    },
+    {
+      "name": "Black Sea",
+      "coords": [
+        [
+          29,
+          41
+        ],
+        [
+          34,
+          44
+        ],
+        [
+          37,
+          46
+        ]
+      ]
+    },
+    {
+      "name": "US-Canada",
+      "coords": [
+        [
+          -75,
+          43
+        ],
+        [
+          -90,
+          47
+        ],
+        [
+          -110,
+          49
+        ],
+        [
+          -123,
+          49
+        ]
+      ]
+    },
+    {
+      "name": "India-SE Asia",
+      "coords": [
+        [
+          78,
+          13
+        ],
+        [
+          85,
+          10
+        ],
+        [
+          95,
+          8
+        ],
+        [
+          104,
+          5
+        ]
+      ]
+    }
+  ],
+  "riskIndex": {
+    "score": 55,
+    "label": "Moderate Risk",
+    "sparkline": [
+      50,
+      39,
+      49,
+      55,
+      59,
+      55,
+      54,
+      55,
+      58,
+      60,
+      52,
+      63,
+      47,
+      56
+    ],
+    "change": 9,
+    "trend": "up"
+  },
+  "stats": {
+    "disruptions": 105,
+    "sources": 2412
+  }
+}
