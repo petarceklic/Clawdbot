@@ -42,28 +42,8 @@ If a cron job listed here is missing from live cron, recreate it immediately.
 ---
 
 ## 5. Sunday Night Grocery Automation
-- **Cron ID (Phase 1 — 7pm generate):** b282e685-e0b2-40ab-b40b-3e3e42987de3
-- **Cron ID (Phase 2 — 9pm deadline):** 4fcb9960-49af-40a2-acfe-b5b534f75228
-- **Schedule:** Phase 1: Sunday 7:00 PM | Phase 2: Sunday 9:00 PM (Australia/Perth)
-- **Script:** ~/clawd/scripts/grocery-automation.js
-- **State file:** ~/clawd/scripts/.grocery-state.json
-- **Handler docs:** ~/clawd/GROCERY_HANDLER.md
-- **What it does:**
-  1. 7pm: Build grocery list (staples + Ellen's pending list + smart protein + specials-only items)
-  2. Telegram Ellen the dot-point list, ask for tweaks or "order it"
-  3. Ellen replies → update list and confirm, or "order it" → place order immediately
-  4. 9pm: If Ellen hasn't responded, auto-place the order anyway
-  5. Browser-automates Woolworths (clawd profile): login → add items → cheapest Monday delivery → checkout
-  6. Confirms back to Ellen AND Petar with order number + total
-- **Smart rules:**
-  - Cat food, laundry sheets, Sukin 1L body wash: ONLY if on special
-  - Sukin: 1L body wash ONLY — never shampoo or conditioner
-  - Protein: if chicken breast >$22/kg, suggest turkey wings or lean beef
-  - Avoid highly processed products
-  - Delivery: aim $2 slot, avoid $15 express, fallback to Tuesday if needed
-- **Woolworths account:** eceklic@gmail.com / password in ~/.env as WOOLWORTHS_PASSWORD
-- **Delivery address:** 22 Franklin St, Leederville WA 6097
 - **Status:** ❌ Deleted (2026-03-03 — Petar removed, do not recreate)
+- Both crons fully removed 2026-03-15. Do not recreate under any circumstances.
 
 ---
 

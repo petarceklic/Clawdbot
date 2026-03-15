@@ -286,3 +286,22 @@ Last updated: 2026-03-07
 - **PDF Form Filler** -- takes non-smart PDF forms, AI fills everything in
 - **Component Screenshot Library** -- auto-capture UI components from live sites while browsing
 - Full list in ~/clawd/ideas.json
+
+### Finch Innovation Index
+- Research intelligence product -- tracks 1M+ research papers (preprints) across 73 themes
+- Core value prop: "Two years ahead of the money" -- preprint velocity signals innovation before patents/funding rounds/Bloomberg coverage
+- 1,010,889 papers indexed, 99.3% classification rate, 66 months historical depth, 19 countries
+- Target buyers: VC, corporate strategy, M&A advisory, hedge funds, consulting, data platforms
+- Has sample data, "Request Access" CTA (gated product)
+- Site: finchindex.com (presumably -- URL to confirm)
+- Key proof point: GLP-1 obesity research spiked 180% in early 2021, 2-3 years before Ozempic became mainstream
+
+### Volterra (mineralvolatility.com)
+- ML-driven minerals volatility prediction -- "before the market moves"
+- Daily predictions for 12 exchange-traded minerals (LME, COMEX, NYMEX, SGX)
+- 3 forecast horizons: 7, 14, 30-day
+- 34 active ML models, walk-forward validated, 0.815 mean backtested AUC
+- Delivered 08:00 UTC daily, CSV + JSON, via AWS Data Exchange
+- Gated product -- "Request Access" model
+- GitHub repo: petarceklic/Volterra (Next.js + Prisma)
+- Part of Petar's data intelligence product suite alongside Finch + TravelIndexLab
