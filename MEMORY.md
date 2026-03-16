@@ -1,6 +1,6 @@
 # MEMORY.md — Mia's Long-Term Memory
 
-Last updated: 2026-03-07
+Last updated: 2026-03-16
 
 ---
 
@@ -8,300 +8,166 @@ Last updated: 2026-03-07
 
 ### Petar Ceklic (@teknoperf)
 - Product designer, 20 years exp, not a coder by trade
-- Phone: 0434042628
-- Telegram ID: 5897115037
+- Phone: 0434042628 | Telegram ID: 5897115037
 - Nickname: Peki (use sometimes in messages to Ellen)
-- Building multiple SaaS projects
-- Timezone: GMT+8 (Perth, Australia)
-- Passport: PB5508067 (see memory/passports.md for full details)
-- Kids: Ozren and Filip
-- Family cat (Temptations treats, Smitten Crystal litter)
+- Building multiple SaaS projects | Timezone: GMT+8 (Perth, Australia)
+- Passport: PB5508067 (see memory/passports.md)
+- Kids: Ozren and Filip | Family cat (Temptations treats, Smitten Crystal litter)
 - Claude Max plan (subscription billing, NOT API)
 - Accountant: Shield Business Group (Vincent Kang)
 - Active clients: Kevin Clark, Joel Hooper, Zasha O'Brien (Elastik), Jeffrey Poon (Austal), Len Webel (UWA/Sense Analytics), Chao Sun (UWA/SafePaths)
 
 ### Ellen Ceklic (Petar's wife)
-- Full name: Ellen Ceklic, nickname: Elle Bell
-- iMessage: +61411315424
-- Telegram ID: 8680578395 (joined 2026-02-23)
+- Nickname: Elle Bell | iMessage: +61411315424 | Telegram ID: 8680578395
 - Woolworths: eceklic@gmail.com / password in ~/.env as WOOLWORTHS_PASSWORD
 - Woolworths credit card Visa ending 4368, CVV: in ~/.env as WOOLWORTHS_CVV
 - Delivery address: 22 Franklin St, Leederville WA 6097
-- Passport: PB1714943 (see memory/passports.md for full details)
+- Passport: PB1714943 (see memory/passports.md)
 - Prefers organic, avoids highly processed food with additive numbers
-- Comfort fabric conditioner (Marrakesh/Paris/Tahiti scents)
-- Laundry: Resolv laundry sheets (Fresh Ocean)
-- Grocery communication moved to Telegram (not iMessage) as of Feb 23
+- Comfort fabric conditioner (Marrakesh/Paris/Tahiti scents) | Laundry: Resolv sheets (Fresh Ocean)
+- Grocery communication via Telegram (not iMessage)
 
 ---
 
 ## Systems & Infrastructure
 
-### Woolworths Grocery Automation
-- Browser session persists (logged in as Ellen, clawd browser profile)
-- **Woolworths uses nested shadow DOM** — wc-product-tile → wc-add-to-cart → button.add-to-cart-btn (pierce with .shadowRoot)
-- Cart API: POST /api/v3/ui/trolley/update {items: [{Stockcode, Quantity}]}
-- Search API: POST /apis/ui/Search/products
-- CVV: in ~/.env as WOOLWORTHS_CVV (Visa 4368) — in cross-origin gr4vy iframe; find CDP target with "input.html?parentOrigin" in URL, inject via nativeInputValueSetter
-- **Delivery Unlimited is ACTIVE** on Ellen's account — delivery is FREE (saves $15)
-- Browser act/navigate/snapshot can time out — fall back to direct CDP WebSocket Node.js scripting
-- **Fruit & Veg: NO substitutions** — set "no substitute" on all produce items at checkout
-- **Apples: always search "Pink Lady apples"** and verify product name before adding
-- **Cosmetics specials: use Woolworths browser directly**, not third-party catalogue sites
-
-### Ellen's Grocery Preferences
-- Sukin body wash 1L ONLY when on special — never shampoo/conditioner
-- Italian pasta: La Molisana or De Cecco — NOT Barilla
-- Always 1L sizes for body wash etc.
-- School snacks: no additive numbers, minimal ingredients, school is NOT nut-free
-- Kimchi: skip if in last 2 orders
-- Check actual order history before adding recurring items
-
-### Amazon / Alexa
-- Account: petarceklic@gmail.com / M73pqERrZGXt6G7
-- Echo devices: 192.168.68.87 + 192.168.68.93 (office pod Echo)
-- Sonos Arc is a SEPARATE unit — not linked to this Amazon account
-
-### Fisher & Paykel Washing Machine (SmartHQ)
-- App: SmartHQ
-- Account: petarceklic@gmail.com / puwzYz-qanfyc-9pefpe
-- Device: F&P 10KG SmartDrive Steam Care front-loader
-- Network: 192.168.68.90 (MAC: fc:b9:7e:23:bd:b7 — GE/Haier/F&P)
-- API: SmartHQ cloud (no local API)
-
-### Sensibo (Air Con)
-- API key: in ~/.env as SENSIBO_API_KEY
-- Office pod: HxJbpzZN
-- Turn on/off: POST https://home.sensibo.com/api/v2/pods/HxJbpzZN/acStates?apiKey=KEY {"acState":{"on":true/false}}
-
-### Mac Mini Login
-- User: clawd
-- Password: stored in ~/.env as CLAWD_LOGIN_PASSWORD
-- Useful for: unlocking screen via AppleScript, Screen Sharing, manual troubleshooting
-
-### GDELT Nightcrawler
-- Runs nightly 10pm–5am AWST, downloads GDELT data to /Volumes/5TB Drive/
-- High CPU during this window is **expected and intentional** — DO NOT kill it or alert on it
-- Process name TBD (confirm when first seen in health checks)
-
-### IB Gateway Watchdog
-- Script: ~/clawd/scripts/ib-gateway-watchdog.sh
-- App: ~/Applications/IB Gateway 10.44/IB Gateway 10.44.app (NOT /Applications/)
-- Checks process + port 4002; restarts via **IBC (Interactive Brokers Controller)** if down
-- **IBC installed at ~/ibc/** — handles headless auto-login at Java level (no AppleScript, no screen needed)
-- IBC config: ~/ibc/config.ini (TradingMode=paper, port 4002, credentials stored)
-- IBC start script: ~/ibc/start-gateway.sh
-- IB login credentials: in ~/.env as IB_GATEWAY_USERNAME / IB_GATEWAY_PASSWORD
-- Crons: 4:30 AM, 6:30 AM (pre-ASX), every 15 min 7–1 PM (trading hours), 12 PM AWST weekdays
-- All cron IDs in SYSTEMS.md
-- **Note:** AppleScript approach FAILED on locked screen — IBC tested working 2026-03-03
-
-### Philips Hue
-- Hue Bridge "2A5980" at 192.168.68.50
-- Existing morning routines (Hue app/cloud-controlled): Kitchen & Lounge Morning (6:20-8:00 AM), Morning Coach (6:00-8:00 AM), Sunroom Mornings (sunrise-8:00 AM)
-- Mia can trigger rooms/lights manually on request ONLY
-- **DO NOT automate lounge lights** — morning routines cause blue stuck issue, root cause is Hue cloud routines we can't control. Only adjust lights when Petar explicitly asks.
-
-### AC Setup
-- **Whole house:** AirTouch 5 (zones: Family Area, Master Bed, Gaystation, Ozren, Filip)
-- **Ellen's office:** Mitsubishi WF-RAC only
-
-### Mitsubishi WF-RAC (Ellen's Office AC)
-- IP: 192.168.68.70, Port: 51443 (plain HTTP not HTTPS)
-- MAC/airconId: e8165617aaf3
-- mDNS service: `_beaver._tcp` → `e8165617aaf3.local:51443`
-- Controller: `~/clawd/scripts/wf-rac.py status|on|off|temp|mode|fan`
-- **Key quirk:** Port 51443 but plain HTTP (not TLS). Python ssl will fail, use http.client directly.
-- Firmware: WF-RAC, mcu:131, wifi:010
-
-### AirTouch 5 AC
-- AirTouch 5 console ID: AT5C202405000322 (IP is DHCP — script uses UDP discovery, no hardcoded IP)
-- Zones: Family Area, Master Bed, Gaystation, Ozren, Filip
-- Cron: auto-off at 5:00 AM daily
-
-### Ring Camera Monitoring
-- Script: ~/clawd/scripts/ring-monitor.py
-- Token: ~/.ring_token.json (petarceklic@gmail.com, auto-refreshes)
-- venv: ~/clawd/venvs/ring/
-- Monitors BOTH locations: 🏠 Leederville (02a4d6e0) + 👴 Mount Lawley FIL (dab6a6a3)
-- Person detection ONLY (cv_properties), 11 PM – 5 AM Perth
-- Cron: 2d5b22a7 (*/5 23,0,1,2,3,4 AWST)
-
-### Google Analytics / Search Console
-- Clawd browser (clawd profile) is logged in as petarceklic@gmail.com
-- Sites to monitor: petarceklic.com (GA+SC), ellenceklic.com (GA p445362232 + SC), thedatafusion.com (SC), disruptis.io (SC), travelabindex.com (SC)
-- Ellen's site GA account: a317517606, property: p445362232
-- Monitoring script being built: ~/clawd/scripts/site-monitor.py (sub-agent running 2026-02-27)
+### Mac Mini
+- **Current IP: 192.168.68.52** (DHCP -- always verify before sharing)
+- Get current IP: `python3 -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0])"`
+- Deco DHCP reservation set for 192.168.68.62 (set 2026-03-15, not yet active)
+- User: clawd | Password: ~/.env as CLAWD_LOGIN_PASSWORD
 
 ### War Room Dashboard
-- URL: http://192.168.68.62:3002 (Mac mini LAN) — **IP is DHCP, may change. Always check current IP before sharing.**
-- Location: ~/clawd/war-room/server.js
-- Ideas data: ~/clawd/ideas.json
-- Pages: / (main), /ideas, /possum-au, /possum-us
-- 🏆 Leaderboard nav link → http://192.168.68.52:8080/leaderboard (US vs AU head-to-head)
-- Auto-starts via launchd
-- **DO NOT change network/IP settings on Mac Mini** — use router DHCP reservation if static IP needed
+- URL: http://[MAC_MINI_IP]:3002 | Location: ~/clawd/war-room/server.js
+- Ideas data: ~/clawd/ideas.json | Auto-starts via launchd
 - Add ideas to ideas.json directly whenever Petar mentions one
 
-### Meeting Alert (Ellen)
-- Cron: every minute, checks calendar for video calls
-- Messages Ellen via iMessage ~15 min before
-- Script: ~/clawd/scripts/meeting-alert.sh
-- 7 template variations, signed "xo Mia"
+### GDELT Nightcrawler
+- Dashboard: http://[MAC_MINI_IP]:8000 (uvicorn, always running)
+- Project: ~/clawd/GDELT NightCrawler/ | Runs nightly 10pm-5am AWST
+- Downloads GDELT data to /Volumes/5TB Drive/ -- high CPU is expected, DO NOT kill
+
+### Woolworths Grocery Automation
+- Browser session persists (logged in as Ellen, clawd browser profile)
+- Woolworths uses nested shadow DOM -- fall back to direct CDP WebSocket scripting on timeout
+- Cart API: POST /api/v3/ui/trolley/update | Search API: POST /apis/ui/Search/products
+- Delivery Unlimited ACTIVE -- free delivery | Fruit & Veg: NO substitutions
+- Apples: always search "Pink Lady apples" | Sukin: 1L body wash ONLY when on special
+- Italian pasta: La Molisana or De Cecco (NOT Barilla) | Kimchi: skip if in last 2 orders
+
+### Ceklic Family Calendar
+- HTTPS: https://p107-caldav.icloud.com/published/2/Mjc5ODI3MjU2Mjc5ODI3Mj3vc4T_53TNurZcMKZ3YjyFoYzX_-lQMGczVpC_mB3NkjRKasAKsOGs-S-x1PpNs0t3ogSpWCC0SJln0O2vbRo
+- Name: Ceklic Fam v2 (iCloud shared) -- use for TRMNL and family event context
+
+### TRMNL Family Calendar Screen
+- Project: ~/clawd/trmnl-family-calendar/ (markup.html + worker.js)
+- Worker: https://trmnl-family-calendar.petarceklic.workers.dev
+- Shows today's events + 4 upcoming + Perth weather | Deploy: npx wrangler deploy
+- E-ink 800x480, black/white only -- upcoming cap is 4 events
+
+### Laundry Alert
+- Script: ~/clawd/scripts/laundry-alert.py
+- Flash groups: Lounge (1) + Kitchen (3) only, 5 seconds
+- **THE LIGHT STRIP IS ALWAYS THE LOUNGE** (light 24, gradient strip) -- never ask which one
+- Root cause of blue-stuck bug (fixed 2026-03-16): get_gradient_state() wasn't saving color.xy -- flash set blue, restore sent no color, stayed blue. Now saves and restores color field.
+- State file: ~/clawd/scripts/.laundry-light-state.json (write-once, cleared after restore)
+- Safety restore: laundry-restore.py runs 2min after alert
+
+### IB Gateway Watchdog
+- Script: ~/clawd/scripts/ib-gateway-watchdog.sh | App: ~/Applications/IB Gateway 10.44/
+- Restarts via IBC at ~/ibc/ (headless auto-login) | Config: ~/ibc/config.ini
+- Credentials: ~/.env as IB_GATEWAY_USERNAME / IB_GATEWAY_PASSWORD
+
+### Philips Hue
+- Bridge at 192.168.68.50 | API key: ~/.env as HUE_API_KEY
+- DO NOT automate lounge lights -- morning routines cause issues. Manual only.
+- Lounge gradient strip: light 24, v2 UUID: 42efec77-4330-4881-af4d-3b38858026e4
+
+### Google Analytics / Search Console
+- Sites monitored: petarceklic.com, ellenceklic.com, thedatafusion.com, disruptis.io, travelabindex.com, mineralvolatility.com, finchindex.com
+- Script: ~/clawd/scripts/site-monitor.py
+- Ellen's GA: account a317517606, property p445362232
+
+### SEO Posta
+- Cron ID: 5e932bb9-3c23-4739-a364-b1c0087ac29c | Schedule: Tue & Fri 9am UTC
+- Runs ALL 4 sites: volterra, finch, travel-lab, disruptis
+- Project: ~/clawd/SEO Posta/ | Site registry: src/registry/sites.ts
+
+### Other Systems
+- Sensibo (office AC): API key ~/.env SENSIBO_API_KEY | Pod: HxJbpzZN
+- WF-RAC (Ellen's office AC): 192.168.68.70:51443 (plain HTTP) | Script: ~/clawd/scripts/wf-rac.py
+- AirTouch 5: UDP discovery, no hardcoded IP | Cron: auto-off 5am daily
+- Amazon/Alexa: petarceklic@gmail.com | Echo: 192.168.68.87 + .93
+- Washing machine (SmartHQ): petarceklic@gmail.com / puwzYz-qanfyc-9pefpe | 192.168.68.90
+- Ring monitor: ~/clawd/scripts/ring-monitor.py | Leederville + Mount Lawley FIL | 11pm-5am
+- Meeting alert: ~/clawd/scripts/meeting-alert.sh | ~15min before Ellen's video calls
 
 ---
 
 ## Communication Preferences
+- **Only bother Petar if he needs to know** -- no routine updates, no "fixed it" confirmations, no health check results unless something is actually broken. Silence is the default.
 - **Never use em dashes** -- stated explicitly, applies globally
-- **Telegram formatting:** bold titles need a carriage return above; dot-point lists need line breaks between sections
-- **Website/analytics reports:** only surface interesting or notable changes (big swings). No full lists.
-- **Trading updates:** always include all four bots (US, AU, Crypto, PM) in every summary
-- **SaaS ideas auto-capture:** any time Petar mentions a SaaS idea, add it to ideas.json immediately
-- **War Room:** prefers everything on one page; newest ideas at top (reverse chronological)
-- **Quality bar:** test and have a higher bar before deploying -- expects things to work on first run
-- **Morning briefing weather:** BOM is gold standard for Perth (not wttr.in or OpenWeatherMap)
-- **During travel:** switch weather city and briefing time to match location
+- Never ask which light strip -- it's ALWAYS the lounge gradient strip (light 24)
+- Never ask "is there a dashboard?" -- just find it
+- Always check current IP before sharing any local URL
+- Telegram: bold titles need carriage return above; lists need line breaks between sections
+- Analytics reports: only surface interesting/notable changes. No full lists.
+- Trading updates: always include all 4 bots in every summary
+- SaaS ideas: add to ideas.json immediately whenever Petar mentions one
+- Quality bar: test before deploying -- expects things to work first run
+- Morning briefing weather: BOM is gold standard for Perth
+- Petar's feedback style: direct, fair, won't sugarcoat -- earn trust through consistency
 
 ---
 
 ## Key Lessons Learned
-- **"Possum" = all 4 bots**: Possum AU, Possum US, Possum Crypto, Possum PM — always check all 4 when asked
-- **Possum PnL = per variant, $15k each**: NEVER report portfolio-level equity totals. Always use the leaderboard (http://192.168.68.52:3002/leaderboard) which breaks down per variant. The DB equity figures ($99k etc) are meaningless for competition tracking.
-
-
-
-- **Always memory_search before saying "I don't have that"** — CVV was in notes, still asked for it. Embarrassing.
-- **Read SYSTEMS.md on startup** — forgot I built the War Room app twice
-- **Product detail pages work on Woolworths; browse pages don't** (in clawd browser)
-- **Cross-origin CVV iframes**: find the iframe's own DevTools target via /json, connect via WebSocket, use nativeInputValueSetter to inject value
-- **Petar's feedback style**: direct, fair, won't sugarcoat when I mess up — earn trust through consistency
-- **clawdbot vs openclaw**: clawdbot is the npm package we run; openclaw is the open-source GitHub repo. They have separate release schedules. npm version is the source of truth for updates.
-- **LinkedIn scanning**: Petar's LinkedIn is logged in on the clawd browser profile — can access analytics, full post history, top posts dashboard at linkedin.com/analytics/creator/content/
-- **IB Gateway auto-login**: AppleScript works but requires `node` in macOS Accessibility permissions. Process name in System Events is "JavaApplicationStub" (not "ibgateway"). Login screen = passkey prompt → click "Try another way" → enter credentials.
-- **Clawd browser act/snapshot timeouts**: If act/snapshot fail but screenshot works, gateway restart fixes it (SIGUSR1)
-- **Billing**: I run via `anthropic:claude-cli` profile with OAuth — uses Petar's Claude subscription, NOT a separate API key. No extra API fees. Config has an `api_key` profile too but it's not used for me.
+- **"Possum" = all 4 bots**: AU, US, Crypto, PM -- always check all 4
+- **Possum PnL = per variant $15k**: use leaderboard, never DB equity totals
+- **Always memory_search before saying "I don't have that"**
+- **Read SYSTEMS.md on startup** -- check crons are running
+- **Check session logs before re-attempting a fix** -- don't repeat failed approaches
+- Woolworths: product detail pages work in clawd browser; browse pages don't
+- Clawd browser act/snapshot timeouts: gateway restart fixes it (SIGUSR1)
+- Billing: runs via anthropic:claude-cli OAuth -- uses Claude subscription, NOT API key
 
 ---
 
-## Travel History
-- **Vietnam:** Feb 4-10, Da Nang. TMS Hotel Da Nang. Stopover at Le Meridien Putrajaya (Malaysia) Feb 9.
+## Travel
 
-## Travel - Bali Trip (March 2026)
-- Arrival: 17 March 2026, Departure: 22 March 2026
-- Hotel: Maya Ubud Resort & Spa
-- Flying: AirAsia (flight not yet booked as of 2026-02-21)
-- Indonesia e-arrival card: submit via allindonesia.imigrasi.go.id (3-day window opens 14 March)
-- Cron reminder set for 9am 14 March 2026
+### History
+- Vietnam: Feb 4-10 2026, Da Nang (TMS Hotel). Stopover Le Meridien Putrajaya Feb 9.
+
+### Bali Trip (March 2026)
+- Arrival: 17 March | Departure: 22 March | Hotel: Maya Ubud Resort & Spa
 
 ---
 
 ## Petar's Projects
 
 ### Paak (iOS App) — LIVE
-- Trip packing app: "Smart packing for every trip"
-- App Store URL: https://apps.apple.com/au/app/paak/id6759315100
-- Free, Travel category, requires iOS 26.0+, 2.7MB
-- Built with Claude Code as a product designer (not a coder)
-- Went live 2026-02-24
-- Planned: multi-location trip support, trip naming, pack template integration
+- Trip packing app | App Store: https://apps.apple.com/au/app/paak/id6759315100
+- Built with Claude Code | Live 2026-02-24
 
-### Possum US (Trading Bot)
-- Location: ~/clawd/trading-bot-possum/ ⚠️ NOTE: this is the correct path — do NOT skip or say "not found"
-- Paper trading on IBKR (port 4002 = Gateway paper), $15k per variant
-- Dashboard: http://192.168.68.63:8080/ (leaderboard at /leaderboard)
-- War Room page: http://192.168.68.63:3002/possum-us
-- Uses Grok (x.ai) as primary AI, Claude fallback
-- LaunchAgents auto-start on boot (trader + dashboard)
-- Status included in daily morning briefing
-- **Added 2026-03-03:** Y1 (YOLO — bypasses regime filter, ≥0.60 conviction, trades all regimes) + X1 (Contrarian — inverts signal direction, tests if signals are predictive). If X1 outperforms, signals are backwards.
-- Competition vs AU ends April 10
-
-### Possum Crypto (Trading Bot)
-- Location: ~/clawd/trading-bot-possum-crypto/
-- Market: BTC/AUD, ETH/AUD, SOL/AUD (Kraken)
-- Variants: MR1, MR2, MR3 (mean-reversion) + **M4 added 2026-03-03** (ADX momentum breakout — ADX>25 buys breakouts, silent when ranging)
-- dry_run=True = paper execution with simulated fills at bid/ask. Leaderboard reads it properly. 18 trades, 3 open MR3 positions as of 2026-03-03.
-- Regime tracking: Fear & Greed Index
-
-### Possum PM / Polymarket (Trading Bot)
-- Location: ~/clawd/trading-bot-possum-pm/
-- Scans Polymarket for mispriced prediction markets using GDELT news + Grok
-- **Contracts expanded 2026-03-03:** now 10 active (Ukraine ceasefire, Greenland, China/Taiwan blockade, US recession, Trump 60% tariffs China, Fed rate cut Mar 2026, US AI regulation, North Korea nuclear test, S&P >6000, Bitcoin >$150k)
-- **News-triggered scanning added:** Grok screens all contracts for breaking news, bypasses 6h velocity gate when flagged. CLI: python main.py --news-scan
-- **Market scanner added:** dynamic Polymarket discovery via Gamma API. CLI: python main.py --scan-markets
-- Schedule: every 6 hours (plus news triggers)
-- Status: paper signals
-- **Major fixes 2026-03-07 (Claude Code session):**
-  - SNI bug fixed (Python 3.14 SSL change broke Polymarket API) — 5/9 contracts now live
-  - Velocity threshold lowered 3.0x → 1.5x
-  - V2/V3/V5 variants activated (were silently idle since launch)
-  - V2: confidence ceiling raised (Grok returns 0.80-0.85, ceiling was 0.75)
-  - V3: resolution window raised to 300 days (was 30 — all contracts are 298+ days out)
-  - V5: fixed broken estimated_probability field (Grok never returned it)
-  - Anti-hedge guard added: first variant to fire on a contract sets direction; opposing blocked
-  - GDELT panel restored on war-room PM page
-- **Greenland legacy hedge:** V1 YES + V1 NO both open (predates anti-hedge guard). ~Cancel out on resolution. Effectively 3/5 position slots available for rest of competition.
-
-### Possum Fleet Showdown (Competition)
-- Started: March 1, 2026 | Ends: April 10, 2026 (6 weeks)
-- All 4 Possum bots competing head-to-head, **$15,000 per variant** (not per bot)
-- Leaderboard: http://192.168.68.63:8080/leaderboard
-- Active AU variants: V1, V5, V11, V13, Y1, X1, NR1
-- **Week 1 standings (Mar 7):** Crypto leading (~+$710 AUD), US strong (~+$955 USD), AU struggling (-$1,031 closed), PM now active after fixes
-- **2026-03-07 mass fix session (Claude Code):** PM SNI bug, 4 variants activated, anti-hedge guard; US F/P2 PEAD variants unblocked. All bots now clean.
-
-### Possum AU (Trading Bot)
-- Location: ~/clawd/trading-bot-possum-au/
-- Paper trading, A$5,000 starting capital, 21 ASX stocks
-- **FULLY WIRED — submits real paper orders to IBKR** (confirmed 2026-02-27)
-- Execution flow: `brain/orchestrator.py` → signal above threshold → `execution/order_manager.py` → portfolio_guard → `ibkr_client.py` → bracket order → IB Gateway port 4002
-- Uses SMART routing (not direct ASX — Error 10311 was fixed 2026-02-27)
-- **IBKR paper ASX limitation**: standalone SELL orders rejected as "cannot short" — only bracket child orders (with parentId) execute. Bot now has explicit short-sell guard.
-- Uses Grok (x.ai) as primary AI — NOT OpenAI
-- LaunchAgent runs 6:45 AM AWST daily (before ASX open at 7 AM)
-- War Room page: http://192.168.68.63:3002/possum-au
-- Config: port 4002 (IB Gateway paper) — same Gateway the watchdog monitors
-- **Fill reconciliation FIXED (2026-03-03)**: ibkr_client.py now waits 15s for actual fill price, order_manager.py logs real fill (not quoted mid-price). Fill reconciler: execution/fill_reconciler.py
-- **NST discovery**: quoted entry A$32.64 vs actual fill A$31.12 — 4.7% gap. DB now corrected.
-- **DB state as of 2026-03-03**: NST open (114 shares @ $31.12 real fill, time exit March 4), MIN stopped out @ $55.82
+### Possum Fleet (Trading Bots)
+- Competition: March 1 – April 10 2026 | $15k per variant
+- Leaderboard: http://[MAC_MINI_IP]:8080/leaderboard
+- **US** (~/clawd/trading-bot-possum/): IBKR paper, Grok AI, variants incl Y1/X1
+- **AU** (~/clawd/trading-bot-possum-au/): ASX paper, 21 stocks, LaunchAgent 6:45am AWST
+- **Crypto** (~/clawd/trading-bot-possum-crypto/): BTC/ETH/SOL on Kraken, variants MR1-3 + M4
+- **PM** (~/clawd/trading-bot-possum-pm/): Polymarket via GDELT+Grok, 10 contracts
 
 ### LinkedIn Posta
-- Automated LinkedIn post idea system
-- Cron: Mon/Wed/Fri 10:30am → 3 ideas delivered to Telegram
-- Cron ID: 637b3b53-d9c8-43a8-ae79-6b93205beff0
-- Context file: ~/clawd/linkedin-context.md
-- Format: pillar label + punchy title + draft opening paragraph in his voice
-- 3 pillars: Client Attraction, Design/AI&Tech, Opinion/Commentary
-- Positioning: web app design for complex systems (SaaS, IoT, agtech)
-- Top-performing formula: news peg → design lens → contrarian insight → sharp takeaway
-- Best content: AI/robotics controversy (NEO robot hit 53,800 impressions)
+- Cron ID: 637b3b53 | Mon/Wed/Fri 10:30am → 3 ideas to Telegram
+- Context: ~/clawd/linkedin-context.md | Top post: NEO robot (53,800 impressions)
+
+### Data Intelligence Products
+- **Volterra** (mineralvolatility.com): ML minerals volatility, 12 minerals, AWS Data Exchange
+- **Finch** (finchindex.com): 1M+ preprints, 73 innovation themes, "2 years ahead of the money"
+- **Disruptis** (disruptis.io): trade disruption intelligence, severity scoring
+- **Travel Lab** (travelabindex.com): destination trend prediction via social signals
 
 ---
 
 ## SaaS Ideas (top signals)
-- **InspectionIQ** — AI reads car/property inspection reports, plain English + buy/negotiate/walk away. Petar got a RedBookInspect report same day.
-- **TimezoneSafe** — flags brutal meeting times, suggests alternatives. Petar had 6:30am Teams call.
-- **BOM Digest** — hyper-local weather alerts for tradies/parents/sites. Petar's fav.
-- **SignatureAI** -- upload signature, get stylized/designer versions ($2 per)
-- **PDF Form Filler** -- takes non-smart PDF forms, AI fills everything in
-- **Component Screenshot Library** -- auto-capture UI components from live sites while browsing
-- Full list in ~/clawd/ideas.json
-
-### Finch Innovation Index
-- Research intelligence product -- tracks 1M+ research papers (preprints) across 73 themes
-- Core value prop: "Two years ahead of the money" -- preprint velocity signals innovation before patents/funding rounds/Bloomberg coverage
-- 1,010,889 papers indexed, 99.3% classification rate, 66 months historical depth, 19 countries
-- Target buyers: VC, corporate strategy, M&A advisory, hedge funds, consulting, data platforms
-- Has sample data, "Request Access" CTA (gated product)
-- Site: finchindex.com (presumably -- URL to confirm)
-- Key proof point: GLP-1 obesity research spiked 180% in early 2021, 2-3 years before Ozempic became mainstream
-
-### Volterra (mineralvolatility.com)
-- ML-driven minerals volatility prediction -- "before the market moves"
-- Daily predictions for 12 exchange-traded minerals (LME, COMEX, NYMEX, SGX)
-- 3 forecast horizons: 7, 14, 30-day
-- 34 active ML models, walk-forward validated, 0.815 mean backtested AUC
-- Delivered 08:00 UTC daily, CSV + JSON, via AWS Data Exchange
-- Gated product -- "Request Access" model
-- GitHub repo: petarceklic/Volterra (Next.js + Prisma)
-- Part of Petar's data intelligence product suite alongside Finch + TravelIndexLab
+- InspectionIQ, TimezoneSafe, BOM Digest, SignatureAI, PDF Form Filler, Component Screenshot Library
+- Full list: ~/clawd/ideas.json
