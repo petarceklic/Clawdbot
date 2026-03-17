@@ -1,6 +1,12 @@
 # MEMORY.md — Mia's Long-Term Memory
 
-Last updated: 2026-03-16
+Last updated: 2026-03-17
+
+## ⚠️ HARD RULES — READ FIRST
+- **Silent by default.** Fix errors quietly. NEVER send Petar a message about a fixable error.
+- **Tool call failures, edit errors, script crashes, missing packages** = fix silently, no notification.
+- **Only message Petar** if something is genuinely broken AND requires his direct intervention.
+- OpenClaw tool errors (edit failed, etc.) must NEVER trigger a message to Petar. Ever.
 
 ---
 
@@ -18,6 +24,7 @@ Last updated: 2026-03-16
 - Active clients: Kevin Clark, Joel Hooper, Zasha O'Brien (Elastik), Jeffrey Poon (Austal), Len Webel (UWA/Sense Analytics), Chao Sun (UWA/SafePaths)
 
 ### Ellen Ceklic (Petar's wife)
+- Starting new job: Head of AI and Data, managing a team. Will need her own agent setup (work-focused, team lead / chief of staff style, separate from home setup).
 - Nickname: Elle Bell | iMessage: +61411315424 | Telegram ID: 8680578395
 - Woolworths: eceklic@gmail.com / password in ~/.env as WOOLWORTHS_PASSWORD
 - Woolworths credit card Visa ending 4368, CVV: in ~/.env as WOOLWORTHS_CVV
@@ -45,6 +52,7 @@ Last updated: 2026-03-16
 ### GDELT Nightcrawler
 - Dashboard: http://[MAC_MINI_IP]:8000 (uvicorn, always running)
 - Project: ~/clawd/GDELT NightCrawler/ | Runs nightly 10pm-5am AWST
+- Backfill rate: ~1 month of GDELT data per night | At Mar 17: backfill at May 2021, ~58 nights remaining (~mid-May 2026 completion)
 - Downloads GDELT data to /Volumes/5TB Drive/ -- high CPU is expected, DO NOT kill
 
 ### Woolworths Grocery Automation
@@ -106,6 +114,7 @@ Last updated: 2026-03-16
 
 ## Communication Preferences
 - **Only bother Petar if he needs to know** -- no routine updates, no "fixed it" confirmations, no health check results unless something is actually broken. Silence is the default.
+- **NEVER message Petar for fixable errors** -- missing packages, script crashes, transient failures = fix silently. Only message if genuinely unfixable and requires his direct action. This keeps getting forgotten -- engrave it.
 - **Never use em dashes** -- stated explicitly, applies globally
 - Never ask which light strip -- it's ALWAYS the lounge gradient strip (light 24)
 - Never ask "is there a dashboard?" -- just find it
