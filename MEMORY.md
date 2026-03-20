@@ -160,7 +160,7 @@ Last updated: 2026-03-17
 ### Possum Fleet (Trading Bots)
 - Competition: March 1 – April 10 2026 | $15k per variant
 - Leaderboard: http://[MAC_MINI_IP]:8080/leaderboard
-- **US** (~/clawd/trading-bot-possum/): IBKR paper, Grok AI, variants incl Y1/X1
+- **US** (~/clawd/trading-bot-possum/): Alpaca paper, Grok AI, variants incl Y1/X1. main.py at root, DB: possum_us.db. Status: `python3 interface/status_report.py`. NOT a separate -us folder — it's the base possum dir.
 - **AU** (~/clawd/trading-bot-possum-au/): ASX paper, 21 stocks, LaunchAgent 6:45am AWST
 - **Crypto** (~/clawd/trading-bot-possum-crypto/): BTC/ETH/SOL on Kraken, variants MR1-3 + M4
 - **PM** (~/clawd/trading-bot-possum-pm/): Polymarket via GDELT+Grok, 10 contracts
